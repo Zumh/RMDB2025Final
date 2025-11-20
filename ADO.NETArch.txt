@@ -1,0 +1,17 @@
+Dataset - disconnected model
+- you can stop some one from inserting invalid data that have no indexing number.
+
+DataProvider - connected model
+
+don't worry about ORM, NoSQL queries, Serverless Databases
+
+Importance 
+- Dynamic Data Management
+- Scalibility and Performance
+- 
+
+Security - 
+Data integrity - analogies
+- Example: 1 laptop left.  
+- Concept of roll back: 
+- purchasing and put in the money mechanism. 
