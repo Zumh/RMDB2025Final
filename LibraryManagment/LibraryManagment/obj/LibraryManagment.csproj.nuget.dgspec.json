@@ -1,20 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj": {}
+    "D:\\SET_2\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj": {}
   },
   "projects": {
-    "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj": {
+    "D:\\SET_2\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj",
+        "projectUniqueName": "D:\\SET_2\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj",
         "projectName": "LibraryManagment",
-        "projectPath": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj",
-        "packagesPath": "C:\\Users\\setStudent\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\obj\\",
+        "projectPath": "D:\\SET_2\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj",
+        "packagesPath": "C:\\Users\\ZLConestoga\\.nuget\\packages\\",
+        "outputPath": "D:\\SET_2\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\setStudent\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ZLConestoga\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -67,7 +70,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
