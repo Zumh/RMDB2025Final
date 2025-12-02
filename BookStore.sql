@@ -52,15 +52,19 @@ CREATE TABLE `Order` (
 );
 
 CREATE TABLE OrderDetail (
-	id INTEGER AUTO_INCREMENT PRIMARY KEY,
-	orderID INT NOT NULL, 
-    bookID INT NOT NULL,
+    id INTEGER AUTO_INCREMENT,        
+    orderID INTEGER NOT NULL,         
+    bookID INTEGER NOT NULL,          
     quantity INT NOT NULL,
     unitPrice DOUBLE NOT NULL,
-    FOREIGN KEY (orderID) REFERENCES `order`(id),
-    FOREIGN KEY (bookID) REFERENCES book(id)
-    
+    PRIMARY KEY(id),                   
+    CONSTRAINT fk_order FOREIGN KEY (orderID) REFERENCES `order`(id),
+    CONSTRAINT fk_book FOREIGN KEY (bookID) REFERENCES book(id)
 );
+
+
+
+
 
 
 
