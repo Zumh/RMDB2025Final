@@ -11,6 +11,7 @@ CREATE DATABASE bookstore;
 
 Use bookstore;
 
+-- Table for customer data
 CREATE TABLE customer (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -19,16 +20,19 @@ CREATE TABLE customer (
     phoneNumber VARCHAR(255) NOT NULL
 );
 
+-- table for publisher info
 CREATE TABLE publisher (
     id INT AUTO_INCREMENT PRIMARY KEY,
     publisherName VARCHAR(255) NOT NULL
 );
 
+-- table for category info
 CREATE TABLE category (
     id INT AUTO_INCREMENT PRIMARY KEY,
     categoryName VARCHAR(255) NOT NULL
 );
 
+-- table for book info
 CREATE TABLE book (
     id INT AUTO_INCREMENT PRIMARY KEY,
     publisherID INT NOT NULL,
@@ -43,14 +47,17 @@ CREATE TABLE book (
 );
 
 
+
+-- table for order details
 CREATE TABLE `Order` (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
     customerID INT NOT NULL,
     orderDate DATE,
-    totalAmount DOUBLE,
+    totalAmount DOUBLE DEFAULT 0.00,
     FOREIGN KEY (customerID) REFERENCES customer(id)
 );
 
+-- table for orderdetails
 CREATE TABLE OrderDetail (
     id INTEGER AUTO_INCREMENT,        
     orderID INTEGER NOT NULL,         
@@ -62,9 +69,197 @@ CREATE TABLE OrderDetail (
     CONSTRAINT fk_book FOREIGN KEY (bookID) REFERENCES book(id)
 );
 
+-- default data for testing purposes
 
+-- adding customers
+INSERT INTO customer VALUES (
+1,
+"John Doe",
+"JohnDoe@email.com",
+"123 round St, ON",
+"905-456-6789"
+);
+INSERT INTO customer VALUES (
+2,
+"Peter Parker",
+"parkerP@gmail.com",
+"132 square St, ON",
+"905-876-6349"
+);
 
+INSERT INTO customer VALUES (
+3,
+"Jen James",
+"Jamesss@email.com",
+"456 circle St, ON",
+"225-234-1783"
+);
 
+-- adding publishers
+INSERT INTO publisher VALUE (
+1,
+"Big Books"
+);
+INSERT INTO publisher VALUE (
+2,
+"World Wide Books"
+);
 
+INSERT INTO publisher VALUE (
+3,
+"Perdue Books"
+);
 
+INSERT INTO publisher VALUE (
+4,
+"AudioBook"
+);
 
+-- adding categories
+INSERT INTO category VALUE (
+1,
+"Non fiction"
+);
+INSERT INTO category VALUE (
+2,
+"Science fiction"
+);
+INSERT INTO category VALUE (
+3,
+"Romance"
+);
+INSERT INTO category VALUE (
+4,
+"Business"
+);
+INSERT INTO category VALUE (
+5,
+"Self-help"
+);
+
+INSERT INTO category VALUE (
+6,
+"Science"
+);
+-- adding books
+
+INSERT INTO book VALUE (
+1, 
+2,
+4,
+"How to start a business",
+"978-3-16-148410-0",
+19.99,
+15
+);
+
+INSERT INTO book VALUE (
+2, 
+2,
+2,
+"Space Odyssey",
+"658-3-16-675410-2",
+29.99,
+40
+);
+
+INSERT INTO book VALUE (
+3, 
+1,
+1,
+"MySQL for Dummies",
+"375-7-26-148445-8",
+14.99,
+23
+);
+
+INSERT INTO book VALUE (
+4, 
+4,
+6,
+"Physics 101",
+"456-3-17-172310-9",
+39.99,
+24
+);
+
+INSERT INTO book VALUE (
+5, 
+3,
+5,
+"How to help yourself",
+"980-1-76-925110-2",
+15.00,
+33
+);
+
+-- adding orders
+INSERT INTO `order` VALUES (
+1,
+1,
+'2026-01-01',
+14.99
+);
+
+INSERT INTO `order` VALUES (
+2,
+2,
+'2026-02-13',
+19.99
+);
+
+INSERT INTO `order` VALUES (
+3,
+3,
+'2025-12-13',
+29.99
+);
+
+-- adding order details
+INSERT INTO orderDetail VALUE (
+1, 
+1,
+3,
+1,
+14.99
+);
+
+INSERT INTO orderDetail VALUE (
+2, 
+2,
+1,
+1,
+19.99
+);
+--
+-- how do we save multiple books and prices in one order.!!!!!
+--
+-- INSERT INTO orderDetail VALUE (
+-- 3, 
+-- 3,
+-- [5, 3], -- array??
+-- 2,
+-- [15.00, 14.99] -- array??
+-- );
+
+-- testing different search conditions
+
+-- search each table
+SELECT * FROM customer;
+SELECT * FROM publisher;
+SELECT * FROM book;
+SELECT * FROM category;
+SELECT * FROM `order`;
+SELECT * FROM orderdetail;
+
+-- search with conditions
+SELECT * FROM book WHERE publisherID = 2;
+
+SELECT * FROM book WHERE categoryID = 1;
+
+SELECT title FROM book WHERE id = 1;
+
+SELECT `name`, email 
+FROM customer 
+INNER JOIN `order` 
+WHERE customer.id = `order`.customerID;
