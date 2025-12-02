@@ -6,61 +6,78 @@ VERSION     : 12/02/2025
 DESCRIPTION : This file is based on the bookstore ERD, it contain SQL DDL statements to create the database schema.    
 			The file contain all necessary primary keys, foreign keys, and integrity constraints for bookstore database.  
 */
+DROP DATABASE bookstore;
+## Create database
+CREATE DATABASE IF NOT EXISTS bookstore;
+USE bookstore;
 
-CREATE DATABASE bookstore;
-
-Use bookstore;
-
+###############################
+## Customer table
+###############################
 CREATE TABLE customer (
-	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
-    phoneNumber VARCHAR(255) NOT NULL
+    phoneNumber VARCHAR(50) NOT NULL
 );
 
+###############################
+## Publisher table
+###############################
 CREATE TABLE publisher (
     id INT AUTO_INCREMENT PRIMARY KEY,
     publisherName VARCHAR(255) NOT NULL
 );
 
+###############################
+## Category table
+###############################
 CREATE TABLE category (
     id INT AUTO_INCREMENT PRIMARY KEY,
     categoryName VARCHAR(255) NOT NULL
 );
 
+###############################
+## Book table
+###############################
 CREATE TABLE book (
     id INT AUTO_INCREMENT PRIMARY KEY,
     publisherID INT NOT NULL,
     categoryID INT NOT NULL,
     title VARCHAR(255) NOT NULL,
-    isbn VARCHAR(255) NOT NULL,
-    price DOUBLE,
-    stock INT,
-    
+    isbn VARCHAR(13) NOT NULL,
+    price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    stock INT NOT NULL DEFAULT 0,
     FOREIGN KEY (publisherID) REFERENCES publisher(id),
-	FOREIGN KEY (categoryID) REFERENCES category(id)
+    FOREIGN KEY (categoryID) REFERENCES category(id)
 );
 
-
+###############################
+## Order table
+###############################
 CREATE TABLE `Order` (
-	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     customerID INT NOT NULL,
-    orderDate DATE,
-    totalAmount DOUBLE,
+    orderDate DATE NOT NULL DEFAULT (CURRENT_DATE()),
+    totalAmount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     FOREIGN KEY (customerID) REFERENCES customer(id)
 );
 
+###############################
+## OrderDetail table
+###############################
 CREATE TABLE OrderDetail (
-    id INTEGER AUTO_INCREMENT,        
-    orderID INTEGER NOT NULL,         
-    bookID INTEGER NOT NULL,          
-    quantity INT NOT NULL,
-    unitPrice DOUBLE NOT NULL,
-    PRIMARY KEY(id),                   
-    CONSTRAINT fk_order FOREIGN KEY (orderID) REFERENCES `order`(id),
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    orderID INT NOT NULL,
+    bookID INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    unitPrice DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    UNIQUE KEY unique_order_book (orderID, bookID),
+    CONSTRAINT fk_order FOREIGN KEY (orderID) REFERENCES `Order`(id) ON DELETE CASCADE,
     CONSTRAINT fk_book FOREIGN KEY (bookID) REFERENCES book(id)
 );
+
 
 
 
