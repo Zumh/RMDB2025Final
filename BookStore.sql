@@ -2,18 +2,22 @@
 FILE        : BookStore.sql
 PROJECT     : A3 | SENG2031 - Relational Database - Assignment #3
 PROGRAMMER  : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
-VERSION     : 12/02/2025
+VERSION     : 2025-12-02
 DESCRIPTION : This file is based on the bookstore ERD, it contain SQL DDL statements to create the database schema.    
 			The file contain all necessary primary keys, foreign keys, and integrity constraints for bookstore database.  
 */
 DROP DATABASE bookstore;
-## Create database
+-- =============================
+-- Create database
+-- =============================
 CREATE DATABASE IF NOT EXISTS bookstore;
 USE bookstore;
 
-###############################
-## Customer table
-###############################
+-- =============================
+-- Customer table
+-- =============================
+--Purpose: To store customer information
+--Relationships: Primary entity
 CREATE TABLE customer (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -22,25 +26,31 @@ CREATE TABLE customer (
     phoneNumber VARCHAR(50) NOT NULL
 );
 
-###############################
-## Publisher table
-###############################
+-- =============================
+-- Publisher table
+-- =============================
+--Purpose: To store publisher information
+--Relationships: Referenced by Book table
 CREATE TABLE publisher (
     id INT AUTO_INCREMENT PRIMARY KEY,
     publisherName VARCHAR(255) NOT NULL
 );
 
-###############################
-## Category table
-###############################
+-- =============================
+-- Category table
+-- =============================
+--Purpose: To store book category information
+--Relationships: Referenced by Book table
 CREATE TABLE category (
     id INT AUTO_INCREMENT PRIMARY KEY,
     categoryName VARCHAR(255) NOT NULL
 );
 
-###############################
-## Book table
-###############################
+-- =============================
+-- Book table
+-- =============================
+--Purpose: To store book information
+--Relationships: References Publisher and Category tables
 CREATE TABLE book (
     id INT AUTO_INCREMENT PRIMARY KEY,
     publisherID INT NOT NULL,
@@ -53,9 +63,11 @@ CREATE TABLE book (
    CONSTRAINT  FOREIGN KEY (categoryID) REFERENCES category(id)
 );
 
-###############################
-## Order table
-###############################
+-- =============================
+-- Order table
+-- =============================
+--Purpose: To store order information
+--Relationships: References Customer table
 CREATE TABLE `Order` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     customerID INT NOT NULL,
@@ -64,9 +76,11 @@ CREATE TABLE `Order` (
     CONSTRAINT FOREIGN KEY (customerID) REFERENCES customer(id)
 );
 
-###############################
-## OrderDetail table
-###############################
+-- =============================
+-- OrderDetail table
+-- =============================
+--Purpose: To store order details information
+--Relationships: References Order and Book tables
 CREATE TABLE OrderDetail (
     id INT AUTO_INCREMENT PRIMARY KEY,
     orderID INT NOT NULL,
@@ -78,7 +92,11 @@ CREATE TABLE OrderDetail (
     CONSTRAINT fk_book FOREIGN KEY (bookID) REFERENCES book(id)
 );
 
-################### Sample datas and CRUD ################### 
+
+-- =============================
+-- Sample datas and CRUD
+-- =============================
+
 -- Insert sample customers
 INSERT INTO customer (name, email, address, phoneNumber) VALUES
 ('Alice Johnson', 'alice@example.com', '123 Maple Street', '555-1111'),
@@ -87,7 +105,7 @@ INSERT INTO customer (name, email, address, phoneNumber) VALUES
 -- Insert sample publishers
 INSERT INTO publisher (publisherName) VALUES
 ('Pearson'),
-('O\'Reilly Media');
+('O''Reilly Media');
 
 -- Insert sample categories
 INSERT INTO category (categoryName) VALUES
@@ -109,80 +127,83 @@ INSERT INTO OrderDetail (orderID, bookID, quantity, unitPrice) VALUES
 (1, 1, 2, 15.99),
 (2, 2, 1, 45.50);
 
-################### Customer CRUD ################### 
 
-## Creat
+-- =============================
+--Customer CRUD 
+-- =============================
+
+-- Creat
 INSERT INTO customer (name, email, address, phoneNumber)
 VALUES ('Charlie Brown', 'charlie@example.com', '789 Pine Road', '555-3333');
 
-## Read
+-- Read
 SELECT * FROM customer;
 SELECT * FROM customer WHERE id = 1; -- by ID
 
-## Update
+-- Update
 UPDATE customer
 SET address = '321 Elm Street'
 WHERE id = 2;
 
-## Delete
-
+-- Delete
 DELETE FROM customer
 WHERE id = 2; -- Only works if no orders exist
 
 
+-- =============================
+-- BOOK CRUD
+-- =============================
 
-# BOOK CRUD
-
-## Creat
+-- Create
 INSERT INTO book (publisherID, categoryID, title, isbn, price, stock)
 VALUES (1, 1, '1984', '9780451524935', 12.99, 8);
 
-
-## Read
+-- Read
 SELECT * FROM book;
 SELECT * FROM book WHERE categoryID = 2;
 
-
-## Update
+-- Update
 UPDATE book
 SET stock = stock + 5
 WHERE id = 2;
 
-
-## Delete
+-- Delete
 DELETE FROM book
 WHERE id = 3;
 
-################### Orders ################### 
-## Creat
+-- =============================
+-- Orders CRUD
+-- =============================
+
+-- Creat
 INSERT INTO `Order` (customerID, orderDate, totalAmount)
 VALUES (1, '2025-12-03', 28.50);
 
-## Read
+-- Read
 SELECT o.id, c.name, o.orderDate, o.totalAmount
 FROM `Order` o
 JOIN customer c ON o.customerID = c.id;
 
-
-## Update
+-- Update
 UPDATE `Order`
 SET totalAmount = 35.00
 WHERE id = 1;
 
-
-## Delete
+-- Delete
 DELETE FROM `Order`
 WHERE id = 1; -- order details are automatically deleted
 
-################### OrderDetails ################### 
+-- =============================
+-- OrderDetails CRUD
+-- =============================
 
-## Creat
+-- Create
 INSERT INTO OrderDetail (orderID, bookID, quantity, unitPrice)
 VALUES (1, 2, 1, 45.50);
 
 
 
-## Read
+-- Read
 SELECT od.id, o.id AS orderID, b.title, od.quantity, od.unitPrice
 FROM OrderDetail od
 JOIN `Order` o ON od.orderID = o.id
@@ -190,12 +211,12 @@ JOIN book b ON od.bookID = b.id;
 
 
 
-## Update
+-- Update
 UPDATE OrderDetail
 SET quantity = 3
 WHERE id = 1;
 
-## Delete
+-- Delete
 DELETE FROM OrderDetail
 WHERE id = 2;
 
