@@ -16,8 +16,8 @@ USE bookstore;
 -- =============================
 -- Customer table
 -- =============================
---Purpose: To store customer information
---Relationships: Primary entity
+-- Purpose: To store customer information
+-- Relationships: Primary entity
 CREATE TABLE customer (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -29,8 +29,8 @@ CREATE TABLE customer (
 -- =============================
 -- Publisher table
 -- =============================
---Purpose: To store publisher information
---Relationships: Referenced by Book table
+-- Purpose: To store publisher information
+-- Relationships: Referenced by Book table
 CREATE TABLE publisher (
     id INT AUTO_INCREMENT PRIMARY KEY,
     publisherName VARCHAR(255) NOT NULL
@@ -39,8 +39,8 @@ CREATE TABLE publisher (
 -- =============================
 -- Category table
 -- =============================
---Purpose: To store book category information
---Relationships: Referenced by Book table
+-- Purpose: To store book category information
+-- Relationships: Referenced by Book table
 CREATE TABLE category (
     id INT AUTO_INCREMENT PRIMARY KEY,
     categoryName VARCHAR(255) NOT NULL
@@ -49,8 +49,8 @@ CREATE TABLE category (
 -- =============================
 -- Book table
 -- =============================
---Purpose: To store book information
---Relationships: References Publisher and Category tables
+-- Purpose: To store book information
+-- Relationships: References Publisher and Category tables
 CREATE TABLE book (
     id INT AUTO_INCREMENT PRIMARY KEY,
     publisherID INT NOT NULL,
@@ -66,8 +66,8 @@ CREATE TABLE book (
 -- =============================
 -- Order table
 -- =============================
---Purpose: To store order information
---Relationships: References Customer table
+-- Purpose: To store order information
+-- Relationships: References Customer table
 CREATE TABLE `Order` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     customerID INT NOT NULL,
@@ -79,8 +79,8 @@ CREATE TABLE `Order` (
 -- =============================
 -- OrderDetail table
 -- =============================
---Purpose: To store order details information
---Relationships: References Order and Book tables
+-- Purpose: To store order details information
+-- Relationships: References Order and Book tables
 CREATE TABLE OrderDetail (
     id INT AUTO_INCREMENT PRIMARY KEY,
     orderID INT NOT NULL,
@@ -129,7 +129,7 @@ INSERT INTO OrderDetail (orderID, bookID, quantity, unitPrice) VALUES
 
 
 -- =============================
---Customer CRUD 
+-- Customer CRUD 
 -- =============================
 
 -- Creat
@@ -201,14 +201,11 @@ WHERE id = 1; -- order details are automatically deleted
 INSERT INTO OrderDetail (orderID, bookID, quantity, unitPrice)
 VALUES (1, 2, 1, 45.50);
 
-
-
 -- Read
 SELECT od.id, o.id AS orderID, b.title, od.quantity, od.unitPrice
 FROM OrderDetail od
 JOIN `Order` o ON od.orderID = o.id
 JOIN book b ON od.bookID = b.id;
-
 
 
 -- Update
