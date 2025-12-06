@@ -7,6 +7,16 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-
+        <TabControl>
+            <TabItem Header="Books">
+         
+            </TabItem>
+            <TabItem Header="Authors">
+        
+            </TabItem>
+            <TabItem Header="Publishers">
+           
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

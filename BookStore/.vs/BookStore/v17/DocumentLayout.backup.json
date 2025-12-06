@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\BookStore\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2CBC6958-D0BD-46A8-8DF7-6AB58506098A}|BookStore\\BookStore.csproj|c:\\users\\setstudent\\documents\\github\\rmdb2025final\\bookstore\\bookstore\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{2CBC6958-D0BD-46A8-8DF7-6AB58506098A}|BookStore\\BookStore.csproj|solutionrelative:bookstore\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 230,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -22,6 +27,18 @@
             {
               "$type": "Bookmark",
               "Name": "ST:1:0:{e8b06f52-6d01-11d2-aa7d-00c04f990343}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\BookStore\\BookStore\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "BookStore\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\BookStore\\BookStore\\MainWindow.xaml",
+              "RelativeToolTip": "BookStore\\MainWindow.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-12-06T23:33:47.164Z",
+              "EditorCaption": ""
             }
           ]
         }
