@@ -31,7 +31,12 @@ namespace BookStore
             loginPassword.Text = "";
             dataBaseName.Text = "";
         }
-
+        //NAME: AddCustomerBtn_Click
+        //DESCRIPTION: Validates the customer input
+        //             Adds the customer to the dataTable
+        //             Handles input errors and UI clean up
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void AddCustomerBtn_Click(object sender, RoutedEventArgs e)
         {
             bool validated = true;
@@ -68,10 +73,10 @@ namespace BookStore
                 CustomerEmailTextBox.Text = "";
             }
 
-            //if (validated) 
-            //{ 
-            //    //add customer to DB
-            //}
+            if (validated)
+            {
+                //add customer to DB, need to the data adapter 
+            }
 
             //clear customer info
             CustomerNameTextBox.Text = "";
