@@ -19,6 +19,17 @@ namespace BookStore
         public MainWindow()
         {
             InitializeComponent();
+           
+        }
+        //NAME: ClearLogin_Click
+        //DESCRIPTION: Clears the login fields of all text
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void ClearLogin_Click(object sender, RoutedEventArgs e)
+        {
+            userId.Text = "";
+            loginPassword.Text = "";
+            dataBaseName.Text = "";
         }
     }
 }
