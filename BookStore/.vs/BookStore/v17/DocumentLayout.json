@@ -3,12 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\BookStore\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2CBC6958-D0BD-46A8-8DF7-6AB58506098A}|BookStore\\BookStore.csproj|c:\\users\\setstudent\\documents\\github\\rmdb2025final\\bookstore\\bookstore\\mainwindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{2CBC6958-D0BD-46A8-8DF7-6AB58506098A}|BookStore\\BookStore.csproj|solutionrelative:bookstore\\mainwindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{2CBC6958-D0BD-46A8-8DF7-6AB58506098A}|BookStore\\BookStore.csproj|c:\\users\\setstudent\\documents\\github\\rmdb2025final\\bookstore\\bookstore\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{2CBC6958-D0BD-46A8-8DF7-6AB58506098A}|BookStore\\BookStore.csproj|solutionrelative:bookstore\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2CBC6958-D0BD-46A8-8DF7-6AB58506098A}|BookStore\\BookStore.csproj|c:\\users\\setstudent\\documents\\github\\rmdb2025final\\bookstore\\bookstore\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2CBC6958-D0BD-46A8-8DF7-6AB58506098A}|BookStore\\BookStore.csproj|solutionrelative:bookstore\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2CBC6958-D0BD-46A8-8DF7-6AB58506098A}|BookStore\\BookStore.csproj|c:\\users\\setstudent\\documents\\github\\rmdb2025final\\bookstore\\bookstore\\mainwindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{2CBC6958-D0BD-46A8-8DF7-6AB58506098A}|BookStore\\BookStore.csproj|solutionrelative:bookstore\\mainwindow.xaml||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,13 +38,26 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\BookStore\\BookStore\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "BookStore\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\BookStore\\BookStore\\MainWindow.xaml.cs",
+              "RelativeToolTip": "BookStore\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-07T22:17:01.791Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\BookStore\\BookStore\\MainWindow.xaml",
               "RelativeDocumentMoniker": "BookStore\\MainWindow.xaml",
               "ToolTip": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\BookStore\\BookStore\\MainWindow.xaml",
               "RelativeToolTip": "BookStore\\MainWindow.xaml",
-              "ViewState": "AgIAABUAAAAAAAAAAAAAACoAAAAlAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACoAAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-12-06T23:45:30.418Z",
               "EditorCaption": ""
@@ -68,7 +85,7 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "C:\\Users\\setStudent\\Documents\\GitHub\\RMDB2025Final\\BookStore\\BookStore\\MainWindow.xaml",
               "RelativeDocumentMoniker": "BookStore\\MainWindow.xaml",

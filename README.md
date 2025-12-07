@@ -2,62 +2,18 @@
 
 * make sure to branch off from dev branch
 
-\## A console LibraryManagment UI:
-
-
-
-1\. Add Book
-
-
-
-2\. View Books
-
-
-
-3\. Add Member
-
-
-
-4\. Borrow Book
-
-
-
-5\. Return Book
-
-\## ERD
-
-\### Books
-
-* These are the items being tracked. 
-* ID, title, author, maybe a published year, and something that signals “is this available?”.
-* Primary Key: BookID.
-
-
-
-\### Members
-
-* Humans who borrow books. 
-* Name, email, phone.
-* Primary Key: MemberID.
-
-
-
-\### Borrow
-
-* A book being borrowed by a member.
-* Attributes might include LoanDate, ReturnDate, DueDate.
-* Primary Key: LoanID (or composite if you want to get fancy).
-* Foreign Keys: BookID -> Books, MemberID → Members.
-
-
-
-\### Relationship
-
-* Members connect to Loans.
-* Books connect to Loans.
-* Loans sits in the middle, forming two one-to-many relationships:
-* One member can have many borrow books.
-* One book can appear in many borrow (over time), but only one active borrowed book at a time based on our rules.
+\## A Bookstore managment UI:
+### Folder structures
+Entities/
+    Customer.cs
+    Book.cs
+    Order.cs
+    OrderDetail.cs
+DataAccess/
+    DbManager.cs
+    CustomerRepository.cs
+    BookRepository.cs
+    OrderRepository.cs
 
 ## Project Phases:
 
