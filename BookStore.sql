@@ -6,194 +6,199 @@ VERSION     : 12/02/2025
 DESCRIPTION : This file is based on the bookstore ERD, it contain SQL DDL statements to create the database schema.    
 			The file contain all necessary primary keys, foreign keys, and integrity constraints for bookstore database.  
 */
+DROP DATABASE bookstore;
+## Create database
+CREATE DATABASE IF NOT EXISTS bookstore;
+USE bookstore;
 
-CREATE DATABASE bookstore;
-
-Use bookstore;
-
--- Table for customer data
+###############################
+## Customer table
+###############################
 CREATE TABLE customer (
-	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
-    phoneNumber VARCHAR(255) NOT NULL
+    phoneNumber VARCHAR(50) NOT NULL
 );
 
--- table for publisher info
+###############################
+## Publisher table
+###############################
 CREATE TABLE publisher (
     id INT AUTO_INCREMENT PRIMARY KEY,
     publisherName VARCHAR(255) NOT NULL
 );
 
--- table for category info
+###############################
+## Category table
+###############################
 CREATE TABLE category (
     id INT AUTO_INCREMENT PRIMARY KEY,
     categoryName VARCHAR(255) NOT NULL
 );
 
--- table for book info
+###############################
+## Book table
+###############################
 CREATE TABLE book (
     id INT AUTO_INCREMENT PRIMARY KEY,
     publisherID INT NOT NULL,
     categoryID INT NOT NULL,
     title VARCHAR(255) NOT NULL,
-    isbn VARCHAR(255) NOT NULL,
-    price DOUBLE,
-    stock INT,
-    
-    FOREIGN KEY (publisherID) REFERENCES publisher(id),
-	FOREIGN KEY (categoryID) REFERENCES category(id)
+    isbn VARCHAR(13) NOT NULL,
+    price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    stock INT NOT NULL DEFAULT 0,
+    CONSTRAINT FOREIGN KEY (publisherID) REFERENCES publisher(id),
+   CONSTRAINT  FOREIGN KEY (categoryID) REFERENCES category(id)
 );
 
-
-
--- table for order details
+###############################
+## Order table
+###############################
 CREATE TABLE `Order` (
-	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     customerID INT NOT NULL,
-    orderDate DATE,
-    totalAmount DOUBLE DEFAULT 0.00,
-    FOREIGN KEY (customerID) REFERENCES customer(id)
+    orderDate DATE NOT NULL DEFAULT (CURRENT_DATE()),
+    totalAmount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    CONSTRAINT FOREIGN KEY (customerID) REFERENCES customer(id)
 );
 
--- table for orderdetails
+###############################
+## OrderDetail table
+###############################
 CREATE TABLE OrderDetail (
-    id INTEGER AUTO_INCREMENT,        
-    orderID INTEGER NOT NULL,         
-    bookID INTEGER NOT NULL,          
-    quantity INT NOT NULL,
-    unitPrice DOUBLE NOT NULL,
-    PRIMARY KEY(id),                   
-    CONSTRAINT fk_order FOREIGN KEY (orderID) REFERENCES `order`(id),
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    orderID INT NOT NULL,
+    bookID INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    unitPrice DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    UNIQUE KEY unique_order_book (orderID, bookID),
+    CONSTRAINT fk_order FOREIGN KEY (orderID) REFERENCES `Order`(id) ON DELETE CASCADE,
     CONSTRAINT fk_book FOREIGN KEY (bookID) REFERENCES book(id)
 );
 
--- default data for testing purposes
+################### Sample datas and CRUD ################### 
+-- Insert sample customers
+INSERT INTO customer (name, email, address, phoneNumber) VALUES
+('Alice Johnson', 'alice@example.com', '123 Maple Street', '555-1111'),
+('Bob Smith', 'bob@example.com', '456 Oak Avenue', '555-2222'),
+('Ron Swanson', 'ron@example.com', '763 Circle Avenue', '555-4444'),
+('Sam Lamb', 'sam@example.com', '4126 Square Crest', '532-2254');
 
--- adding customers
-INSERT INTO customer VALUES (
-1,
-"John Doe",
-"JohnDoe@email.com",
-"123 round St, ON",
-"905-456-6789"
-);
-INSERT INTO customer VALUES (
-2,
-"Peter Parker",
-"parkerP@gmail.com",
-"132 square St, ON",
-"905-876-6349"
-);
+-- Insert sample publishers
+INSERT INTO publisher (publisherName) VALUES
+('Pearson'),
+('O\'Reilly Media');
 
-INSERT INTO customer VALUES (
-3,
-"Jen James",
-"Jamesss@email.com",
-"456 circle St, ON",
-"225-234-1783"
-);
+-- Insert sample categories
+INSERT INTO category (categoryName) VALUES
+('Fiction'),
+('Technology');
 
--- adding publishers
-INSERT INTO publisher VALUE (
-1,
-"Big Books"
-);
-INSERT INTO publisher VALUE (
-2,
-"World Wide Books"
-);
+-- Insert sample books
+INSERT INTO book (publisherID, categoryID, title, isbn, price, stock) VALUES
+(1, 1, 'The Great Gatsby', '9780141182636', 15.99, 10),
+(2, 2, 'Learning Python', '9781449355739', 45.50, 5);
 
-INSERT INTO publisher VALUE (
-3,
-"Perdue Books"
-);
+-- Insert sample orders
+INSERT INTO `Order` (customerID, orderDate, totalAmount) VALUES
+(1, '2025-12-01', 31.98),
+(2, '2025-12-02', 45.50);
 
-INSERT INTO publisher VALUE (
-4,
-"AudioBook"
-);
+-- Insert sample order details
+INSERT INTO OrderDetail (orderID, bookID, quantity, unitPrice) VALUES
+(1, 1, 2, 15.99),
+(2, 2, 1, 45.50);
 
--- adding categories
-INSERT INTO category VALUE (
-1,
-"Non fiction"
-);
-INSERT INTO category VALUE (
-2,
-"Science fiction"
-);
-INSERT INTO category VALUE (
-3,
-"Romance"
-);
-INSERT INTO category VALUE (
-4,
-"Business"
-);
-INSERT INTO category VALUE (
-5,
-"Self-help"
-);
+################### Customer CRUD ################### 
 
-INSERT INTO category VALUE (
-6,
-"Science"
-);
--- adding books
+## Creat
+INSERT INTO customer (name, email, address, phoneNumber)
+VALUES ('Charlie Brown', 'charlie@example.com', '789 Pine Road', '555-3333');
 
-INSERT INTO book VALUE (
-1, 
-2,
-4,
-"How to start a business",
-"978-3-16-148410-0",
-19.99,
-15
-);
+## Read
+SELECT * FROM customer;
+SELECT * FROM customer WHERE id = 1; -- by ID
 
-INSERT INTO book VALUE (
-2, 
+## Update
+UPDATE customer
+SET address = '321 Elm Street'
+WHERE id = 2;
+
+## Delete
+
+DELETE FROM customer
+WHERE id = 2; -- Only works if no orders exist
+
+# BOOK CRUD
+
+## Creat
+INSERT INTO book (publisherID, categoryID, title, isbn, price, stock)
+VALUES (1, 1, '1984', '9780451524935', 12.99, 8);
+
+INSERT INTO book (publisherID, categoryID, title, isbn, price, stock) VALUE (
 2,
 2,
 "Space Odyssey",
-"658-3-16-675410-2",
+"6583166754102",
 29.99,
 40
 );
 
-INSERT INTO book VALUE (
-3, 
+INSERT INTO book (publisherID, categoryID, title, isbn, price, stock) VALUE (
 1,
 1,
 "MySQL for Dummies",
-"375-7-26-148445-8",
+"3757261484458",
 14.99,
 23
 );
 
-INSERT INTO book VALUE (
-4, 
+INSERT INTO book (publisherID, categoryID, title, isbn, price, stock) VALUE (
 4,
 6,
 "Physics 101",
-"456-3-17-172310-9",
+"4563171723109",
 39.99,
 24
 );
 
-INSERT INTO book VALUE (
-5, 
+INSERT INTO book (publisherID, categoryID, title, isbn, price, stock) VALUE (
 3,
 5,
 "How to help yourself",
-"980-1-76-925110-2",
+"9801769251102",
 15.00,
 33
 );
 
--- adding orders
+INSERT INTO book (publisherID, categoryID, title, isbn, price, stock) VALUE (
+2,
+4,
+"How to start a business",
+"9783161484100",
+19.99,
+15
+);
+## Read
+SELECT * FROM book;
+SELECT * FROM book WHERE categoryID = 2;
+
+## Update
+UPDATE book
+SET stock = stock + 5
+WHERE id = 2;
+
+## Delete
+DELETE FROM book
+WHERE id = 3;
+
+################### Orders ################### 
+## Creat
+INSERT INTO `Order` (customerID, orderDate, totalAmount)
+VALUES (1, '2025-12-03', 28.50);
+
 INSERT INTO `order` VALUES (
 1,
 1,
@@ -215,51 +220,96 @@ INSERT INTO `order` VALUES (
 29.99
 );
 
--- adding order details
-INSERT INTO orderDetail VALUE (
-1, 
+## Read
+SELECT o.id, c.name, o.orderDate, o.totalAmount
+FROM `Order` o
+JOIN customer c ON o.customerID = c.id;
+
+## Update
+UPDATE `Order`
+SET totalAmount = 35.00
+WHERE id = 1;
+
+## Delete
+DELETE FROM `Order`
+WHERE id = 1; -- order details are automatically deleted
+
+################### OrderDetails ################### 
+
+## Create
+INSERT INTO OrderDetail (orderID, bookID, quantity, unitPrice)
+VALUES (1, 2, 1, 45.50);
+
+INSERT INTO orderDetail (orderID, bookID, quantity, unitPrice) VALUE ( 
 1,
 3,
 1,
 14.99
 );
 
-INSERT INTO orderDetail VALUE (
-2, 
+INSERT INTO orderDetail (orderID, bookID, quantity, unitPrice) VALUE (
 2,
 1,
 1,
 19.99
 );
---
--- how do we save multiple books and prices in one order.!!!!!
---
--- INSERT INTO orderDetail VALUE (
--- 3, 
--- 3,
--- [5, 3], -- array??
--- 2,
--- [15.00, 14.99] -- array??
--- );
 
--- testing different search conditions
+## Read
+SELECT od.id, o.id AS orderID, b.title, od.quantity, od.unitPrice
+FROM OrderDetail od
+JOIN `Order` o ON od.orderID = o.id
+JOIN book b ON od.bookID = b.id;
 
--- search each table
-SELECT * FROM customer;
-SELECT * FROM publisher;
-SELECT * FROM book;
+## Update
+UPDATE OrderDetail
+SET quantity = 3
+WHERE id = 1;
+
+## Delete
+DELETE FROM OrderDetail
+WHERE id = 2;
+
+-- adding publishers
+INSERT INTO publisher (publishername) VALUE (
+"Big Books"
+);
+INSERT INTO publisher (publishername) VALUE (
+"World Wide Books"
+);
+
+INSERT INTO publisher (publishername) VALUE (
+"Perdue Books"
+);
+
+INSERT INTO publisher (publishername) VALUE (
+"AudioBook"
+);
+
+-- adding categories
+INSERT INTO category (categoryname) VALUE (
+"Non fiction"
+);
+INSERT INTO category (categoryname) VALUE (
+"Science fiction"
+);
+INSERT INTO category (categoryname) VALUE (
+"Romance"
+);
+INSERT INTO category (categoryname) VALUE (
+"Business"
+);
+INSERT INTO category (categoryname) VALUE (
+"Self-help"
+);
+
+INSERT INTO category VALUE (
+"Science"
+);
+
 SELECT * FROM category;
-SELECT * FROM `order`;
-SELECT * FROM orderdetail;
+SELECT * FROM customer;
 
--- search with conditions
-SELECT * FROM book WHERE publisherID = 2;
-
-SELECT * FROM book WHERE categoryID = 1;
-
-SELECT title FROM book WHERE id = 1;
-
-SELECT `name`, email 
-FROM customer 
-INNER JOIN `order` 
-WHERE customer.id = `order`.customerID;
+SELECT c.`name`, c.email 
+FROM customer c
+INNER JOIN `order` o
+WHERE c.id = o.customerID;

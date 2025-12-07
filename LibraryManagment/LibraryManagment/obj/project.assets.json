@@ -594,23 +594,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ZLConestoga\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\Nicho\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\SET_2\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj",
+      "projectUniqueName": "C:\\relationalDatabase\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj",
       "projectName": "LibraryManagment",
-      "projectPath": "D:\\SET_2\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj",
-      "packagesPath": "C:\\Users\\ZLConestoga\\.nuget\\packages\\",
-      "outputPath": "D:\\SET_2\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\obj\\",
+      "projectPath": "C:\\relationalDatabase\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\LibraryManagment.csproj",
+      "packagesPath": "C:\\Users\\Nicho\\.nuget\\packages\\",
+      "outputPath": "C:\\relationalDatabase\\RMDB2025Final\\LibraryManagment\\LibraryManagment\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\ZLConestoga\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Nicho\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -618,6 +619,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -636,7 +638,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -663,7 +665,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
