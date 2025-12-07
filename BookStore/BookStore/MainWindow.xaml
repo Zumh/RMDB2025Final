@@ -71,7 +71,7 @@
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Name:" Width="100"/>
                             <TextBox Width="200" Name="CustomerNameTextBox"/>
-                            <Label Width="200" Name="NameErr" Margin="5, 0, 0, 0" Foreground="red"/>
+                            <Label Width="200" Name="NameErr" Foreground="red"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">

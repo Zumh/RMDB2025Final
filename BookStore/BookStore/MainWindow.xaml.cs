@@ -36,10 +36,15 @@ namespace BookStore
         {
             bool validated = true;
 
-            string customerName = CustomerNameTextBox.Text.Trim();
-            string customerEmail = CustomerEmailTextBox.Text.Trim();
-            string customerAddress = CustomerAddressTextBox.Text.Trim();
-            string customerPhoneNumber = CustomerPhoneTextBox.Text.Trim();
+            string customerName = CustomerNameTextBox.Text;
+            string customerEmail = CustomerEmailTextBox.Text;
+            string customerAddress = CustomerAddressTextBox.Text;
+            string customerPhoneNumber = CustomerPhoneTextBox.Text;
+            //clear error messages
+            NameErr.Content = "";
+            EmailErr.Content = "";
+            AddressErr.Content = "";
+            PhoneErr.Content = "";
 
             //validate each user input
             if (!(validated = Customer.ValidateName(customerName)))
@@ -54,21 +59,26 @@ namespace BookStore
             }
             if (!(validated = Customer.ValidateAddress(customerAddress)))
             {
-                EmailErr.Content = "Field is Mandatory";
+                AddressErr.Content = "Field is Mandatory";
                 CustomerAddressTextBox.Text = "";
             }
             if (!(validated = Customer.ValidatePhoneNumber(customerPhoneNumber)))
             {
-                EmailErr.Content = "Format should be \"555-555-5555\"";
+                PhoneErr.Content = "Format should be \"555-555-5555\"";
                 CustomerEmailTextBox.Text = "";
             }
 
-            if (validated) 
-            { 
-                //add customer to DB
-            }
+            //if (validated) 
+            //{ 
+            //    //add customer to DB
+            //}
+
+            //clear customer info
+            CustomerNameTextBox.Text = "";
+            CustomerEmailTextBox.Text = "";
+            CustomerAddressTextBox.Text = "";
+            CustomerPhoneTextBox.Text = "";
+
         }
-
-
     }
 }

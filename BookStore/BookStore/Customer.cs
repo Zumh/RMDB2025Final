@@ -22,7 +22,7 @@ namespace BookStore
         {
             bool isValid = true;
 
-            if (string.IsNullOrEmpty(customerName))
+            if (string.IsNullOrEmpty(customerName.Trim()))
             {
                 isValid = false;
             }
@@ -31,7 +31,7 @@ namespace BookStore
         public static bool ValidateAddress(string address)
         {
             bool isValid = true;
-            if (string.IsNullOrEmpty(address))
+            if (string.IsNullOrEmpty(address.Trim()))
             {
                 isValid = false;
             }
@@ -40,7 +40,7 @@ namespace BookStore
         public static bool ValidatePhoneNumber(string phone) 
         {
             bool isValid = true;
-            if (!string.IsNullOrEmpty(phone))
+            if (!string.IsNullOrEmpty(phone.Trim()))
             {
                 if (!Regex.IsMatch(phone, regexPhonePattern))
                 {
@@ -53,7 +53,7 @@ namespace BookStore
         public static bool ValidateEmail(string email) 
         {
             bool isValid = true;
-            if (!string.IsNullOrEmpty(email))
+            if (!string.IsNullOrEmpty(email.Trim()))
             {
                 if (!Regex.IsMatch(email, regexEmailPattern))
                 {
@@ -61,6 +61,14 @@ namespace BookStore
                 }
             }
             return isValid;
+        }
+
+        public static void ClearCustomerInput(string name, string address, string phoneNumber, string email)
+        {
+            name = "";
+            address = "";
+            phoneNumber = "";
+            email = "";
         }
     }
 
