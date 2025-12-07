@@ -7,7 +7,47 @@
         mc:Ignorable="d"
         Title="BookStore" Height="450" Width="800">
     <Grid>
-        <TabControl>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <!-- Main content -->
+            <RowDefinition Height="Auto" />
+            <!-- Status bar -->
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="0">
+            <TabItem Header="Login">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <!-- Left side (inputs) -->
+                        <ColumnDefinition Width="Auto" />
+                        <!-- Right side (buttons) -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- LEFT SIDE: Customer info -->
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,20,0">
+                        <TextBlock Text="Database Login" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Name:" Width="100"/>
+                            <TextBox Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Password:" Width="100"/>
+                            <TextBox Width="200"/>
+                        </StackPanel>
+
+                    
+                    </StackPanel>
+
+                    <!-- RIGHT SIDE: Buttons -->
+                    <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
+                        <Button Content="Login" Width="140" Margin="0,0,0,10"/>
+                        <Button Content="Clear" Width="140" Margin="0,0,0,10"/>
+ 
+                    </StackPanel>
+                </Grid>
+            </TabItem>
             <TabItem Header="Customer">
                 <Grid Margin="10">
                     <Grid.ColumnDefinitions>
@@ -227,5 +267,12 @@
 
 
         </TabControl>
+        <!-- Bottom Status Bar -->
+        <Border Grid.Row="1" Background="#EEE" Padding="5" BorderThickness="1,0,0,0" BorderBrush="#CCC">
+            <TextBlock x:Name="StatusText"
+                   Text="Ready."
+                   FontSize="12"
+                   Foreground="Gray"/>
+        </Border>
     </Grid>
 </Window>
