@@ -70,40 +70,39 @@
                         
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Name:" Width="100"/>
-                            <TextBox Width="200" Name="CustomerNameTextBox"/>
-                            <Label Width="200" Name="NameErr" Foreground="red"/>
+                            <TextBox Width="200" x:Name="CustomerNameTextBox"/>
+                            <Label Width="200" x:Name="NameErr" Foreground="red"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Email:" Width="100"/>
-                            <TextBox Width="200" Name="CustomerEmailTextBox"/>
-                            <Label Width="200" Name="EmailErr" Margin="5, 0, 0, 0" Foreground="red"/>
+                            <TextBox Width="200" x:Name="CustomerEmailTextBox"/>
+                            <Label Width="200" x:Name="EmailErr" Margin="5, 0, 0, 0" Foreground="red"/>
                         </StackPanel>
                         
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Address:" Width="100"/>
-                            <TextBox Width="200" Name="CustomerAddressTextBox"/>
-                            <Label Width="200" Name="AddressErr" Margin="5, 0, 0, 0" Foreground="red"/>
+                            <TextBox Width="200" x:Name="CustomerAddressTextBox"/>
+                            <Label Width="200" x:Name="AddressErr" Margin="5, 0, 0, 0" Foreground="red"/>
                         </StackPanel>
                         
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Phone:" Width="100"/>
-                            <TextBox Width="200" Name="CustomerPhoneTextBox"/>
-                            <Label Width="200" Name="PhoneErr" Margin="5, 0, 0, 0" Foreground="red"/>
+                            <TextBox Width="200" x:Name="CustomerPhoneTextBox"/>
+                            <Label Width="200" x:Name="PhoneErr" Margin="5, 0, 0, 0" Foreground="red"/>
                         </StackPanel>
 
                         <TextBlock Text="Customer List" FontSize="16" FontWeight="Bold" Margin="0,20,0,10"/>
-                        <ListBox Height="200">
-                            <ListBoxItem>John Doe</ListBoxItem>
-                            <ListBoxItem>Jane Smith</ListBoxItem>
-                        </ListBox>
+                        <DataGrid Height="200" AutoGenerateColumns="True" x:Name="CustomerList">
+                        </DataGrid>
                     </StackPanel>
 
                     <!-- RIGHT SIDE: Buttons -->
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
-                        <Button Content="Add Customer" Width="140" Margin="0,0,0,10" Name="AddCustomerBtn" Click="AddCustomerBtn_Click"/>
+                        <Button Content="Add Customer" Width="140" Margin="0,0,0,10" x:Name="AddCustomerBtn" Click="AddCustomerBtn_Click"/>
                         <Button Content="Remove Customer" Width="140" Margin="0,0,0,10"/>
-                        <Button Content="Search Customer" Width="140"/>
+                        <Button Content="Search Customer" Width="140" Margin="0,0,0,10"/>
+                        <Button Content="Display All Customers" Width="140" Margin="0,0,0,10" x:Name="DisplayAllCustomers" Click="DisplayAllCustomers_Click"/>
                     </StackPanel>
                 </Grid>
             </TabItem>

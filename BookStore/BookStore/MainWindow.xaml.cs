@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Data;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,11 +12,10 @@ using System.Windows.Shapes;
 
 namespace BookStore
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        //database manager for sending queries
+        DBManager db = new DBManager();
         public MainWindow()
         {
             InitializeComponent();
@@ -85,5 +85,29 @@ namespace BookStore
             CustomerPhoneTextBox.Text = "";
 
         }
+
+        private void DisplayAllCustomers_Click(object sender, RoutedEventArgs e)
+        {
+
+
+            DataTable dataTable = db.GetDataTable("SELECT * FROM customer");
+
+            List<Customer> customers = new List<Customer>();
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                customers.Add(new Customer
+                {
+                    CustomerId = Convert.ToInt32(row["id"]),
+                    CustomerName = row["name"].ToString(),
+                    Address = row["address"].ToString(),
+                    Email = row["email"].ToString(),
+                    Phone = row["phonenumber"].ToString()
+                });
+            }
+
+            CustomerList.ItemsSource = customers;
+        }
+
     }
 }
