@@ -5,16 +5,57 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BookStore"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="BookStore" Height="450" Width="800">
     <Grid>
         <TabControl>
-            <TabItem Header="Books">
-         
+            <TabItem Header="Customer">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <!-- Left side (inputs) -->
+                        <ColumnDefinition Width="Auto" />
+                        <!-- Right side (buttons) -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- LEFT SIDE: Customer info -->
+                    <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,20,0">
+                        <TextBlock Text="Customer Information" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Name:" Width="100"/>
+                            <TextBox Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Email:" Width="100"/>
+                            <TextBox Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Phone:" Width="100"/>
+                            <TextBox Width="200"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Customer List" FontSize="16" FontWeight="Bold" Margin="0,20,0,10"/>
+                        <ListBox Height="200">
+                            <ListBoxItem>John Doe</ListBoxItem>
+                            <ListBoxItem>Jane Smith</ListBoxItem>
+                        </ListBox>
+                    </StackPanel>
+
+                    <!-- RIGHT SIDE: Buttons -->
+                    <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
+                        <Button Content="Add Customer" Width="140" Margin="0,0,0,10"/>
+                        <Button Content="Remove Customer" Width="140" Margin="0,0,0,10"/>
+                        <Button Content="Search Customer" Width="140"/>
+                    </StackPanel>
+                </Grid>
             </TabItem>
-            <TabItem Header="Authors">
+
+            <TabItem Header="Book">
         
             </TabItem>
-            <TabItem Header="Publishers">
+            <TabItem Header="Order">
            
             </TabItem>
         </TabControl>
