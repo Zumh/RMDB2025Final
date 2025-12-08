@@ -23,6 +23,8 @@ namespace BookStore
             InitializeComponent();
            
         }
+        ////////////////////////////////////////        LOGIN FUNCTIONS      ///////////////////////////////////////////////////////////
+
         //NAME: ClearLogin_Click
         //DESCRIPTION: Clears the login fields of all text
         //PARAMETERS: object sender, RoutedEventArgs e
@@ -39,6 +41,9 @@ namespace BookStore
         //             Handles input errors and UI clean up
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
+
+        //////////////////////////////             CUSTOMER FUNCTIONS             //////////////////////////////////////////////////////
+
         private void AddCustomerBtn_Click(object sender, RoutedEventArgs e)
         {
             bool validated = true;
@@ -48,36 +53,44 @@ namespace BookStore
             string customerAddress = CustomerAddressTextBox.Text;
             string customerPhoneNumber = CustomerPhoneTextBox.Text;
             //clear error messages
-            ClearErrorCodes();
+            StatusText.Text = "";
 
             //validate each user input
             if (!(validated = Customer.ValidateName(customerName)))
             {
-                NameErr.Content = "Field is Mandatory";
+                StatusText.Text = "Field is Mandatory";
                 CustomerNameTextBox.Text = "";
             }
-            if (!(validated = Customer.ValidateEmail(customerEmail)))
+            else if (!(validated = Customer.ValidateEmail(customerEmail)))
             {
-                EmailErr.Content = "Format should be \"Example@email.com\"";
+                StatusText.Text = "Format should be \"Example@email.com\"";
                 CustomerEmailTextBox.Text = "";
             }
-            if (!(validated = Customer.ValidateAddress(customerAddress)))
+            else if (!(validated = Customer.ValidateAddress(customerAddress)))
             {
-                AddressErr.Content = "Field is Mandatory";
+                StatusText.Text = "Field is Mandatory";
                 CustomerAddressTextBox.Text = "";
             }
-            if (!(validated = Customer.ValidatePhoneNumber(customerPhoneNumber)))
+            else if (!(validated = Customer.ValidatePhoneNumber(customerPhoneNumber)))
             {
-                PhoneErr.Content = "Format should be \"555-555-5555\"";
+                StatusText.Text = "Format should be \"555-555-5555\"";
                 CustomerEmailTextBox.Text = "";
             }
-
-            if (validated)
+            else
             {
-                //add customer to DB, need to the data adapter 
+                //add customer to customer list
+                if (validated)
+                {
+                    Customer._customers.Add(new Customer
+                    {
+                        CustomerName = customerName,
+                        Email = customerEmail,
+                        Address = customerAddress,
+                        Phone = customerPhoneNumber
+                    });
+                    ClearUIInput();
+                }
             }
-            ClearCustomerInfo();
-
         }
 
         //NAME: DisplayAllCustomers_Click
@@ -114,16 +127,19 @@ namespace BookStore
                 e.Column.IsReadOnly = true;
             }
         }
-
+        //NAME: SearchForCustomer_Click
+        //DESCRIPTION: Searches for customer based on name        
+        //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
+        //RETURN: void
         private void SearchForCustomer_Click(object sender, RoutedEventArgs e)
         {
             string customerName = CustomerNameTextBox.Text;
             string customerEmail = CustomerEmailTextBox.Text;
             string customerAddress = CustomerAddressTextBox.Text;
             string customerPhoneNumber = CustomerPhoneTextBox.Text;
-           
-            ClearErrorCodes();  
 
+            StatusText.Text = "";
+            //need to add more options for searching
             List<Customer> list = new List<Customer>();
 
             if (!string.IsNullOrEmpty(customerName)) 
@@ -135,6 +151,7 @@ namespace BookStore
                 else
                 {
                     list = Customer.SearchByName(customerName);
+                    StatusText.Text = "";
                 }
             }
             if(list.Count == 0)
@@ -144,26 +161,120 @@ namespace BookStore
             {
                 CustomerList.ItemsSource = list;
             }
+            
+        }
 
-        }
-        //NAME: ClearErrorCodes
-        //DESCRIPTION: Clears all error codes       
-        //PARAMETERS: none
-        //RETURN: void
-        public void ClearErrorCodes()
+        //////////////////////////////             BOOK FUNCTIONS             //////////////////////////////////////////////////////
+
+        private void SearchBook_Click(object sender, RoutedEventArgs e)
         {
-            NameErr.Content = "";
-            EmailErr.Content = "";
-            AddressErr.Content = "";
-            PhoneErr.Content = "";
+
+            //Successfully loads data ------ this is just for test purposes, need to implement actual search
+            DataTable dataTable = db.DataBaseQuery("SELECT * FROM book");
+            Book.LoadBookData(dataTable);
+            BookList.ItemsSource = Book._books;
+        }
+
+        //NAME: BookList_Columns
+        //DESCRIPTION: Sets bookID, publisher ID, and categoryID to readonly        
+        //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
+        //RETURN: void
+        private void BookList_Columns(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            //check if column name is id and make it read only
+            if (e.PropertyName == "BookID")
+            {
+                e.Column.IsReadOnly = true;
+            }
+            if(e.PropertyName == "PublisherID")
+            {
+                e.Column.IsReadOnly = true;
+            }
+            if (e.PropertyName == "CategoryID")
+            {
+                e.Column.IsReadOnly = true;
+            }
+        }
+
+        //NAME: AddBook_Click
+        //DESCRIPTION: Validates user input for a new book
+        //             Adds a new book object to the _book list        
+        //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
+        //RETURN: void
+        private void AddBook_Click(object sender, RoutedEventArgs e)
+        {
+            bool validated = true;
+
+            string title = BookTitletextBox.Text;
+            string isbn = IsbnTextBox.Text;
+            string publisher = BookPublisherTextBox.Text;
+            string price = BookPriceTextBox.Text;
+            string stock = BookStockTextBox.Text;
+            //clear error messages
             StatusText.Text = "";
+
+            //validate each user input
+            if (!(validated = Book.ValidateBookTitle(title)))
+            {
+                StatusText.Text = "Name is Mandatory";
+                BookTitletextBox.Text = "";
+            }
+            else if (!(validated = Book.ValidateIBSN(isbn)))
+            {
+                StatusText.Text = "ISBN is Mandatory and must be 13 digits long, ex.(1234567890123).";
+                IsbnTextBox.Text = "";
+            }
+            else if (!(validated = Book.ValidatePrice(price)))
+            {
+                StatusText.Text = "Price is Mandatory and must be numeric";
+                BookPriceTextBox.Text = "";
+            }
+            else if (!(validated = Book.ValidateStock(stock)))
+            {
+                StatusText.Text = "Stock is Mandatory and must be numeric";
+                BookStockTextBox.Text = "";
+            } 
+            else
+            {
+                double numericISBN;
+                float numericPrice;
+                int numericStock;
+                //parse strings into numbers
+                double.TryParse(isbn, out numericISBN);
+                float.TryParse(price, out numericPrice);
+                int.TryParse(stock, out numericStock);
+                if (validated)
+                {
+                    Book._books.Add(new Book
+                    {
+                        Title = title,
+                        ISBN = numericISBN,
+                        Price = numericPrice,
+                        Stock = numericStock
+                    });
+                    StatusText.Text = "";
+                    ClearUIInput();
+                }
+            }        
         }
-        //NAME: ClearCustomerInfo
-        //DESCRIPTION: Clears all Customer Info       
+
+        //////////////////////////////////          ORDER FUNCTIONS            ////////////////////////////////////////
+
+
+
+        //////////////////////////////////          GENERAL UI FUNCTIONS            ////////////////////////////////////////
+        
+        //NAME: ClearUIInput
+        //DESCRIPTION: Clears all UI inputs        
         //PARAMETERS: none
         //RETURN: void
-        public void ClearCustomerInfo()
+        public void ClearUIInput()
         {
+            BookTitletextBox.Text = "";
+            IsbnTextBox.Text = "";
+            BookPublisherTextBox.Text = "";
+            BookPriceTextBox.Text = "";
+            BookStockTextBox.Text = "";
             CustomerNameTextBox.Text = "";
             CustomerEmailTextBox.Text = "";
             CustomerAddressTextBox.Text = "";
