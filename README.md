@@ -7,15 +7,15 @@
 ### Folder structures
 
 * Entities/
-* Customer.cs
-* Book.cs
-* Order.cs
-* OrderDetail.cs
+ * Customer.cs
+ * Book.cs
+ * Order.cs
+ * OrderDetail.cs
 * DataAccess/
-* DbManager.cs
-* CustomerRepository.cs
-* BookRepository.cs
-* OrderRepository.cs
+ * DbManager.cs
+ * CustomerRepository.cs
+ * BookRepository.cs
+ * OrderRepository.cs
 
 ## Project Phases:
 
