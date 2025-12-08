@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Data;
 
 namespace BookStore
 {
@@ -18,6 +19,8 @@ namespace BookStore
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }
+
+        static public List<Customer> _customers = new List<Customer>(); 
 
         //NAME: ValidateName
         //DESCRIPTION: Validates the customer name is not blank
@@ -77,6 +80,43 @@ namespace BookStore
                 }
             }
             return isValid;
+        }
+
+        //NAME: LoadCustomerData
+        //DESCRIPTION: Adds the dataTable to a Customer List
+        //PARAMETERS: DataTable data - customer data from database
+        //RETURN: void
+        public static void LoadCustomerData (DataTable data)
+        {
+                //create a new customer object for each customer in database
+                foreach (DataRow row in data.Rows)
+                {
+                    _customers.Add(new Customer
+                    {
+                        CustomerId = Convert.ToInt32(row["id"]),
+                        CustomerName = row["name"].ToString(),
+                        Address = row["address"].ToString(),
+                        Email = row["email"].ToString(),
+                        Phone = row["phonenumber"].ToString()
+                    });
+                }
+        }
+        //NAME: SearchByName
+        //DESCRIPTION: Searches through customer list to filter by name
+        //PARAMETERS: none
+        //RETURN: void
+        public static List<Customer> SearchByName(string name)
+        {
+            List<Customer> list = new List<Customer>();
+            foreach (Customer customer in Customer._customers)
+            {
+                if (customer.CustomerName != null &&
+                    customer.CustomerName.Contains(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    list.Add(customer);
+                }
+            }
+            return list;
         }
     }
 

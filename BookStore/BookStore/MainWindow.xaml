@@ -55,7 +55,7 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Customer">
+            <TabItem Header="Customer" Height="20" VerticalAlignment="Center" x:Name="CustomerTab">
                 <Grid Margin="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -71,7 +71,7 @@
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Name:" Width="100"/>
                             <TextBox Width="200" x:Name="CustomerNameTextBox"/>
-                            <Label Width="200" x:Name="NameErr" Foreground="red"/>
+                            <Label Width="200" x:Name="NameErr" Margin="5, 0, 0, 0" Foreground="red"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
@@ -93,7 +93,8 @@
                         </StackPanel>
 
                         <TextBlock Text="Customer List" FontSize="16" FontWeight="Bold" Margin="0,20,0,10"/>
-                        <DataGrid Height="200" AutoGenerateColumns="True" x:Name="CustomerList">
+                        <DataGrid Height="200" AutoGenerateColumns="True" AutoGeneratingColumn="CustomerList_Columns" x:Name="CustomerList">
+  
                         </DataGrid>
                     </StackPanel>
 
@@ -101,7 +102,7 @@
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
                         <Button Content="Add Customer" Width="140" Margin="0,0,0,10" x:Name="AddCustomerBtn" Click="AddCustomerBtn_Click"/>
                         <Button Content="Remove Customer" Width="140" Margin="0,0,0,10"/>
-                        <Button Content="Search Customer" Width="140" Margin="0,0,0,10"/>
+                        <Button Content="Search Customer" Width="140" Margin="0,0,0,10" x:Name="SearchCustomer" Click="SearchForCustomer_Click"/>
                         <Button Content="Display All Customers" Width="140" Margin="0,0,0,10" x:Name="DisplayAllCustomers" Click="DisplayAllCustomers_Click"/>
                     </StackPanel>
                 </Grid>

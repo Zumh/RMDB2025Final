@@ -13,7 +13,7 @@ namespace BookStore
         static string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
         MySqlConnection connection = new(connectionString);
 
-        public DataTable GetDataTable(string query)
+        public DataTable DataBaseQuery(string query)
         {
             DataTable dataTable = new DataTable();
 
@@ -36,7 +36,7 @@ namespace BookStore
             }
             return dataTable;
         }
-
+      
 
     }
 }
