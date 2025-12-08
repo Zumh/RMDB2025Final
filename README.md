@@ -7,7 +7,7 @@
 ### Folder structures
 
 * Entities/
- * Customer.cs
+ + Customer.cs
  * Book.cs
  * Order.cs
  * OrderDetail.cs
