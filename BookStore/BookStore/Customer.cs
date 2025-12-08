@@ -1,4 +1,11 @@
-﻿using System;
+﻿//FILE : Customer.cs
+//PROJECT : PROG2111 Final Project
+//PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+//FIRST VERSION : 03/12/2025
+/*DESCRIPTION: This is the Customer class that manages the customer objects created when the database information is retrieved.
+ *             It contains all the functions necessary to validate new customers, existing customers and load datatables with data.
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

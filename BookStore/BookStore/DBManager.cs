@@ -1,4 +1,12 @@
-﻿using System;
+﻿//FILE : DBManager.cs
+//PROJECT : PROG2111 Final Project
+//PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+//FIRST VERSION : 03/12/2025
+/*DESCRIPTION: This is the database manager class that manages the connection to the database.
+ *             It handles the queries to the database, retrieving and sending data back and forth. 
+ *             
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
