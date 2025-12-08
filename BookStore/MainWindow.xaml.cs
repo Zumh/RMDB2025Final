@@ -220,7 +220,7 @@ namespace BookStore
             string isbn = IsbnTextBox.Text;
             string publisher = BookPublisherTextBox.Text;
             string price = BookPriceTextBox.Text;
-            string stock = BookStockTextBox.Text;
+            string stock = BookStock.Text;
             //clear error messages
             StatusText.Text = "";
 
@@ -243,7 +243,7 @@ namespace BookStore
             else if (!(validated = Book.ValidateStock(stock)))
             {
                 StatusText.Text = "Stock is Mandatory and must be numeric";
-                BookStockTextBox.Text = "";
+                BookStock.Text = "";
             } 
             else
             {
@@ -285,7 +285,7 @@ namespace BookStore
             IsbnTextBox.Text = "";
             BookPublisherTextBox.Text = "";
             BookPriceTextBox.Text = "";
-            BookStockTextBox.Text = "";
+            BookStock.Text = "";
             CustomerNameTextBox.Text = "";
             CustomerEmailTextBox.Text = "";
             CustomerAddressTextBox.Text = "";
