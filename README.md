@@ -3,17 +3,19 @@
 * make sure to branch off from dev branch
 
 \## A Bookstore managment UI:
+
 ### Folder structures
-Entities/
-    Customer.cs
-    Book.cs
-    Order.cs
-    OrderDetail.cs
-DataAccess/
-    DbManager.cs
-    CustomerRepository.cs
-    BookRepository.cs
-    OrderRepository.cs
+
+* Entities/
+* Customer.cs
+* Book.cs
+* Order.cs
+* OrderDetail.cs
+* DataAccess/
+* DbManager.cs
+* CustomerRepository.cs
+* BookRepository.cs
+* OrderRepository.cs
 
 ## Project Phases:
 
