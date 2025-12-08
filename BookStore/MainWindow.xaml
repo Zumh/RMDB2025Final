@@ -29,21 +29,21 @@
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Name:" Width="100"/>
-                            <TextBox Width="200"/>
+                            <TextBox Width="200" Name="userId"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Password:" Width="100"/>
-                            <TextBox Width="200"/>
+                            <TextBox Width="200" Name="loginPassword"/>
                         </StackPanel>
                         
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Database:" Width="100"/>
-                            <TextBox Width="200"/>
+                            <TextBox Width="200" Name="dataBaseName"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                            <Button Content="Login" Width="66" Margin="0,0,0,0"/>
-                            <Button Content="Clear" Width="66" Margin="10,0,0,0"/>
+                            <Button Content="Login" Width="66" Margin="0,0,0,0" Name="LoginBtn"/>
+                            <Button Content="Clear" Width="66" Margin="10,0,0,0" Name="clearLoginBtn" Click="ClearLogin_Click"/>
                         </StackPanel>
                         
                     </StackPanel>
@@ -55,7 +55,7 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Customer">
+            <TabItem Header="Customer" Height="20" VerticalAlignment="Center" x:Name="CustomerTab">
                 <Grid Margin="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -67,44 +67,44 @@
                     <!-- LEFT SIDE: Customer info -->
                     <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,20,0">
                         <TextBlock Text="Customer Information" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-
+                        
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Name:" Width="100"/>
-                            <TextBox Width="200"/>
+                            <TextBox Width="200" x:Name="CustomerNameTextBox"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Email:" Width="100"/>
-                            <TextBox Width="200"/>
+                            <TextBox Width="200" x:Name="CustomerEmailTextBox"/>
                         </StackPanel>
                         
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Address:" Width="100"/>
-                            <TextBox Width="200"/>
+                            <TextBox Width="200" x:Name="CustomerAddressTextBox"/>
                         </StackPanel>
                         
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Phone:" Width="100"/>
-                            <TextBox Width="200"/>
+                            <TextBox Width="200" x:Name="CustomerPhoneTextBox"/>
                         </StackPanel>
 
                         <TextBlock Text="Customer List" FontSize="16" FontWeight="Bold" Margin="0,20,0,10"/>
-                        <ListBox Height="200">
-                            <ListBoxItem>John Doe</ListBoxItem>
-                            <ListBoxItem>Jane Smith</ListBoxItem>
-                        </ListBox>
+                        <DataGrid Height="200" AutoGenerateColumns="True" AutoGeneratingColumn="CustomerList_Columns" x:Name="CustomerList">
+  
+                        </DataGrid>
                     </StackPanel>
 
                     <!-- RIGHT SIDE: Buttons -->
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
-                        <Button Content="Add Customer" Width="140" Margin="0,0,0,10"/>
+                        <Button Content="Add Customer" Width="140" Margin="0,0,0,10" x:Name="AddCustomerBtn" Click="AddCustomerBtn_Click"/>
                         <Button Content="Remove Customer" Width="140" Margin="0,0,0,10"/>
-                        <Button Content="Search Customer" Width="140"/>
+                        <Button Content="Search Customer" Width="140" Margin="0,0,0,10" x:Name="SearchCustomer" Click="SearchForCustomer_Click"/>
+                        <Button Content="Display All Customers" Width="140" Margin="0,0,0,10" x:Name="DisplayAllCustomers" Click="DisplayAllCustomers_Click"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Book">
+            <TabItem Header="Book" HorizontalAlignment="Left" Width="39">
                 <Grid Margin="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -119,41 +119,39 @@
                         <!-- Title -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Title:" Width="100"/>
-                            <TextBox Width="200"/>
+                            <TextBox Width="200" x:Name="BookTitletextBox"/>
                         </StackPanel>
                         <!-- ISBN -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="ISBN:" Width="100"/>
-                            <TextBox Width="200"/>
+                            <TextBox Width="200" x:Name="IsbnTextBox"/>
                         </StackPanel>
                         <!-- PRICE -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Price:" Width="100"/>
-                            <TextBox Width="200"/>
+                            <TextBox Width="200" x:Name="BookPriceTextBox"/>
                         </StackPanel>
                         <!-- Publisher -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Publisher:" Width="100"/>
-                            <TextBox Width="200"/>
+                            <TextBox Width="200" x:Name="BookPublisherTextBox"/>
                         </StackPanel>
                         <!-- Stock -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Stock:" Width="100"/>
-                            <TextBlock Text="0"/>
+                            <TextBox Width="200" x:Name="BookStockTextBox"/>
                         </StackPanel>
                         <!-- Book List -->
                         <TextBlock Text="Book List" FontSize="16" FontWeight="Bold" Margin="0,20,0,10"/>
-                        <ListBox Height="200">
-                            <ListBoxItem>Book Title</ListBoxItem>
-                            <ListBoxItem>Book Title</ListBoxItem>
-                        </ListBox>
+                        <DataGrid Height="200" AutoGenerateColumns="True" AutoGeneratingColumn="BookList_Columns" x:Name="BookList">
+                        </DataGrid>
                     </StackPanel>
 
                     <!-- RIGHT SIDE: Buttons -->
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
-                        <Button Content="Add Book" Width="140" Margin="0,0,0,10"/>
+                        <Button Content="Add Book" Width="140" Margin="0,0,0,10" x:Name="AddBook" Click="AddBook_Click"/>
                         <Button Content="Remove Book" Width="140" Margin="0,0,0,10"/>
-                        <Button Content="Search Book" Width="140"/>
+                        <Button Content="Search Book" Width="140" x:Name="SearchBook" Click="SearchBook_Click"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
