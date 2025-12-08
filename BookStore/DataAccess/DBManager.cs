@@ -6,11 +6,7 @@
  *             It handles the queries to the database, retrieving and sending data back and forth. 
  *             
 */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using MySql.Data.MySqlClient;
 using System.Data;
 

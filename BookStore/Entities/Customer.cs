@@ -5,11 +5,7 @@
 /*DESCRIPTION: This is the Customer class that manages the customer objects created when the database information is retrieved.
  *             It contains all the functions necessary to validate new customers, existing customers and load datatables with data.
 */
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using System.Text.RegularExpressions;
 using System.Data;
 
