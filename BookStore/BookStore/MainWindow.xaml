@@ -36,7 +36,7 @@
                             <TextBlock Text="Password:" Width="100"/>
                             <TextBox Width="200" Name="loginPassword"/>
                         </StackPanel>
-                        
+
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Database:" Width="100"/>
                             <TextBox Width="200" Name="dataBaseName"/>
@@ -45,13 +45,13 @@
                             <Button Content="Login" Width="66" Margin="0,0,0,0" Name="LoginBtn"/>
                             <Button Content="Clear" Width="66" Margin="10,0,0,0" Name="clearLoginBtn" Click="ClearLogin_Click"/>
                         </StackPanel>
-                        
+
                     </StackPanel>
 
                     <!-- RIGHT SIDE: Buttons -->
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
-                      
- 
+
+
                     </StackPanel>
                 </Grid>
             </TabItem>
@@ -67,7 +67,7 @@
                     <!-- LEFT SIDE: Customer info -->
                     <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,20,0">
                         <TextBlock Text="Customer Information" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-                        
+
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Name:" Width="100"/>
                             <TextBox Width="200" x:Name="CustomerNameTextBox"/>
@@ -79,13 +79,13 @@
                             <TextBox Width="200" x:Name="CustomerEmailTextBox"/>
                             <Label Width="200" x:Name="EmailErr" Margin="5, 0, 0, 0" Foreground="red"/>
                         </StackPanel>
-                        
+
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Address:" Width="100"/>
                             <TextBox Width="200" x:Name="CustomerAddressTextBox"/>
                             <Label Width="200" x:Name="AddressErr" Margin="5, 0, 0, 0" Foreground="red"/>
                         </StackPanel>
-                        
+
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Phone:" Width="100"/>
                             <TextBox Width="200" x:Name="CustomerPhoneTextBox"/>
@@ -118,6 +118,7 @@
 
                     <!-- LEFT SIDE: Book info -->
                     <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,20,0">
+                        
                         <TextBlock Text="Book Information" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
                         <!-- Title -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
@@ -139,6 +140,19 @@
                             <TextBlock Text="Publisher:" Width="100"/>
                             <TextBox Width="200"/>
                         </StackPanel>
+                        <!-- categories -->
+                      
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            
+                            <ComboBox Name="catCombo"
+                        
+                        
+                            IsEditable="true"
+                            IsReadOnly="true" Width="200"/>
+
+                            <TextBlock Text="{Binding ElementName=catCombo, Path=SelectedItem.CategoryName}"/>
+                        </StackPanel>
+                        
                         <!-- Stock -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Stock:" Width="100"/>
@@ -160,7 +174,7 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-            
+
             <!-- Order -->
             <TabItem Header="Order">
                 <Grid Margin="10">

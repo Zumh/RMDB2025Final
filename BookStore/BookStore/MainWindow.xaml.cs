@@ -16,11 +16,28 @@ namespace BookStore
     {
         //database manager for sending queries
         DBManager db = new DBManager();
+        List<Category>? categories = null; 
+
         public MainWindow()
         {
             InitializeComponent();
-           
+            LoadCategories();
+
         }
+
+        private void LoadCategories()
+        {
+            categories = new List<Category>
+            {
+                new Category { Id = 1, CategoryName = "Fiction" },
+                new Category { Id = 2, CategoryName = "Non-Fiction" },
+                new Category { Id = 3, CategoryName = "Science" },
+            };
+            catCombo.ItemsSource = categories;
+            catCombo.DisplayMemberPath = "CategoryName";  
+            catCombo.SelectedValuePath = "Id";           
+        }
+
         //NAME: ClearLogin_Click
         //DESCRIPTION: Clears the login fields of all text
         //PARAMETERS: object sender, RoutedEventArgs e
