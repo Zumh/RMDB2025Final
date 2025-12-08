@@ -1,8 +1,10 @@
 ﻿
+using MySql.Data.MySqlClient;
 using System.Data;
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 
 namespace BookStore
@@ -10,15 +12,21 @@ namespace BookStore
     public partial class MainWindow : Window
     {
         //database manager for sending queries
-        DBManager db = new DBManager();
-        List<Category> categories = null;
+        DBManager? db = new DBManager();
+        List<Category>? categories = null;
+        public string? ConnectionString { get; private set; }
+
         public MainWindow()
         {
             InitializeComponent();
 
             InitializeCategories();
-           
+            LoadLogin();
+
+
         }
+
+
 
         private void InitializeCategories()
         {
@@ -36,16 +44,8 @@ namespace BookStore
 
         ////////////////////////////////////////        LOGIN FUNCTIONS      ///////////////////////////////////////////////////////////
 
-        //NAME: ClearLogin_Click
-        //DESCRIPTION: Clears the login fields of all text
-        //PARAMETERS: object sender, RoutedEventArgs e
-        //RETURN: void
-        private void ClearLogin_Click(object sender, RoutedEventArgs e)
-        {
-            userId.Text = "";
-            loginPassword.Text = "";
-            dataBaseName.Text = "";
-        }
+      
+     
         //NAME: AddCustomerBtn_Click
         //DESCRIPTION: Validates the customer input
         //             Adds the customer to the dataTable
@@ -290,6 +290,101 @@ namespace BookStore
             CustomerEmailTextBox.Text = "";
             CustomerAddressTextBox.Text = "";
             CustomerPhoneTextBox.Text = "";
+        }
+
+        private void LoadLogin()
+        {
+            serverName.Text = "localhost";
+            portNumber.Text = "3306";
+            userId.Text = "root";
+            loginPassword.Password = "student1";
+            dataBaseName.Text = "BookStore";
+        }
+
+
+        private void LoginClick(object sender, RoutedEventArgs e)
+        {
+
+            string server = serverName.Text.Trim();
+            string user = userId.Text.Trim();
+            string password = loginPassword.Password;
+            string database = dataBaseName.Text.Trim();
+            string port = portNumber.Text.Trim();
+
+            // Check for empty fields
+            if (string.IsNullOrEmpty(server) ||
+                string.IsNullOrEmpty(user) ||
+                string.IsNullOrEmpty(password) ||
+                string.IsNullOrEmpty(database) ||
+                string.IsNullOrEmpty(port))
+            {
+                StatusText.Text = "All fields are required!";
+                StatusText.Foreground = Brushes.Red; // Show error in red
+                return;
+            }
+
+            // Temporary connection to server without database
+            string connStr = $"server={server};port={port};uid={user};pwd={password};";
+
+            try
+            {
+                using MySqlConnection conn = new MySqlConnection(connStr);
+                conn.Open();
+
+                // Check if database exists
+                using MySqlCommand checkDbCmd = new MySqlCommand($"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{database}';", conn);
+                object result = checkDbCmd.ExecuteScalar();
+
+                if (result == null)
+                {
+                    // Database does not exist, ask user if they want to create it
+                    MessageBoxResult answer = MessageBox.Show($"Database '{database}' does not exist. Do you want to create it?",
+                                                 "Create Database", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (answer == MessageBoxResult.Yes)
+                    {
+                        using MySqlCommand createDbCmd = new MySqlCommand($"CREATE DATABASE `{database}`;", conn);
+                        createDbCmd.ExecuteNonQuery();
+                        StatusText.Text = $"Database '{database}' created successfully!";
+                        StatusText.Foreground = Brushes.Green;
+                    }
+                    else
+                    {
+                        StatusText.Text = "Database creation canceled.";
+                        StatusText.Foreground = Brushes.Red;
+                        return;
+                    }
+                }
+                else
+                {
+                    StatusText.Text = $"Database '{database}' exists. Connected successfully!";
+                    StatusText.Foreground = Brushes.Green;
+                }
+
+                // Save connection string with database
+                ConnectionString = $"server={server};port={port};uid={user};pwd={password};database={database};";
+
+              
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = $"Connection failed: {ex.Message}";
+                StatusText.Foreground = Brushes.Red;
+            }
+
+
+        }
+
+        //NAME: ClearLoginClick
+        //DESCRIPTION: Clears the login fields of all text
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void ClearLoginClick(object sender, RoutedEventArgs e)
+        {
+            userId.Text = "";
+            loginPassword.Clear();
+            dataBaseName.Text = "";
+            serverName.Text = "";
+            portNumber.Text = "";
         }
     }
 }

@@ -42,16 +42,27 @@ DESCRIPTION: This is the Customer class that manages the customer objects create
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Password:" Width="100"/>
-                            <TextBox Width="200" Name="loginPassword"/>
+                            <PasswordBox Width="200" Name="loginPassword"/>
                         </StackPanel>
                         
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Database:" Width="100"/>
                             <TextBox Width="200" Name="dataBaseName"/>
                         </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Server:" Width="100"/>
+                            <TextBox Width="200" Name="serverName"/>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Port:" Width="100"/>
+                            <TextBox Width="200" Name="portNumber"/>
+                        </StackPanel>
+                        
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                            <Button Content="Login" Width="66" Margin="0,0,0,0" Name="LoginBtn"/>
-                            <Button Content="Clear" Width="66" Margin="10,0,0,0" Name="clearLoginBtn" Click="ClearLogin_Click"/>
+                            <Button Content="Login" Width="66" Margin="0,0,0,0" Name="LoginBtn" Click="LoginClick"/>
+                            <Button Content="Clear" Width="66" Margin="10,0,0,0" Name="clearLoginBtn" Click="ClearLoginClick"/>
                         </StackPanel>
                         
                     </StackPanel>
