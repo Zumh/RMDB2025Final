@@ -5,13 +5,11 @@
 /*DESCRIPTION: This is the Order class that manages the order objects created when the database information is retrieved.
  *             It contains all the functions necessary to validate new orders, existing orders and load datatables with data.
 */
-using System;
-using System.Collections.Generic;
+
 using System.Data;
-using System.Linq;
-using System.Text;
+
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+
 
 namespace BookStore
 {
