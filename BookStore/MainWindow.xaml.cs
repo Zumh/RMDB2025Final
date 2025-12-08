@@ -1,15 +1,9 @@
-﻿using MySqlX.XDevAPI.Relational;
+﻿
 using System.Data;
-using System.Text;
+
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace BookStore
 {
@@ -17,12 +11,29 @@ namespace BookStore
     {
         //database manager for sending queries
         DBManager db = new DBManager();
-    
+        List<Category> categories = null;
         public MainWindow()
         {
             InitializeComponent();
+
+            InitializeCategories();
            
         }
+
+        private void InitializeCategories()
+        {
+            categories = new List<Category>
+            {
+                new Category { Id = 1, Name = "Fiction" },
+                new Category { Id = 2, Name = "Non-Fiction" },
+                new Category { Id = 2, Name = "Other" }
+            };
+
+            catComboBox.ItemsSource = categories;
+            catComboBox.DisplayMemberPath = "Name";
+            catComboBox.SelectedValuePath = "Id";
+        }
+
         ////////////////////////////////////////        LOGIN FUNCTIONS      ///////////////////////////////////////////////////////////
 
         //NAME: ClearLogin_Click

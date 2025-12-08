@@ -1,4 +1,12 @@
-﻿<Window x:Class="BookStore.MainWindow"
+﻿<!-- 
+FILE : MainWindow.xaml.cs
+PROJECT : PROG2111 Final Project
+PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+FIRST VERSION : 03/12/2025
+DESCRIPTION: This is the Customer class that manages the customer objects created when the database information is retrieved.
+              It contains all the functions necessary to validate new customers, existing customers and load datatables with data.
+-->
+    <Window x:Class="BookStore.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -136,11 +144,20 @@
                             <TextBlock Text="Publisher:" Width="100"/>
                             <TextBox Width="200" x:Name="BookPublisherTextBox"/>
                         </StackPanel>
+
+                        <!-- Category -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Category:" Width="100"/>
+                            <ComboBox x:Name="catComboBox" Width="200"  />
+                
+                        </StackPanel>
+                        
                         <!-- Stock -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Stock:" Width="100"/>
                             <TextBox Width="200" x:Name="BookStockTextBox"/>
                         </StackPanel>
+                        
                         <!-- Book List -->
                         <TextBlock Text="Book List" FontSize="16" FontWeight="Bold" Margin="0,20,0,10"/>
                         <DataGrid Height="200" AutoGenerateColumns="True" AutoGeneratingColumn="BookList_Columns" x:Name="BookList">
@@ -200,6 +217,7 @@
                                 <TextBlock Text="Publisher:" Width="100"/>
                                 <TextBlock Text="Publisher..." />
                             </StackPanel>
+                      
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <TextBlock Text="Stock:" Width="100"/>
