@@ -5,9 +5,7 @@
 /*DESCRIPTION: This is the Book class that manages the book objects created when the database information is retrieved.
  *             It contains all the functions necessary to validate new books, existing books and load datatables with data.
 */
-
 using System.Data;
-
 
 namespace BookStore
 {

@@ -61,8 +61,8 @@ DESCRIPTION: This is the Customer class that manages the customer objects create
                         </StackPanel>
                         
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                            <Button Content="Login" Width="66" Margin="0,0,0,0" Name="LoginBtn" Click="LoginClick"/>
-                            <Button Content="Clear" Width="66" Margin="10,0,0,0" Name="clearLoginBtn" Click="ClearLoginClick"/>
+                            <Button Content="Login" Width="66" Margin="0,0,0,0" Name="LoginBtn" Click="LoginBtn_Click"/>
+                            <Button Content="Clear" Width="66" Margin="10,0,0,0" Name="clearLoginBtn" Click="ClearLogin_Click"/>
                         </StackPanel>
                         
                     </StackPanel>

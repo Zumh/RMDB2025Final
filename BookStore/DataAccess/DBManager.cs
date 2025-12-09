@@ -16,57 +16,26 @@ namespace BookStore
 {
     public class DBManager
     {
-        public string ConnectionString { get; private set; }
+        static public string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
 
-        // Lazy-loaded repositories
-        private CustomerRepository? customerRepo = null;
-        private BookRepository? bookRepo = null;
-        private OrderRepository? orderRepo = null;
-        public DataSet? Data = null;
-        public DBManager(){
-            Data = new DataSet();
-          //Data.EnforceConstraints = true;
-
-        }
-      
-        public CustomerRepository Customers => customerRepo ??= new CustomerRepository(ConnectionString, Data);
-        //public BookRepository Books => bookRepo ??= new BookRepository(ConnectionString);
-        //public OrderRepository Orders => orderRepo ??= new OrderRepository(ConnectionString);
-
-        public DbInitResult CheckDatabase(
-           string server,
-           string user,
-           string password,
-           string database,
-           string port)
+        static public string BuildConnectionString (string name, string password, string database)
         {
-            // Validate input
-            if (string.IsNullOrWhiteSpace(server) ||
-                string.IsNullOrWhiteSpace(user) ||
-                string.IsNullOrWhiteSpace(password) ||
-                string.IsNullOrWhiteSpace(database) ||
-                string.IsNullOrWhiteSpace(port))
-            {
-                return new DbInitResult
-                {
-                    Success = false,
-                    Message = "All fields are required."
-                };
-            }
+             return $"Server=localhost;Port=3306;Uid={name};Pwd={password};Database={database};";
+        }
 
-            string connStr = $"server={server};port={port};uid={user};pwd={password};";
-
+        //NAME: DataBaseQuery
+        //DESCRIPTION: takes the query string and sends it to the database to retreive data
+        //PARAMETERS: string query - mySQL statement used to query the database
+        //RETURN: DataTable - datatable with relevant search results
+        public DataTable DataBaseQuery(string query)
+        {
+            
+            DataTable dataTable = new DataTable();
             try
             {
-                using MySqlConnection conn = new MySqlConnection(connStr);
-                conn.Open();
-
-                using MySqlCommand cmd = new MySqlCommand(
-                    "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = @db;",
-                    conn);
-                cmd.Parameters.AddWithValue("@db", database);
-
-                object? result = cmd.ExecuteScalar();
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
 
                 if (result == null)
                 {
@@ -140,5 +109,35 @@ namespace BookStore
             }
         }
 
+        //NAME: DataBaseCRUD
+        //DESCRIPTION: takes the query string and performs various CRUD operations on the database
+        //PARAMETERS: string query - mySQL statement used to perform the operation on the database
+        //RETURN: void
+        public static int DataBaseCRUD(string query)
+        {
+            //default set to error value
+            int result = -1;
+            try
+            {
+                //create connection
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    //open connection
+                    connection.Open();
+                    //create command object
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        //get return value
+                        result = command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+
+            return result;
+        }
     }
 }

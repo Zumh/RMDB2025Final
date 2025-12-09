@@ -7,7 +7,6 @@
 */
 
 using System.Data;
-
 using System.Text.RegularExpressions;
 
 
@@ -56,7 +55,6 @@ namespace BookStore
 
         public static void LoadOrders(DataTable data)
         {
-            
             foreach (DataRow row in data.Rows) 
             {
                 _orders.Add(new Order

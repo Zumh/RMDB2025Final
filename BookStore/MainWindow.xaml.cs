@@ -5,7 +5,11 @@ using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using MySql.Data.MySqlClient;
+using System.Data.Common;
 
 namespace BookStore
 {
@@ -28,9 +32,17 @@ namespace BookStore
 
         }
 
+        private void LoginBtn_Click(object sender, RoutedEventArgs e)
+        {
+           string connectionString = DBManager.BuildConnectionString(userId.Text, loginPassword.Text, dataBaseName.Text);
+           DBManager.connectionString = connectionString;
+        }
 
-
-        private void InitializeCategories()
+        //NAME: ClearLogin_Click
+        //DESCRIPTION: Clears the login fields of all text
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void ClearLogin_Click(object sender, RoutedEventArgs e)
         {
             categories = new List<Category>
             {
@@ -44,22 +56,19 @@ namespace BookStore
             catComboBox.SelectedValuePath = "Id";
         }
 
-        ////////////////////////////////////////        LOGIN FUNCTIONS      ///////////////////////////////////////////////////////////
+        //////////////////////////////             CUSTOMER FUNCTIONS             //////////////////////////////////////////////////////
+        
 
-      
-     
         //NAME: AddCustomerBtn_Click
         //DESCRIPTION: Validates the customer input
         //             Adds the customer to the dataTable
         //             Handles input errors and UI clean up
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-
-        //////////////////////////////             CUSTOMER FUNCTIONS             //////////////////////////////////////////////////////
-
         private void AddCustomerBtn_Click(object sender, RoutedEventArgs e)
         {
             bool validated = true;
+            int failedCRUD = -1;
 
             string customerName = CustomerNameTextBox.Text;
             string customerEmail = CustomerEmailTextBox.Text;
@@ -95,27 +104,13 @@ namespace BookStore
                 //add customer to customer list
                 if (validated)
                 {
-                    try
+                 int result = DBManager.DataBaseCRUD("INSERT INTO customer (name, email, address, phoneNumber)" +
+                        $" VALUES\r\n('{customerName}', '{customerEmail}', '{customerAddress}', '{customerPhoneNumber}')");
+                    if (result == failedCRUD) 
                     {
-                        // add latest customer id plus one to new customer
-                        dbManager.Customers.Add(new Customer { 
-                          
-                            CustomerName = customerName,
-                            Email = customerEmail,
-                            Address = customerAddress,
-                            Phone = customerPhoneNumber
-                        });
-                        dbManager.Customers.SaveChanges();
-                        // reflect changes in datagrid
-                        customers = dbManager.Customers.GetAllCustomers();
-                        CustomerList.ItemsSource = customers;
-
-                        ClearUIInput();
+                        StatusText.Text = "Failed to add Customer to Database.";
                     }
-                    catch (System.Exception ex)
-                    {
-                        MessageBox.Show(ex.Message);
-                    }
+                    ClearUIInput();
                 }
 
                
@@ -338,120 +333,5 @@ namespace BookStore
             CustomerPhoneTextBox.Text = "";
         }
 
-        private void LoadLogin()
-        {
-            serverName.Text = "localhost";
-            portNumber.Text = "3306";
-            userId.Text = "root";
-            loginPassword.Password = "student1";
-            dataBaseName.Text = "BookStore";
-        }
-
-
-        private void LoginClick(object sender, RoutedEventArgs e)
-        {
-
-            string server = serverName.Text.Trim();
-            string user = userId.Text.Trim();
-            string password = loginPassword.Password;
-            string database = dataBaseName.Text.Trim();
-            string port = portNumber.Text.Trim();
-
-            DbInitResult? check = dbManager?.CheckDatabase(server, user, password, database, port);
-            if(check == null)
-            {
-                StatusText.Text = "Database manager not initialized.";
-                StatusText.Foreground = Brushes.Red;
-                return;
-            }
-            // database doesn't exist and doesn't need to be created
-            if (!check.Success && !check.NeedsCreation)
-            {
-                StatusText.Text = check.Message;
-                StatusText.Foreground = Brushes.Red;
-             
-            }
-            else if (check.NeedsCreation)
-            {
-                // ask the user if they want to create the database
-                MessageBoxResult answer = MessageBox.Show(
-                    check.Message + "\nDo you want to create it?",
-                    "Create Database",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-
-                // if user does not want to create database
-                if (answer == MessageBoxResult.No)
-                {
-                    StatusText.Text = "Database creation cancelled.";
-                    StatusText.Foreground = Brushes.Red;
-            
-                }
-                else
-                {
-                    // Step 2: Create database
-                    DbInitResult create = dbManager.CreateDatabase(server, user, password, database, port);
-
-                    // is not successful created 
-                    if (!create.Success)
-                    {
-                        StatusText.Text = create.Message;
-                        StatusText.Foreground = Brushes.Red;
-                    
-                    }
-                    else
-                    {
-
-                        connectionString = create.ConnectionString!;
-                        StatusText.Text = create.Message;
-                        StatusText.Foreground = Brushes.Green;
-
-                    }// successfully created database
-
-
-                }// user wants to create database
-
-
-            }
-
-            else // database exists and is connected
-            {
-                connectionString = check.ConnectionString!;
-                StatusText.Text = check.Message;
-                StatusText.Foreground = Brushes.Green;
-            }
-        }
-
-
-
-        
-
-        //NAME: ClearLoginClick
-        //DESCRIPTION: Clears the login fields of all text
-        //PARAMETERS: object sender, RoutedEventArgs e
-        //RETURN: void
-        private void ClearLoginClick(object sender, RoutedEventArgs e)
-        {
-            userId.Text = "";
-            loginPassword.Clear();
-            dataBaseName.Text = "";
-            serverName.Text = "";
-            portNumber.Text = "";
-        }
-
-      
-        private void RemoveCustomer_Click(object sender, RoutedEventArgs e)
-        {
-            // get selected customer from datagrid 
-            Customer? selectedCustomer = CustomerList.SelectedItem as Customer;
-            if (selectedCustomer != null)
-            {
-                dbManager.Customers.Delete(selectedCustomer);
-                dbManager.Customers.SaveChanges();
-                // Refresh the DataGrid
-                customers = dbManager.Customers.GetAllCustomers();
-                CustomerList.ItemsSource = customers;
-            }
-        }
     }
 }
