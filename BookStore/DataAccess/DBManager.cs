@@ -9,12 +9,10 @@
 
 using MySql.Data.MySqlClient;
 using System.Data;
-using static System.Reflection.Metadata.BlobBuilder;
-
 
 namespace BookStore
 {
-    public class DBManager
+    internal class DBManager
     {
         static public string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
 
@@ -37,76 +35,17 @@ namespace BookStore
                 {
                     connection.Open();
 
-                if (result == null)
-                {
-                    return new DbInitResult
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(query, connection))
                     {
-                        Success = false,
-                        DatabaseExists = false,
-                        NeedsCreation = true,
-                        Message = $"Database '{database}' does not exist."
-                    };
+                        adapter.Fill(dataTable); // Fill the DataTable with results
+                    }
                 }
-
-                ConnectionString = $"server={server};port={port};uid={user};pwd={password};database={database};";
-
-                return new DbInitResult
-                {
-                    Success = true,
-                    DatabaseExists = true,
-                    Message = "Database exists.",
-                    ConnectionString = ConnectionString
-                };
             }
             catch (Exception ex)
             {
-                return new DbInitResult
-                {
-                    Success = false,
-                    Message = $"Connection failed: {ex.Message}"
-                };
+                Console.WriteLine("Error: " + ex.Message);
             }
-        }
-
-
-
-        public DbInitResult CreateDatabase(
-            string server,
-            string user,
-            string password,
-            string database,
-            string port)
-        {
-            string connStr = $"server={server};port={port};uid={user};pwd={password};";
-
-            try
-            {
-                using MySqlConnection conn = new MySqlConnection(connStr);
-                conn.Open();
-
-                using MySqlCommand createCmd =
-                    new MySqlCommand($"CREATE DATABASE `{database}`;", conn);
-                createCmd.ExecuteNonQuery();
-
-                ConnectionString =
-                    $"server={server};port={port};uid={user};pwd={password};database={database};";
-
-                return new DbInitResult
-                {
-                    Success = true,
-                    DatabaseExists = true,
-                    Message = $"Database '{database}' created.",
-                    ConnectionString = ConnectionString
-                };
-            }
-            catch (Exception ex)
-            {
-                return new DbInitResult
-                {
-                    Success = false,
-                    Message = $"Database creation failed: {ex.Message}"
-                };
-            }
+            return dataTable;
         }
 
         //NAME: DataBaseCRUD
