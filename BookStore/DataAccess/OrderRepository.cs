@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
-namespace BookStore.DataAccess
+namespace BookStore
 {
-    internal class OrderRepository
+    public class OrderRepository
     {
+
     }
 }

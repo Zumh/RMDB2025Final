@@ -42,16 +42,27 @@ DESCRIPTION: This is the Customer class that manages the customer objects create
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Password:" Width="100"/>
-                            <TextBox Width="200" Name="loginPassword"/>
+                            <PasswordBox Width="200" Name="loginPassword"/>
                         </StackPanel>
                         
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Database:" Width="100"/>
                             <TextBox Width="200" Name="dataBaseName"/>
                         </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Server:" Width="100"/>
+                            <TextBox Width="200" Name="serverName"/>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Port:" Width="100"/>
+                            <TextBox Width="200" Name="portNumber"/>
+                        </StackPanel>
+                        
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                            <Button Content="Login" Width="66" Margin="0,0,0,0" Name="LoginBtn"/>
-                            <Button Content="Clear" Width="66" Margin="10,0,0,0" Name="clearLoginBtn" Click="ClearLogin_Click"/>
+                            <Button Content="Login" Width="66" Margin="0,0,0,0" Name="LoginBtn" Click="LoginClick"/>
+                            <Button Content="Clear" Width="66" Margin="10,0,0,0" Name="clearLoginBtn" Click="ClearLoginClick"/>
                         </StackPanel>
                         
                     </StackPanel>
@@ -105,7 +116,7 @@ DESCRIPTION: This is the Customer class that manages the customer objects create
                     <!-- RIGHT SIDE: Buttons -->
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
                         <Button Content="Add Customer" Width="140" Margin="0,0,0,10" x:Name="AddCustomerBtn" Click="AddCustomerBtn_Click"/>
-                        <Button Content="Remove Customer" Width="140" Margin="0,0,0,10"/>
+                        <Button Content="Remove Customer" Width="140" Margin="0,0,0,10"  Click="RemoveCustomer_Click"/>
                         <Button Content="Search Customer" Width="140" Margin="0,0,0,10" x:Name="SearchCustomer" Click="SearchForCustomer_Click"/>
                         <Button Content="Display All Customers" Width="140" Margin="0,0,0,10" x:Name="DisplayAllCustomers" Click="DisplayAllCustomers_Click"/>
                     </StackPanel>
@@ -168,7 +179,8 @@ DESCRIPTION: This is the Customer class that manages the customer objects create
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
                         <Button Content="Add Book" Width="140" Margin="0,0,0,10" x:Name="AddBook" Click="AddBook_Click"/>
                         <Button Content="Remove Book" Width="140" Margin="0,0,0,10"/>
-                        <Button Content="Search Book" Width="140" x:Name="SearchBook" Click="SearchBook_Click"/>
+                        <Button Content="Search Book" Width="140" x:Name="SearchBook" Margin="0,0,0,10" Click="SearchBook_Click"/>
+                        <Button Content="Diplay books" Width="140" x:Name="DisplayBooks" Click="DisplayBook_Click"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
