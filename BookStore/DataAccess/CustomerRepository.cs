@@ -64,5 +64,103 @@ namespace BookStore
             return customers;
         }
 
+        // find customer by id 
+        public Customer? FindById(int customerId)
+        {
+            DataRow? row = Table.Rows.Find(customerId);
+            if (row != null)
+            {
+                return new Customer
+                {
+                    CustomerId = Convert.ToInt32(row["id"]),
+                    CustomerName = row["name"].ToString(),
+                    Email = row["email"].ToString(),
+                    Address = row["address"].ToString(),
+                    Phone = row["phoneNumber"].ToString()
+                };
+            }
+            return null;
+
+        }
+
+        // find customer by name
+        public Customer? FindByName(string customerName)
+        {
+            foreach (DataRow row in Table.Rows)
+            {
+                if (row.RowState != DataRowState.Deleted && row["name"].ToString() == customerName)
+                {
+                    return new Customer
+                    {
+                        CustomerId = Convert.ToInt32(row["id"]),
+                        CustomerName = row["name"].ToString(),
+                        Email = row["email"].ToString(),
+                        Address = row["address"].ToString(),
+                        Phone = row["phoneNumber"].ToString()
+                    };
+                }
+            }
+            return null;
+        }
+
+        // find customer by email
+        public Customer? FindByEmail(string email)
+        {
+            foreach (DataRow row in Table.Rows)
+            {
+                if (row.RowState != DataRowState.Deleted && row["email"].ToString() == email)
+                {
+                    return new Customer
+                    {
+                        CustomerId = Convert.ToInt32(row["id"]),
+                        CustomerName = row["name"].ToString(),
+                        Email = row["email"].ToString(),
+                        Address = row["address"].ToString(),
+                        Phone = row["phoneNumber"].ToString()
+                    };
+                }
+            }
+            return null;
+        }
+
+        // find customer by phone number
+        public Customer? FindByPhone(string phoneNumber)
+        {
+            foreach (DataRow row in Table.Rows)
+            {
+                if (row.RowState != DataRowState.Deleted && row["phoneNumber"].ToString() == phoneNumber)
+                {
+                    return new Customer
+                    {
+                        CustomerId = Convert.ToInt32(row["id"]),
+                        CustomerName = row["name"].ToString(),
+                        Email = row["email"].ToString(),
+                        Address = row["address"].ToString(),
+                        Phone = row["phoneNumber"].ToString()
+                    };
+                }
+            }
+            return null;
+        }
+
+        // find customer by address
+        public Customer? FindByAddress(string address)
+        {
+            foreach (DataRow row in Table.Rows)
+            {
+                if (row.RowState != DataRowState.Deleted && row["address"].ToString() == address)
+                {
+                    return new Customer
+                    {
+                        CustomerId = Convert.ToInt32(row["id"]),
+                        CustomerName = row["name"].ToString(),
+                        Email = row["email"].ToString(),
+                        Address = row["address"].ToString(),
+                        Phone = row["phoneNumber"].ToString()
+                    };
+                }
+            }
+            return null;
+        }
     }
 }

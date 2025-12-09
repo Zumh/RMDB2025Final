@@ -162,29 +162,56 @@ namespace BookStore
             string customerEmail = CustomerEmailTextBox.Text;
             string customerAddress = CustomerAddressTextBox.Text;
             string customerPhoneNumber = CustomerPhoneTextBox.Text;
-
+            Customer? foundCustomer = null;
             StatusText.Text = "";
             //need to add more options for searching
             List<Customer> list = new List<Customer>();
 
             if (!string.IsNullOrEmpty(customerName)) 
             {
-                //if (Customer._customers.Count == 0)
-                //{
-                //    StatusText.Text = "Customer DataSet not found.";
-                //} 
-                //else
-                //{
-                //    list = Customer.SearchByName(customerName);
-                //    StatusText.Text = "";
-                //}
+                
+                foundCustomer = dbManager.Customers.FindByName(customerName);
+                if (foundCustomer != null)
+                {
+                    list.Add(foundCustomer);
+                }
             }
-            if(list.Count == 0)
+            else if (!string.IsNullOrEmpty(customerEmail))
+            {
+
+                foundCustomer = dbManager.Customers.FindByEmail(customerEmail);
+                if (foundCustomer != null)
+                {
+                    list.Add(foundCustomer);
+                }
+            }
+           else  if (!string.IsNullOrEmpty(customerAddress))
+            {
+
+                foundCustomer = dbManager.Customers.FindByAddress(customerAddress);
+                if (foundCustomer != null)
+                {
+                    list.Add(foundCustomer);
+                }
+            }
+            else if (!string.IsNullOrEmpty(customerPhoneNumber))
+            {
+
+                foundCustomer = dbManager.Customers.FindByPhone(customerPhoneNumber);
+                if (foundCustomer != null)
+                {
+                    list.Add(foundCustomer);
+                }
+            }
+            if (list.Count == 0)
             {
                 StatusText.Text = "Customer Name not found.";
+                Background = Brushes.Red;
             } else
             {
                 CustomerList.ItemsSource = list;
+                StatusText.Text = "Customer found";
+                Background = Brushes.LightGreen;
             }
             
         }
