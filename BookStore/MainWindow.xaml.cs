@@ -311,6 +311,7 @@ namespace BookStore
 
                 // TODO: Handle Publisher properly (find ID by name or insert new publisher)
                 // For now we will just use a default ID or try to parse if user entered ID
+                // Since UI is text box, let's assume for prototype we need to fix this later or assume ID 1.
                 int pubId = 1;
                 int catId = 1;
 
@@ -319,8 +320,8 @@ namespace BookStore
                     var newBook = new Book
                     {
                         Title = title,
-                        ISBN = isbn,
-                        Price = (decimal)numericPrice,
+                        ISBN = isbn, // Note: Model has String ISBN but here usage tried double? Model says string.
+                        Price = (decimal)numericPrice, // Model says decimal
                         Stock = numericStock,
                         PublisherID = pubId,
                         CategoryID = catId
@@ -348,14 +349,14 @@ namespace BookStore
         public class CartItem
         {
             public int BookId { get; set; }
-            public string BookTitle { get; set; } = string.Empty;
+            public string BookTitle { get; set; }
             public int Quantity { get; set; }
             public decimal Price { get; set; }
             public decimal TotalPrice => Price * Quantity;
         }
 
         private List<CartItem> _cartItems = new List<CartItem>();
-        private Customer? _selectedOrderCustomer = null;
+        private Customer _selectedOrderCustomer = null;
 
         private void LoadData()
         {
@@ -370,7 +371,7 @@ namespace BookStore
                 OrderBookGrid.ItemsSource = null;
                 RefreshHistory_Click(null, null);
             }
-            catch
+            catch (Exception ex)
             {
                 // StatusText might be null if called too early
             }
@@ -387,14 +388,17 @@ namespace BookStore
             else
             {
                 var all = _customerRepo.GetAll();
-                var filtered = all.Where(c => (c.CustomerName ?? "").ToLower().Contains(filter) || (c.Phone ?? "").Contains(filter)).ToList();
+                var filtered = all.Where(c => c.CustomerName.ToLower().Contains(filter) || c.Phone.Contains(filter)).ToList();
                 OrderCustomerGrid.ItemsSource = filtered;
             }
         }
 
         private void OrderCustomerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _selectedOrderCustomer = OrderCustomerGrid.SelectedItem as Customer;
+            if (OrderCustomerGrid.SelectedItem is Customer c)
+            {
+                _selectedOrderCustomer = c;
+            }
         }
 
         // --- Book Section ---
@@ -408,25 +412,43 @@ namespace BookStore
             else
             {
                 var all = _bookRepo.GetAll();
-                // ✅ FIXED: Now using Book directly instead of BookSelectionViewModel
-                var filtered = all
-                    .Where(b => (b.Title ?? "").ToLower().Contains(filter) || (b.ISBN ?? "").Contains(filter))
-                    .ToList();
+                var filtered = all.Where(b => b.Title.ToLower().Contains(filter) || b.ISBN.Contains(filter)).ToList();
                 OrderBookGrid.ItemsSource = filtered;
             }
         }
 
         private void OrderBookGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            // ✅ FIXED: Now using Book directly instead of BookSelectionViewModel
             if (OrderBookGrid.SelectedItem is Book b)
             {
-                // For now, we'll add with default quantity of 1
-                int qtyToAdd = 1;
+                // ✅ 수정됨: 팝업으로 수량 입력받기
+                string input = Microsoft.VisualBasic.Interaction.InputBox(
+                    $"책 '{b.Title}'의 수량을 입력하세요.\n(최대 {b.Stock}권 가능)", 
+                    "수량 선택", 
+                    "1");
+
+                // 사용자가 취소를 누르면 input이 ""가 됨
+                if (string.IsNullOrEmpty(input))
+                {
+                    return;
+                }
+
+                // 숫자로 변환 시도
+                if (!int.TryParse(input, out int qtyToAdd))
+                {
+                    MessageBox.Show("유효한 숫자를 입력해주세요.");
+                    return;
+                }
 
                 if (qtyToAdd <= 0)
                 {
-                    MessageBox.Show("Please select a quantity greater than 0.");
+                    MessageBox.Show("0보다 큰 수량을 입력해주세요.");
+                    return;
+                }
+
+                if (qtyToAdd > b.Stock)
+                {
+                    MessageBox.Show($"재고가 부족합니다. 최대 {b.Stock}권 가능합니다.");
                     return;
                 }
 
@@ -436,28 +458,23 @@ namespace BookStore
                     if (existing.Quantity + qtyToAdd <= b.Stock)
                     {
                         existing.Quantity += qtyToAdd;
+                        MessageBox.Show($"수량이 업데이트되었습니다. (총 {existing.Quantity}권)");
                     }
                     else
                     {
-                        MessageBox.Show($"Cannot add more. Stock limit ({b.Stock}) reached.");
+                        MessageBox.Show($"재고 부족! 현재: {existing.Quantity}권, 추가 가능: {b.Stock - existing.Quantity}권");
                     }
                 }
                 else
                 {
-                    if (b.Stock >= qtyToAdd)
+                    _cartItems.Add(new CartItem
                     {
-                        _cartItems.Add(new CartItem
-                        {
-                            BookId = b.BookID,
-                            BookTitle = b.Title ?? string.Empty,
-                            Quantity = qtyToAdd,
-                            Price = b.Price
-                        });
-                    }
-                    else
-                    {
-                        MessageBox.Show("Not enough Stock!");
-                    }
+                        BookId = b.BookID,
+                        BookTitle = b.Title,
+                        Quantity = qtyToAdd,
+                        Price = b.Price
+                    });
+                    MessageBox.Show($"카트에 추가되었습니다. ({qtyToAdd}권)");
                 }
 
                 RefreshCart();
@@ -529,7 +546,7 @@ namespace BookStore
         }
 
         // --- Order History Section ---
-        private void RefreshHistory_Click(object? sender, RoutedEventArgs? e)
+        private void RefreshHistory_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -542,8 +559,8 @@ namespace BookStore
                 {
                     if (HistorySearchMethodCombo.SelectedItem is ComboBoxItem item)
                     {
-                        method = item.Content?.ToString() ?? "";
-                        value = HistorySearchValueBox.Text ?? "";
+                        method = item.Content.ToString();
+                        value = HistorySearchValueBox.Text;
                     }
                 }
 
