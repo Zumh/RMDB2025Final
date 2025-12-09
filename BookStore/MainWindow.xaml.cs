@@ -215,12 +215,12 @@ namespace BookStore
             if (list.Count == 0)
             {
                 StatusText.Text = "Customer Name not found.";
-                Background = Brushes.Red;
+                StatusText.Background = Brushes.Red;
             } else
             {
                 CustomerList.ItemsSource = list;
                 StatusText.Text = "Customer found";
-                Background = Brushes.LightGreen;
+                StatusText.Background = Brushes.LightGreen;
             }
             
         }
@@ -230,8 +230,53 @@ namespace BookStore
         private void SearchBook_Click(object sender, RoutedEventArgs e)
         {
 
-            //Successfully loads data ------ this is just for test purposes, need to implement actual search
-           
+            string bookTitle = BookTitletextBox.Text;
+            string bookIsbn = IsbnTextBox.Text;
+            string bookPrice = BookPriceTextBox.Text;
+            string bookPublisher = BookPublisherTextBox.Text;
+            string bookCategory = catComboBox.SelectedValue?.ToString() ?? "";
+
+
+            StatusText.Text = "";
+            //need to add more options for searching
+            List<Book> list = new List<Book>();
+
+            if (!string.IsNullOrEmpty(bookTitle))
+            {
+
+                list = dbManager.Books.SearchBooksByTitle(bookTitle);
+               
+            }
+            else if (!string.IsNullOrEmpty(bookIsbn))
+            {
+                double numericISBN = double.TryParse(bookIsbn, out numericISBN) ? numericISBN : 0;
+                list = dbManager.Books.SearchBooksByISBN(numericISBN);
+               
+            }
+            else if (!string.IsNullOrEmpty(bookPublisher))
+            {
+
+                list = dbManager.Books.SearchBooksByPublisher(bookPublisher);
+              
+            }
+            else if (!string.IsNullOrEmpty(catComboBox.SelectedValue.ToString()))
+            {
+
+                list = dbManager.Books.SearchBooksByCategory(bookCategory);
+             
+            } 
+            if (list.Count == 0)
+            {
+                StatusText.Text = "Books not found.";
+                StatusText.Background = Brushes.Red;
+            }
+            else
+            {
+                BookList.ItemsSource = list;
+                StatusText.Text = "Books found";
+                StatusText.Background = Brushes.LightGreen;
+            }
+
         }
 
         //NAME: BookList_Columns
@@ -318,7 +363,19 @@ namespace BookStore
                 double.TryParse(isbn, out numericISBN);
                 float.TryParse(price, out numericPrice);
                 int.TryParse(stock, out numericStock);
-                int.TryParse(publisher, out publisherID);
+          
+                // find the publisher ID from the database based on the name
+                Publisher? foundPublisher = dbManager.Publishers.FindByName(publisher);
+                if (foundPublisher != null)
+                {
+                    publisherID = foundPublisher.PublisherID;
+                }
+                else
+                {
+                    StatusText.Text = "Publisher not found in database.";
+                    validated = false;
+                }
+
                 if (validated && catComboBox.SelectedItem != null)
                 {
                     dbManager.Books.Add(new Book

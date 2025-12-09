@@ -15,10 +15,10 @@ namespace BookStore
 
         public DataTable? Table;
 
-        public BookRepository(string connectionString, DataSet ds)
+        public BookRepository(string connectionString, DataSet currentDataSet)
         {
             this.connectionString = connectionString;
-            dataset = ds;
+            dataset = currentDataSet;
 
             InitializeAdapters();
             LoadAll();
@@ -148,6 +148,104 @@ namespace BookStore
 
         }
 
+        // search books by title
+        public List<Book> SearchBooksByTitle(string title)
+        {
+            List<Book> books = new List<Book>();
+            LoadAll();
+            foreach (DataRow row in Table.Rows)
+            {
+                if (row["title"].ToString()!.Contains(title, StringComparison.OrdinalIgnoreCase))
+                {
+                    books.Add(new Book
+                    {
+                        BookID = Convert.ToInt32(row["id"]),
+                        Title = row["title"].ToString(),
+                        ISBN = Convert.ToDouble(row["isbn"]),
+                        Price = Convert.ToSingle(row["price"]),
+                        Stock = Convert.ToInt32(row["stock"]),
+                        PublisherID = Convert.ToInt32(row["publisherID"]),
+                        CategoryID = Convert.ToInt32(row["categoryID"])
+                    });
+                }
+            }
+            return books;
+        }
+
+
+        // search books by publisher
+        public List<Book> SearchBooksByPublisher(string publisherName)
+        {
+            List<Book> books = new List<Book>();
+            LoadAll();
+            foreach (DataRow bookRow in Table.Rows)
+            {
+                DataRow? publisherRow = bookRow.GetParentRow("FK_Book_Publisher");
+                if (publisherRow != null && publisherRow["publisherName"].ToString()!.Equals(publisherName, StringComparison.OrdinalIgnoreCase))
+                {
+                    books.Add(new Book
+                    {
+                        BookID = Convert.ToInt32(bookRow["id"]),
+                        Title = bookRow["title"].ToString(),
+                        ISBN = Convert.ToDouble(bookRow["isbn"]),
+                        Price = Convert.ToSingle(bookRow["price"]),
+                        Stock = Convert.ToInt32(bookRow["stock"]),
+                        PublisherID = Convert.ToInt32(bookRow["publisherID"]),
+                        CategoryID = Convert.ToInt32(bookRow["categoryID"])
+                    });
+                }
+            }
+            return books;
+        }
+
+        // search books by category
+        public List<Book> SearchBooksByCategory(string categoryName)
+        {
+            List<Book> books = new List<Book>();
+            LoadAll();
+            foreach (DataRow bookRow in Table.Rows)
+            {
+                DataRow? categoryRow = bookRow.GetParentRow("FK_Book_Category");
+                if (categoryRow != null && categoryRow["id"].ToString()!.Equals(categoryName, StringComparison.OrdinalIgnoreCase))
+                {
+                    books.Add(new Book
+                    {
+                        BookID = Convert.ToInt32(bookRow["id"]),
+                        Title = bookRow["title"].ToString(),
+                        ISBN = Convert.ToDouble(bookRow["isbn"]),
+                        Price = Convert.ToSingle(bookRow["price"]),
+                        Stock = Convert.ToInt32(bookRow["stock"]),
+                        PublisherID = Convert.ToInt32(bookRow["publisherID"]),
+                        CategoryID = Convert.ToInt32(bookRow["categoryID"])
+                    });
+                }
+            }
+            return books;
+        }
+
+        // search books by ISBN
+        public List<Book> SearchBooksByISBN(double isbn)
+        {
+            List<Book> books = new List<Book>();
+            LoadAll();
+            foreach (DataRow row in Table.Rows)
+            {
+                if (Convert.ToDouble(row["isbn"]) == isbn)
+                {
+                    books.Add(new Book
+                    {
+                        BookID = Convert.ToInt32(row["id"]),
+                        Title = row["title"].ToString(),
+                        ISBN = Convert.ToDouble(row["isbn"]),
+                        Price = Convert.ToSingle(row["price"]),
+                        Stock = Convert.ToInt32(row["stock"]),
+                        PublisherID = Convert.ToInt32(row["publisherID"]),
+                        CategoryID = Convert.ToInt32(row["categoryID"])
+                    });
+                }
+            }
+            return books;
+        }
 
     }
 
