@@ -30,7 +30,7 @@ namespace BookStore
         }
       
         public CustomerRepository Customers => customerRepo ??= new CustomerRepository(ConnectionString, Data);
-        //public BookRepository Books => bookRepo ??= new BookRepository(ConnectionString);
+        public BookRepository Books => bookRepo ??= new BookRepository(ConnectionString, Data);
         //public OrderRepository Orders => orderRepo ??= new OrderRepository(ConnectionString);
 
         public DbInitResult CheckDatabase(

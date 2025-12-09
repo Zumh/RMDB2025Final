@@ -68,24 +68,25 @@ namespace BookStore
 
             //clear error messages
             StatusText.Text = "";
-
+            Customer currentCustomer = new Customer();
+  
             //validate each user input
-            if (!(validated = Customer.ValidateName(customerName)))
+            if (!(validated = currentCustomer.ValidateName(customerName)))
             {
                 StatusText.Text = "Field is Mandatory";
                 CustomerNameTextBox.Text = "";
             }
-            else if (!(validated = Customer.ValidateEmail(customerEmail)))
+            else if (!(validated = currentCustomer.ValidateEmail(customerEmail)))
             {
                 StatusText.Text = "Format should be \"Example@email.com\"";
                 CustomerEmailTextBox.Text = "";
             }
-            else if (!(validated = Customer.ValidateAddress(customerAddress)))
+            else if (!(validated = currentCustomer.ValidateAddress(customerAddress)))
             {
                 StatusText.Text = "Field is Mandatory";
                 CustomerAddressTextBox.Text = "";
             }
-            else if (!(validated = Customer.ValidatePhoneNumber(customerPhoneNumber)))
+            else if (!(validated = currentCustomer.ValidatePhoneNumber(customerPhoneNumber)))
             {
                 StatusText.Text = "Format should be \"555-555-5555\"";
                 CustomerEmailTextBox.Text = "";
@@ -269,24 +270,25 @@ namespace BookStore
             string stock = BookStock.Text;
             //clear error messages
             StatusText.Text = "";
+            Book book = new Book();
 
             //validate each user input
-            if (!(validated = Book.ValidateBookTitle(title)))
+            if (!(validated = book.ValidateBookTitle(title)))
             {
                 StatusText.Text = "Name is Mandatory";
                 BookTitletextBox.Text = "";
             }
-            else if (!(validated = Book.ValidateIBSN(isbn)))
+            else if (!(validated = book.ValidateIBSN(isbn)))
             {
                 StatusText.Text = "ISBN is Mandatory and must be 13 digits long, ex.(1234567890123).";
                 IsbnTextBox.Text = "";
             }
-            else if (!(validated = Book.ValidatePrice(price)))
+            else if (!(validated = book.ValidatePrice(price)))
             {
                 StatusText.Text = "Price is Mandatory and must be numeric";
                 BookPriceTextBox.Text = "";
             }
-            else if (!(validated = Book.ValidateStock(stock)))
+            else if (!(validated = book.ValidateStock(stock)))
             {
                 StatusText.Text = "Stock is Mandatory and must be numeric";
                 BookStock.Text = "";
@@ -297,21 +299,21 @@ namespace BookStore
                 float numericPrice;
                 int numericStock;
                 //parse strings into numbers
-                double.TryParse(isbn, out numericISBN);
-                float.TryParse(price, out numericPrice);
-                int.TryParse(stock, out numericStock);
-                if (validated)
-                {
-                    Book._books.Add(new Book
-                    {
-                        Title = title,
-                        ISBN = numericISBN,
-                        Price = numericPrice,
-                        Stock = numericStock
-                    });
-                    StatusText.Text = "";
-                    ClearUIInput();
-                }
+                //double.TryParse(isbn, out numericISBN);
+                //float.TryParse(price, out numericPrice);
+                //int.TryParse(stock, out numericStock);
+                //if (validated)
+                //{
+                //    Book._books.Add(new Book
+                //    {
+                //        Title = title,
+                //        ISBN = numericISBN,
+                //        Price = numericPrice,
+                //        Stock = numericStock
+                //    });
+                //    StatusText.Text = "";
+                //    ClearUIInput();
+                //}
             }        
         }
 
@@ -451,6 +453,22 @@ namespace BookStore
                 // Refresh the DataGrid
                 customers = dbManager.Customers.GetAllCustomers();
                 CustomerList.ItemsSource = customers;
+            }
+        }
+
+        private void DisplayBook_Click(object sender, RoutedEventArgs e)
+        {
+            List<Book> books = dbManager.Books.GetAllBooks();
+            if (books == null)
+            {
+                StatusText.Text = "No books in Database.";
+            }
+            else
+            {
+
+                //add the list to the dataGrid
+                BookList.ItemsSource = books;
+
             }
         }
     }

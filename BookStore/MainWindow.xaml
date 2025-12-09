@@ -179,7 +179,8 @@ DESCRIPTION: This is the Customer class that manages the customer objects create
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
                         <Button Content="Add Book" Width="140" Margin="0,0,0,10" x:Name="AddBook" Click="AddBook_Click"/>
                         <Button Content="Remove Book" Width="140" Margin="0,0,0,10"/>
-                        <Button Content="Search Book" Width="140" x:Name="SearchBook" Click="SearchBook_Click"/>
+                        <Button Content="Search Book" Width="140" x:Name="SearchBook" Margin="0,0,0,10" Click="SearchBook_Click"/>
+                        <Button Content="Diplay books" Width="140" x:Name="DisplayBooks" Click="DisplayBook_Click"/>
                     </StackPanel>
                 </Grid>
             </TabItem>

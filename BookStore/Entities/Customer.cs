@@ -29,7 +29,7 @@ namespace BookStore
         //DESCRIPTION: Validates the customer name is not blank
         //PARAMETERS: string customerName - name of customer
         //RETURN: bool isValid - true if name is valid otherwise false
-        public static bool ValidateName(string customerName)
+        public bool ValidateName(string customerName)
         {
             bool isValid = true;
 
@@ -43,7 +43,7 @@ namespace BookStore
         //DESCRIPTION: Validates the customer address is not blank
         //PARAMETERS: string address - address of customer
         //RETURN: bool isValid - true if address is valid otherwise false
-        public static bool ValidateAddress(string address)
+        public bool ValidateAddress(string address)
         {
             bool isValid = true;
             if (string.IsNullOrEmpty(address.Trim()))
@@ -56,7 +56,7 @@ namespace BookStore
         //DESCRIPTION: Validates the customer phone number is not blank and in proper format
         //PARAMETERS: string phone - phone number of customer
         //RETURN: bool isValid - true if phone number is valid otherwise false
-        public static bool ValidatePhoneNumber(string phone) 
+        public bool ValidatePhoneNumber(string phone) 
         {
             bool isValid = true;
             if (!string.IsNullOrEmpty(phone.Trim()))
@@ -72,7 +72,7 @@ namespace BookStore
         //DESCRIPTION: Validates the customer email is not blank and in proper format
         //PARAMETERS: string email - email of customer
         //RETURN: bool isValid - true if email is valid otherwise false
-        public static bool ValidateEmail(string email) 
+        public bool ValidateEmail(string email) 
         {
             bool isValid = true;
             if (!string.IsNullOrEmpty(email.Trim()))
