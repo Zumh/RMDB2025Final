@@ -631,6 +631,30 @@ namespace BookStore
             RefreshCart();
         }
 
+        private void RemoveOrder_Click(object sender, RoutedEventArgs e)
+        {
+             if (OrderHistoryGrid.SelectedItem is OrderDetail selected)
+             {
+                 if (MessageBox.Show($"Are you sure you want to delete Order #{selected.OrderId}?", "Confirm Delete", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                 {
+                     try
+                     {
+                        _orderRepo.DeleteOrder(selected.OrderId);
+                         StatusText.Text = $"Order #{selected.OrderId} deleted.";
+                         RefreshHistory_Click(null, null);
+                     }
+                     catch(Exception ex)
+                     {
+                         StatusText.Text = "Error deleting order: " + ex.Message;
+                     }
+                 }
+             }
+             else
+             {
+                 MessageBox.Show("Please select an order to remove.");
+             }
+        }
+
         private void SubmitOrder_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedOrderCustomer == null)
@@ -653,7 +677,7 @@ namespace BookStore
                 Order newOrder = new Order
                 {
                     CustomerID = _selectedOrderCustomer?.CustomerId ?? 0,
-                    OrderDate = DateTime.Now.ToString("yyyy-MM-dd"), 
+                    OrderDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), 
                     OrderAmount = (float)total,
                     OrderDetails = new List<OrderDetail>()
                 };

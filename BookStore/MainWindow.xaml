@@ -302,6 +302,7 @@
                                 </ComboBox>
                                 <TextBox x:Name="HistorySearchValueBox" Width="200" KeyDown="HistorySearch_KeyDown"/>
                                 <Button Content="Search" Width="60" Margin="10,0,0,0" Click="HistorySearchButton_Click"/>
+                                <Button Content="Remove" Width="60" Margin="10,0,0,0" Click="RemoveOrder_Click"/>
                                 <Button Content="Refresh" Width="60" Margin="10,0,0,0" Click="RefreshHistory_Click"/>
                             </StackPanel>
 

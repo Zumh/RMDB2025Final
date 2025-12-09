@@ -150,5 +150,15 @@ namespace BookStore.DataAccess
             }
             return history;
         }
+        public void DeleteOrder(int orderId)
+        {
+            // Delete details first due to foreign key constraints
+            string detailQuery = $"DELETE FROM orderdetail WHERE orderID = {orderId}";
+            db.ExecuteNonQuery(detailQuery);
+
+            // Delete order
+            string orderQuery = $"DELETE FROM `order` WHERE id = {orderId}";
+            db.ExecuteNonQuery(orderQuery);
+        }
     }
 }
