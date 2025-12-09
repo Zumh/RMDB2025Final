@@ -311,6 +311,14 @@ namespace BookStore
             string database = dataBaseName.Text.Trim();
             string port = portNumber.Text.Trim();
 
+            DbInitResult check =  manager.CheckDatabase(server, user, password, database, port);
+
+            if (!check.Success && !check.NeedsCreation)
+            {
+                StatusText.Text = check.Message;
+                StatusText.Foreground = Brushes.Red;
+                return;
+            }
             // Check for empty fields
             if (string.IsNullOrEmpty(server) ||
                 string.IsNullOrEmpty(user) ||

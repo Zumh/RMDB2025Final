@@ -7,40 +7,133 @@
  *             
 */
 
+using BookStore.DataAccess;
 using MySql.Data.MySqlClient;
 using System.Data;
 
 namespace BookStore
 {
-    internal class DBManager
+    public class DBManager
     {
-        static string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
-        MySqlConnection connection = new(connectionString);
+        public string ConnectionString { get; private set; }
 
-        public DataTable DataBaseQuery(string query)
+        // Lazy-loaded repositories
+        private CustomerRepository? customerRepo = null;
+        private BookRepository? bookRepo = null;
+        private OrderRepository? orderRepo = null;
+
+        public DBManager(){}
+      
+        public CustomerRepository Customers => customerRepo ??= new CustomerRepository(ConnectionString);
+        public BookRepository Books => bookRepo ??= new BookRepository(ConnectionString);
+        public OrderRepository Orders => orderRepo ??= new OrderRepository(ConnectionString);
+
+        public DbInitResult CheckDatabase(
+           string server,
+           string user,
+           string password,
+           string database,
+           string port)
         {
-            DataTable dataTable = new DataTable();
+            // Validate input
+            if (string.IsNullOrWhiteSpace(server) ||
+                string.IsNullOrWhiteSpace(user) ||
+                string.IsNullOrWhiteSpace(password) ||
+                string.IsNullOrWhiteSpace(database) ||
+                string.IsNullOrWhiteSpace(port))
+            {
+                return new DbInitResult
+                {
+                    Success = false,
+                    Message = "All fields are required."
+                };
+            }
+
+            string connStr = $"server={server};port={port};uid={user};pwd={password};";
 
             try
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    Console.WriteLine("Application Connected to DB");
+                using MySqlConnection conn = new MySqlConnection(connStr);
+                conn.Open();
 
-                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(query, connection))
+                using MySqlCommand cmd = new MySqlCommand(
+                    "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = @db;",
+                    conn);
+                cmd.Parameters.AddWithValue("@db", database);
+
+                object? result = cmd.ExecuteScalar();
+
+                if (result == null)
+                {
+                    return new DbInitResult
                     {
-                        adapter.Fill(dataTable); // Fill the DataTable with results
-                    }
+                        Success = false,
+                        DatabaseExists = false,
+                        NeedsCreation = true,
+                        Message = $"Database '{database}' does not exist."
+                    };
                 }
+
+                ConnectionString = $"server={server};port={port};uid={user};pwd={password};database={database};";
+
+                return new DbInitResult
+                {
+                    Success = true,
+                    DatabaseExists = true,
+                    Message = "Database exists.",
+                    ConnectionString = ConnectionString
+                };
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                return new DbInitResult
+                {
+                    Success = false,
+                    Message = $"Connection failed: {ex.Message}"
+                };
             }
-            return dataTable;
         }
-      
+
+
+
+        public DbInitResult CreateDatabase(
+            string server,
+            string user,
+            string password,
+            string database,
+            string port)
+        {
+            string connStr = $"server={server};port={port};uid={user};pwd={password};";
+
+            try
+            {
+                using MySqlConnection conn = new MySqlConnection(connStr);
+                conn.Open();
+
+                using MySqlCommand createCmd =
+                    new MySqlCommand($"CREATE DATABASE `{database}`;", conn);
+                createCmd.ExecuteNonQuery();
+
+                ConnectionString =
+                    $"server={server};port={port};uid={user};pwd={password};database={database};";
+
+                return new DbInitResult
+                {
+                    Success = true,
+                    DatabaseExists = true,
+                    Message = $"Database '{database}' created.",
+                    ConnectionString = ConnectionString
+                };
+            }
+            catch (Exception ex)
+            {
+                return new DbInitResult
+                {
+                    Success = false,
+                    Message = $"Database creation failed: {ex.Message}"
+                };
+            }
+        }
 
     }
 }
