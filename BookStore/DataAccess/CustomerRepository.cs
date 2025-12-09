@@ -72,7 +72,7 @@ namespace BookStore
             {
                 row.Delete();
             }
-            // find fucstomer by id and delete
+      
 
         }
 

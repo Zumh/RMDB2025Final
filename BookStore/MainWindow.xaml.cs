@@ -497,5 +497,19 @@ namespace BookStore
 
             }
         }
+
+        private void RemoveBook_Click(object sender, RoutedEventArgs e)
+        {
+            // get selected customer from datagrid 
+            Book? selectedBook = BookList.SelectedItem as Book;
+            if (selectedBook != null)
+            {
+                dbManager.Books.Delete(selectedBook);
+                dbManager.Books.SaveChanges();
+                // Refresh the DataGrid
+                books = dbManager.Books.GetAllBooks();
+                BookList.ItemsSource = books;
+            }
+        }
     }
 }

@@ -137,7 +137,16 @@ namespace BookStore
             return books;
         }
 
+        public void Delete(Book currentBook)
+        {
+            DataRow? row = Table.Rows.Find(currentBook.BookID);
+            if (row != null)
+            {
+                row.Delete();
+            }
+   
 
+        }
 
 
     }
