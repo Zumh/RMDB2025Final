@@ -17,8 +17,8 @@ namespace BookStore
         public int PublisherID { get; set; }
         public int CategoryID { get; set; }
         public string? Title { get; set; }
-        public double ISBN { get; set; }
-        public float Price { get; set; }
+        public string? ISBN { get; set; }
+        public decimal Price { get; set; }
         public int Stock { get; set; }
 
         static public List<Book> _books = new List<Book>();
@@ -134,8 +134,8 @@ namespace BookStore
                     PublisherID = Convert.ToInt32(row["publisherID"]),
                     CategoryID = Convert.ToInt32(row["categoryID"]),
                     Title = row["title"].ToString(),
-                    ISBN = Convert.ToInt64(row["isbn"]),
-                    Price = Convert.ToInt32(row["price"]),
+                    ISBN = row["isbn"].ToString(),
+                    Price = Convert.ToDecimal(row["price"]),
                     Stock = Convert.ToInt32(row["stock"])
                 });
             }
