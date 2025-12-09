@@ -103,6 +103,7 @@ namespace BookStore
         // find customer by id 
         public Customer? FindById(int customerId)
         {
+            LoadCustomers();
             DataRow? row = Table.Rows.Find(customerId);
             if (row != null)
             {
@@ -122,6 +123,7 @@ namespace BookStore
         // find customer by name
         public Customer? FindByName(string customerName)
         {
+            LoadCustomers();
             foreach (DataRow row in Table.Rows)
             {
                 if (row.RowState != DataRowState.Deleted && row["name"].ToString() == customerName)
@@ -142,6 +144,7 @@ namespace BookStore
         // find customer by email
         public Customer? FindByEmail(string email)
         {
+            LoadCustomers();
             foreach (DataRow row in Table.Rows)
             {
                 if (row.RowState != DataRowState.Deleted && row["email"].ToString() == email)
@@ -162,6 +165,7 @@ namespace BookStore
         // find customer by phone number
         public Customer? FindByPhone(string phoneNumber)
         {
+            LoadCustomers();
             foreach (DataRow row in Table.Rows)
             {
                 if (row.RowState != DataRowState.Deleted && row["phoneNumber"].ToString() == phoneNumber)
@@ -182,6 +186,7 @@ namespace BookStore
         // find customer by address
         public Customer? FindByAddress(string address)
         {
+            LoadCustomers();
             foreach (DataRow row in Table.Rows)
             {
                 if (row.RowState != DataRowState.Deleted && row["address"].ToString() == address)
