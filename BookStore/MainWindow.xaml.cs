@@ -116,7 +116,7 @@ namespace BookStore
             }
         }
 
-        
+
         //NAME: DisplayAllCustomers_Click
         //DESCRIPTION: Creates a datatable that contains all customers in the database        
         //             Handles no data returns and user feedback
@@ -126,17 +126,18 @@ namespace BookStore
         {
             //query to get all customers
             //DataTable dataTable = db.DataBaseQuery("SELECT * FROM customer");
-            
-            //if (dataTable == null) 
-            //{
-            //    StatusText.Text = "No Customers in Database.";
-            //} 
-            //else
-            //{
-            //    Customer.LoadCustomerData(dataTable);
-            //    //add the list to the dataGrid
-            //    CustomerList.ItemsSource = Customer._customers;
-            //}
+            List<Customer> customers = dbManager.Customers.GetAllCustomers();
+            if (customers == null)
+            {
+                StatusText.Text = "No Customers in Database.";
+            }
+            else
+            {
+
+                //add the list to the dataGrid
+                CustomerList.ItemsSource = customers;
+
+            }
         }
 
         //NAME: CustomerList_Columns
