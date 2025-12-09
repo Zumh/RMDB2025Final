@@ -7,9 +7,8 @@
  *             
 */
 
-using BookStore.DataAccess;
 using MySql.Data.MySqlClient;
-using System.Data;
+
 
 namespace BookStore
 {
@@ -25,8 +24,8 @@ namespace BookStore
         public DBManager(){}
       
         public CustomerRepository Customers => customerRepo ??= new CustomerRepository(ConnectionString);
-        public BookRepository Books => bookRepo ??= new BookRepository(ConnectionString);
-        public OrderRepository Orders => orderRepo ??= new OrderRepository(ConnectionString);
+        //public BookRepository Books => bookRepo ??= new BookRepository(ConnectionString);
+        //public OrderRepository Orders => orderRepo ??= new OrderRepository(ConnectionString);
 
         public DbInitResult CheckDatabase(
            string server,

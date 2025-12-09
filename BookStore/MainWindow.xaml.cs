@@ -1,7 +1,7 @@
 ﻿
 using MySql.Data.MySqlClient;
 using System.Data;
-
+using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -12,14 +12,15 @@ namespace BookStore
     public partial class MainWindow : Window
     {
         //database manager for sending queries
-        DBManager? db = new DBManager();
+        DBManager? dbManager = null;
         List<Category>? categories = null;
-        public string? ConnectionString { get; private set; }
+        private string connectionString = string.Empty;
 
         public MainWindow()
         {
             InitializeComponent();
-
+         
+            dbManager = new DBManager();
             InitializeCategories();
             LoadLogin();
 
@@ -92,13 +93,13 @@ namespace BookStore
                 //add customer to customer list
                 if (validated)
                 {
-                    Customer._customers.Add(new Customer
-                    {
-                        CustomerName = customerName,
-                        Email = customerEmail,
-                        Address = customerAddress,
-                        Phone = customerPhoneNumber
-                    });
+                    //Customer._customers.Add(new Customer
+                    //{
+                    //    CustomerName = customerName,
+                    //    Email = customerEmail,
+                    //    Address = customerAddress,
+                    //    Phone = customerPhoneNumber
+                    //});
                     ClearUIInput();
                 }
             }
@@ -112,18 +113,18 @@ namespace BookStore
         private void DisplayAllCustomers_Click(object sender, RoutedEventArgs e)
         {
             //query to get all customers
-            DataTable dataTable = db.DataBaseQuery("SELECT * FROM customer");
+            //DataTable dataTable = db.DataBaseQuery("SELECT * FROM customer");
             
-            if (dataTable == null) 
-            {
-                StatusText.Text = "No Customers in Database.";
-            } 
-            else
-            {
-                Customer.LoadCustomerData(dataTable);
-                //add the list to the dataGrid
-                CustomerList.ItemsSource = Customer._customers;
-            }
+            //if (dataTable == null) 
+            //{
+            //    StatusText.Text = "No Customers in Database.";
+            //} 
+            //else
+            //{
+            //    Customer.LoadCustomerData(dataTable);
+            //    //add the list to the dataGrid
+            //    CustomerList.ItemsSource = Customer._customers;
+            //}
         }
 
         //NAME: CustomerList_Columns
@@ -155,15 +156,15 @@ namespace BookStore
 
             if (!string.IsNullOrEmpty(customerName)) 
             {
-                if (Customer._customers.Count == 0)
-                {
-                    StatusText.Text = "Customer DataSet not found.";
-                } 
-                else
-                {
-                    list = Customer.SearchByName(customerName);
-                    StatusText.Text = "";
-                }
+                //if (Customer._customers.Count == 0)
+                //{
+                //    StatusText.Text = "Customer DataSet not found.";
+                //} 
+                //else
+                //{
+                //    list = Customer.SearchByName(customerName);
+                //    StatusText.Text = "";
+                //}
             }
             if(list.Count == 0)
             {
@@ -181,9 +182,7 @@ namespace BookStore
         {
 
             //Successfully loads data ------ this is just for test purposes, need to implement actual search
-            DataTable dataTable = db.DataBaseQuery("SELECT * FROM book");
-            Book.LoadBookData(dataTable);
-            BookList.ItemsSource = Book._books;
+           
         }
 
         //NAME: BookList_Columns
@@ -311,76 +310,74 @@ namespace BookStore
             string database = dataBaseName.Text.Trim();
             string port = portNumber.Text.Trim();
 
-            DbInitResult check =  manager.CheckDatabase(server, user, password, database, port);
-
+            DbInitResult? check = dbManager?.CheckDatabase(server, user, password, database, port);
+            if(check == null)
+            {
+                StatusText.Text = "Database manager not initialized.";
+                StatusText.Foreground = Brushes.Red;
+                return;
+            }
+            // database doesn't exist and doesn't need to be created
             if (!check.Success && !check.NeedsCreation)
             {
                 StatusText.Text = check.Message;
                 StatusText.Foreground = Brushes.Red;
-                return;
+             
             }
-            // Check for empty fields
-            if (string.IsNullOrEmpty(server) ||
-                string.IsNullOrEmpty(user) ||
-                string.IsNullOrEmpty(password) ||
-                string.IsNullOrEmpty(database) ||
-                string.IsNullOrEmpty(port))
+            else if (check.NeedsCreation)
             {
-                StatusText.Text = "All fields are required!";
-                StatusText.Foreground = Brushes.Red; // Show error in red
-                return;
-            }
+                // ask the user if they want to create the database
+                MessageBoxResult answer = MessageBox.Show(
+                    check.Message + "\nDo you want to create it?",
+                    "Create Database",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
 
-            // Temporary connection to server without database
-            string connStr = $"server={server};port={port};uid={user};pwd={password};";
-
-            try
-            {
-                using MySqlConnection conn = new MySqlConnection(connStr);
-                conn.Open();
-
-                // Check if database exists
-                using MySqlCommand checkDbCmd = new MySqlCommand($"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{database}';", conn);
-                object result = checkDbCmd.ExecuteScalar();
-
-                if (result == null)
+                // if user does not want to create database
+                if (answer == MessageBoxResult.No)
                 {
-                    // Database does not exist, ask user if they want to create it
-                    MessageBoxResult answer = MessageBox.Show($"Database '{database}' does not exist. Do you want to create it?",
-                                                 "Create Database", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (answer == MessageBoxResult.Yes)
-                    {
-                        using MySqlCommand createDbCmd = new MySqlCommand($"CREATE DATABASE `{database}`;", conn);
-                        createDbCmd.ExecuteNonQuery();
-                        StatusText.Text = $"Database '{database}' created successfully!";
-                        StatusText.Foreground = Brushes.Green;
-                    }
-                    else
-                    {
-                        StatusText.Text = "Database creation canceled.";
-                        StatusText.Foreground = Brushes.Red;
-                        return;
-                    }
+                    StatusText.Text = "Database creation cancelled.";
+                    StatusText.Foreground = Brushes.Red;
+            
                 }
                 else
                 {
-                    StatusText.Text = $"Database '{database}' exists. Connected successfully!";
-                    StatusText.Foreground = Brushes.Green;
-                }
+                    // Step 2: Create database
+                    DbInitResult create = dbManager.CreateDatabase(server, user, password, database, port);
 
-                // Save connection string with database
-                ConnectionString = $"server={server};port={port};uid={user};pwd={password};database={database};";
+                    // is not successful created 
+                    if (!create.Success)
+                    {
+                        StatusText.Text = create.Message;
+                        StatusText.Foreground = Brushes.Red;
+                    
+                    }
+                    else
+                    {
 
-              
+                        connectionString = create.ConnectionString!;
+                        StatusText.Text = create.Message;
+                        StatusText.Foreground = Brushes.Green;
+
+                    }// successfully created database
+
+
+                }// user wants to create database
+
+
             }
-            catch (Exception ex)
+
+            else // database exists and is connected
             {
-                StatusText.Text = $"Connection failed: {ex.Message}";
-                StatusText.Foreground = Brushes.Red;
+                connectionString = check.ConnectionString!;
+                StatusText.Text = check.Message;
+                StatusText.Foreground = Brushes.Green;
             }
-
-
         }
+
+
+
+        
 
         //NAME: ClearLoginClick
         //DESCRIPTION: Clears the login fields of all text
