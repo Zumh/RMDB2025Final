@@ -2,7 +2,7 @@
 
 namespace BookStore
 {
-    internal class Category
+    public class Category
     {
         public int CategoryID { get; set; }
         public string? CategoryName { get; set; }
@@ -29,4 +29,5 @@ namespace BookStore
             return isValid;
         }
     }
+
 }
