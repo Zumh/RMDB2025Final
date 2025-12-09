@@ -9,7 +9,7 @@
 
 using MySql.Data.MySqlClient;
 using System.Data;
-using static System.Reflection.Metadata.BlobBuilder;
+
 
 
 namespace BookStore
@@ -23,9 +23,9 @@ namespace BookStore
         private BookRepository? bookRepo = null;
         private OrderRepository? orderRepo = null;
         public DataSet? Data = null;
-        public DBManager(){
+        public DBManager()
+        {
             Data = new DataSet();
-          //Data.EnforceConstraints = true;
 
         }
       
