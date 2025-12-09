@@ -42,7 +42,7 @@
                             <TextBox Width="200" Name="dataBaseName"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,5">
-                            <Button Content="Login" Width="66" Margin="0,0,0,0" Name="LoginBtn"/>
+                            <Button Content="Login" Width="66" Margin="0,0,0,0" Name="LoginBtn" Click="LoginBtn_Click"/>
                             <Button Content="Clear" Width="66" Margin="10,0,0,0" Name="clearLoginBtn" Click="ClearLogin_Click"/>
                         </StackPanel>
                         
@@ -177,33 +177,41 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- TOP LEFT: Book Information -->
+                        <!-- TOP LEFT: Customer & Book Information -->
                         <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,10,10">
-                            <TextBlock Text="Book Information" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                            <TextBlock Text="Customer Selection" FontSize="16" FontWeight="Bold" Margin="0,0,0,5"/>
+                            <ComboBox x:Name="OrderCustomerComboBox" Margin="0,0,0,10" DisplayMemberPath="CustomerName" SelectedValuePath="CustomerId"/>
 
+                            <TextBlock Text="Book Information" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                            
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <TextBlock Text="Title:" Width="100"/>
-                                <TextBlock Text="BookTitle..." />
+                                <TextBlock x:Name="SelectedBookTitle" Text="..." />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <TextBlock Text="ISBN:" Width="100"/>
-                                <TextBlock Text="ISBN..." />
+                                <TextBlock x:Name="SelectedBookISBN" Text="..." />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <TextBlock Text="Price:" Width="100"/>
-                                <TextBlock Text="Price..." />
+                                <TextBlock x:Name="SelectedBookPrice" Text="..." />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <TextBlock Text="Publisher:" Width="100"/>
-                                <TextBlock Text="Publisher..." />
+                                <TextBlock x:Name="SelectedBookPublisher" Text="..." />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <TextBlock Text="Stock:" Width="100"/>
-                                <TextBlock Text="0"/>
+                                <TextBlock x:Name="SelectedBookStock" Text="0"/>
+                            </StackPanel>
+                            
+                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Quantity:" Width="100"/>
+                                <TextBox x:Name="OrderQuantityTextBox" Width="100" Text="1"/>
                             </StackPanel>
                         </StackPanel>
 
@@ -213,56 +221,50 @@
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                 <TextBlock Text="Total Items:" Width="90"/>
-                                <TextBlock Text="0"/>
+                                <TextBlock x:Name="TotalItemsText" Text="0"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Total Price:" Width="90"/>
-                                <TextBlock Text="$0.00"/>
+                                <TextBlock x:Name="TotalPriceText" Text="$0.00"/>
                             </StackPanel>
+                            
+                            <Button Content="Submit Order" Margin="0,20,0,0" Height="40" Background="#DDDDDD" Click="SubmitOrder_Click"/>
                         </StackPanel>
 
                         <!-- BOTTOM LEFT: Book List -->
                         <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,10,0">
-                            <TextBlock Text="Book List" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-                            <ListBox Height="200">
-                                <ListBoxItem>Book Title</ListBoxItem>
-                                <ListBoxItem>Book Title</ListBoxItem>
-                            </ListBox>
+                            <TextBlock Text="Available Books" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                            <ListBox Height="200" x:Name="OrderBookList" DisplayMemberPath="Title" SelectionChanged="OrderBookList_SelectionChanged"/>
                         </StackPanel>
 
                         <!-- MIDDLE: Add / Remove Buttons -->
                         <StackPanel Grid.RowSpan="2" Grid.Column="1" VerticalAlignment="Center" Margin="10,0">
-                            <Button Content="Add order >>" Width="110" Margin="0,0,0,10"/>
-                            <Button Content="Remove order" Width="110"/>
+                            <Button Content="Add to Order >>" Width="110" Margin="0,0,0,10" Click="AddToOrder_Click"/>
+                            <Button Content="Remove Item" Width="110" Click="RemoveFromOrder_Click"/>
                         </StackPanel>
 
                         <!-- BOTTOM RIGHT: Order List -->
                         <StackPanel Grid.Row="1" Grid.Column="2" Margin="10,0,0,0">
-                            <TextBlock Text="Orders" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-                            <ListBox Height="200">
-                                <ListBoxItem>Book Title</ListBoxItem>
-                                <ListBoxItem>Book Title</ListBoxItem>
-                            </ListBox>
+                            <TextBlock Text="Current Order Items" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                            <ListBox Height="200" x:Name="CurrentOrderList" DisplayMemberPath="Title"/> 
+                             <!-- Note: DisplayMemberPath might need a wrapper object or formatted string -->
                         </StackPanel>
                     </Grid>
 
                     <!-- FAR RIGHT: Search button -->
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
                         <TextBlock Text="Select seach method: "  FontWeight="Bold" Margin="0,0,0,0"/>
-                        <ComboBox  Margin="0,0,0,10"/>
+                        <ComboBox x:Name="SearchMethodComboBox" Margin="0,0,0,10"/>
+                        
                         <TextBlock Text="Enter value and press enter: "  FontWeight="Bold" Margin="0,0,0,0"/>
-                        <TextBox  Margin="0,0,0,10"/>
+                        <TextBox x:Name="SearchValueTextBox" Margin="0,0,0,10" KeyDown="SearchValue_KeyDown"/>
+                        
                         <TextBlock Text="Select for search:" FontWeight="Bold" Margin="0,0,0,0"/>
-                        <ListBox Height="130">
-                            <ListBoxItem>value...</ListBoxItem>
-                            <ListBoxItem>value...</ListBoxItem>
-                        </ListBox>
+                        <ListBox x:Name="SearchResultsListBox" Height="130" SelectionChanged="SearchResults_SelectionChanged"/>
+                        
                         <TextBlock Text="Order List" FontWeight="Bold" Margin="0,0,0,0"/>
-                        <ListBox Height="130">
-                            <ListBoxItem>Order ID, date</ListBoxItem>
-                            <ListBoxItem>Order ID, date</ListBoxItem>
-                        </ListBox>
+                        <ListBox x:Name="OrderDetailsListBox" Height="130"/>
                     </StackPanel>
 
                 </Grid>

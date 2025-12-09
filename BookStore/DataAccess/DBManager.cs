@@ -9,12 +9,13 @@
 
 using MySql.Data.MySqlClient;
 using System.Data;
+using System.Windows;
 
 namespace BookStore
 {
     internal class DBManager
     {
-        static string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
+        public static string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
         MySqlConnection connection = new(connectionString);
 
         public DataTable DataBaseQuery(string query)
@@ -26,7 +27,7 @@ namespace BookStore
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
-                    Console.WriteLine("Application Connected to DB");
+                    // Console.WriteLine("Application Connected to DB"); // Removed spammy log
 
                     using (MySqlDataAdapter adapter = new MySqlDataAdapter(query, connection))
                     {
@@ -36,9 +37,29 @@ namespace BookStore
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                MessageBox.Show("Error: " + ex.Message); // Show error to user
             }
             return dataTable;
+        }
+
+        public int ExecuteNonQuery(string query)
+        {
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        return command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+                return -1;
+            }
         }
       
 

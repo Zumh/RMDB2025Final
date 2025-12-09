@@ -21,7 +21,13 @@ namespace BookStore
         public int Id { get; set; }
         public int CustomerID { get; set; }
         public string? OrderDate { get; set; }
-        public float OrderAmount { get; set; }  
+        public float OrderAmount { get; set; }
+        public List<Entities.OrderDetail> OrderDetails { get; set; } = new List<Entities.OrderDetail>();
+
+        public override string ToString()
+        {
+            return $"Order #{Id} - {OrderDate} ({OrderAmount:C})";
+        }
 
         static public List<Order> _orders = new List<Order>();
 

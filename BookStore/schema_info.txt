@@ -1,0 +1,13 @@
+Schema Debug:
+ORDER TABLE:
+id
+customerID
+orderDate
+totalAmount
+
+ORDERDETAIL TABLE:
+id
+orderID
+bookID
+quantity
+unitPrice
