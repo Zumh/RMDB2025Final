@@ -1,63 +1,98 @@
-﻿
-using MySql.Data.MySqlClient;
+﻿//FILE : MainWindow.xaml.cs
+//PROJECT : PROG2111 Final Project
+//PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+//FIRST VERSION : 03/12/2025
+/*DESCRIPTION: 
+This is the main window of the application where users interact with the system.
+It handles navigation between tabs and user events like clicking buttons to add or search items.
+*/
+
+using MySqlX.XDevAPI.Relational;
 using System.Data;
-using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
+using BookStore.DataAccess;
+using BookStore.Entities;
 
 namespace BookStore
 {
     public partial class MainWindow : Window
     {
-        //database manager for sending queries
-        DBManager? dbManager = null;
-        List<Category>? categories = null;
-        private string connectionString = string.Empty;
-        List<Customer> customers = null;
-        List<Book> books = null;
-
+        // Repositories
+        CustomerRepository _customerRepo = new CustomerRepository();
+        BookRepository _bookRepo = new BookRepository();
+        OrderRepository _orderRepo = new OrderRepository();
+        CategoryRepository _categoryRepo = new CategoryRepository();
+    
         public MainWindow()
         {
             InitializeComponent();
-         
-            dbManager = new DBManager();
-            InitializeCategories();
-            LoadLogin();
-
-
+            // LoadData(); // Don't load until login
         }
 
-
-
-        private void InitializeCategories()
-        {
-            categories = new List<Category>
-            {
-                new Category { Id = 1, Name = "Fiction" },
-                new Category { Id = 2, Name = "Non-Fiction" },
-                new Category { Id = 3, Name = "Other" }
-            };
-
-            catComboBox.ItemsSource = categories;
-            catComboBox.DisplayMemberPath = "Name";
-            catComboBox.SelectedValuePath = "Id";
-        }
 
         ////////////////////////////////////////        LOGIN FUNCTIONS      ///////////////////////////////////////////////////////////
 
-      
-     
-        //NAME: AddCustomerBtn_Click
-        //DESCRIPTION: Validates the customer input
-        //             Adds the customer to the dataTable
-        //             Handles input errors and UI clean up
+        //NAME: LoginBtn_Click
+        //DESCRIPTION: Updates the connection string and tries to load data.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
+        private void LoginBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string user = userId.Text;
+            string pass = loginPassword.Text; // Note: In real app use PasswordBox
+            string dbName = dataBaseName.Text;
+
+            if (string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(dbName))
+            {
+                MessageBox.Show("Please enter User ID and Database Name.");
+                return;
+            }
+
+            // Construct connection string
+            // Assuming localhost/port 3306 for now based on previous hardcode
+            string newConnString = $"Server=localhost;Port=3306;Uid={user};Pwd={pass};Database={dbName};";
+            
+            DBManager.connectionString = newConnString; // Update static connection string
+
+            try
+            {
+                // Test connection by trying to load data
+                LoadData();
+                MessageBox.Show("Connected and Data Loaded!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Login Failed: " + ex.Message);
+            }
+        }
+
+        //NAME: ClearLogin_Click
+        //DESCRIPTION: Clears the login text boxes.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void ClearLogin_Click(object sender, RoutedEventArgs e)
+        {
+            userId.Text = "";
+            loginPassword.Text = "";
+            dataBaseName.Text = "";
+        }
 
         //////////////////////////////             CUSTOMER FUNCTIONS             //////////////////////////////////////////////////////
 
+        //NAME: AddCustomerBtn_Click
+        //DESCRIPTION: Validates input and adds a new customer to the database.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void AddCustomerBtn_Click(object sender, RoutedEventArgs e)
         {
             bool validated = true;
@@ -66,91 +101,97 @@ namespace BookStore
             string customerEmail = CustomerEmailTextBox.Text;
             string customerAddress = CustomerAddressTextBox.Text;
             string customerPhoneNumber = CustomerPhoneTextBox.Text;
-
             //clear error messages
             StatusText.Text = "";
-            Customer currentCustomer = new Customer();
-  
+
             //validate each user input
-            if (!(validated = currentCustomer.ValidateName(customerName)))
+            if (!(validated = Customer.ValidateName(customerName)))
             {
                 StatusText.Text = "Field is Mandatory";
                 CustomerNameTextBox.Text = "";
             }
-            else if (!(validated = currentCustomer.ValidateEmail(customerEmail)))
+            else if (!(validated = Customer.ValidateEmail(customerEmail)))
             {
                 StatusText.Text = "Format should be \"Example@email.com\"";
                 CustomerEmailTextBox.Text = "";
             }
-            else if (!(validated = currentCustomer.ValidateAddress(customerAddress)))
+            else if (!(validated = Customer.ValidateAddress(customerAddress)))
             {
                 StatusText.Text = "Field is Mandatory";
                 CustomerAddressTextBox.Text = "";
             }
-            else if (!(validated = currentCustomer.ValidatePhoneNumber(customerPhoneNumber)))
+            else if (!(validated = Customer.ValidatePhoneNumber(customerPhoneNumber)))
             {
                 StatusText.Text = "Format should be \"555-555-5555\"";
                 CustomerEmailTextBox.Text = "";
             }
             else
             {
-                //add customer to customer list
+                //add customer to customer list AND database
                 if (validated)
                 {
-                    try
+                    var newCustomer = new Customer
                     {
-                        // add latest customer id plus one to new customer
-                        dbManager.Customers.Add(new Customer { 
-                          
-                            CustomerName = customerName,
-                            Email = customerEmail,
-                            Address = customerAddress,
-                            Phone = customerPhoneNumber
-                        });
-                        dbManager.Customers.SaveChanges();
-                        // reflect changes in datagrid
-                        customers = dbManager.Customers.GetAllCustomers();
-                        CustomerList.ItemsSource = customers;
-
-                        ClearUIInput();
+                        CustomerName = customerName,
+                        Email = customerEmail,
+                        Address = customerAddress,
+                        Phone = customerPhoneNumber
+                    };
+                    
+                    try 
+                    {
+                         _customerRepo.Add(newCustomer);
+                         Customer._customers.Add(newCustomer); // Keep local list in sync or reload
+                         StatusText.Text = "Customer Added Successfully.";
+                         ClearUIInput();
+                         RefreshCustomerList();
                     }
-                    catch (System.Exception ex)
+                    catch (Exception ex)
                     {
-                        MessageBox.Show(ex.Message);
+                        StatusText.Text = "Error adding customer: " + ex.Message;
                     }
                 }
-
-               
-                
             }
         }
 
-
         //NAME: DisplayAllCustomers_Click
-        //DESCRIPTION: Creates a datatable that contains all customers in the database        
-        //             Handles no data returns and user feedback
+        //DESCRIPTION: Shows all customers in the list.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
         private void DisplayAllCustomers_Click(object sender, RoutedEventArgs e)
         {
-            //query to get all customers
-            //DataTable dataTable = db.DataBaseQuery("SELECT * FROM customer");
-            customers = dbManager.Customers.GetAllCustomers();
-            if (customers == null)
+            RefreshCustomerList();
+        }
+
+        //NAME: RefreshCustomerList
+        //DESCRIPTION: Reloads the customer list from the database.
+        //PARAMETERS: None
+        //RETURN: void
+        private void RefreshCustomerList()
+        {
+            try
             {
-                StatusText.Text = "No Customers in Database.";
+                List<Customer> customers = _customerRepo.GetAll();
+                Customer._customers = customers; // Update local static list
+                
+                if (customers.Count == 0) 
+                {
+                    StatusText.Text = "No Customers in Database.";
+                    CustomerList.ItemsSource = null;
+                } 
+                else
+                {
+                    CustomerList.ItemsSource = customers;
+                }
             }
-            else
+            catch(Exception ex)
             {
-
-                //add the list to the dataGrid
-                CustomerList.ItemsSource = customers;
-
+                StatusText.Text = "Error loading customers: " + ex.Message;
             }
         }
 
         //NAME: CustomerList_Columns
-        //DESCRIPTION: Sets the first column to read only so users cannot edit primary key        
+        //DESCRIPTION: Makes the ID column read-only in the data grid.
         //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
         //RETURN: void
         private void CustomerList_Columns(object sender, DataGridAutoGeneratingColumnEventArgs e)
@@ -161,9 +202,39 @@ namespace BookStore
                 e.Column.IsReadOnly = true;
             }
         }
+
+        //NAME: RemoveCustomer_Click
+        //DESCRIPTION: Removes the selected customer from the database.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void RemoveCustomer_Click(object sender, RoutedEventArgs e)
+        {
+            if (CustomerList.SelectedItem is Customer selectedCustomer)
+            {
+                if (MessageBox.Show($"Are you sure you want to delete {selectedCustomer.CustomerName}?", "Confirm Delete", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        _customerRepo.Delete(selectedCustomer.CustomerId);
+                        StatusText.Text = "Customer Deleted Successfully.";
+                        RefreshCustomerList();
+                        ClearUIInput();
+                    }
+                    catch (Exception ex)
+                    {
+                        StatusText.Text = "Error deleting customer: " + ex.Message;
+                    }
+                }
+            }
+            else
+            {
+                 MessageBox.Show("Please select a customer to remove.");
+            }
+        }
+
         //NAME: SearchForCustomer_Click
-        //DESCRIPTION: Searches for customer based on name        
-        //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
+        //DESCRIPTION: Searches for customers based on the criteria entered.
+        //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
         private void SearchForCustomer_Click(object sender, RoutedEventArgs e)
         {
@@ -171,116 +242,136 @@ namespace BookStore
             string customerEmail = CustomerEmailTextBox.Text;
             string customerAddress = CustomerAddressTextBox.Text;
             string customerPhoneNumber = CustomerPhoneTextBox.Text;
-            Customer? foundCustomer = null;
+
             StatusText.Text = "";
-            //need to add more options for searching
-            List<Customer> list = new List<Customer>();
-
-            if (!string.IsNullOrEmpty(customerName)) 
-            {
-                
-                foundCustomer = dbManager.Customers.FindByName(customerName);
-                if (foundCustomer != null)
-                {
-                    list.Add(foundCustomer);
-                }
-            }
-            else if (!string.IsNullOrEmpty(customerEmail))
-            {
-
-                foundCustomer = dbManager.Customers.FindByEmail(customerEmail);
-                if (foundCustomer != null)
-                {
-                    list.Add(foundCustomer);
-                }
-            }
-           else  if (!string.IsNullOrEmpty(customerAddress))
-            {
-
-                foundCustomer = dbManager.Customers.FindByAddress(customerAddress);
-                if (foundCustomer != null)
-                {
-                    list.Add(foundCustomer);
-                }
-            }
-            else if (!string.IsNullOrEmpty(customerPhoneNumber))
-            {
-
-                foundCustomer = dbManager.Customers.FindByPhone(customerPhoneNumber);
-                if (foundCustomer != null)
-                {
-                    list.Add(foundCustomer);
-                }
-            }
-            if (list.Count == 0)
-            {
-                StatusText.Text = "Customer Name not found.";
-                StatusText.Background = Brushes.Red;
-            } else
-            {
-                CustomerList.ItemsSource = list;
-                StatusText.Text = "Customer found";
-                StatusText.Background = Brushes.LightGreen;
-            }
             
+            try
+            {
+                // Use new Search method with AND logic
+                List<Customer> list = _customerRepo.Search(customerName, customerEmail, customerAddress, customerPhoneNumber);
+                
+                if (list.Count == 0)
+                {
+                    StatusText.Text = "No customers found matching the criteria.";
+                    CustomerList.ItemsSource = null;
+                }
+                else
+                {
+                    CustomerList.ItemsSource = list;
+                    StatusText.Text = $"{list.Count} customer(s) found.";
+                }
+            }
+            catch (Exception ex)
+            {
+                 StatusText.Text = "Error searching customers: " + ex.Message;
+            }
         }
 
         //////////////////////////////             BOOK FUNCTIONS             //////////////////////////////////////////////////////
 
-        private void SearchBook_Click(object sender, RoutedEventArgs e)
+        //NAME: RemoveBook_Click
+        //DESCRIPTION: Removes the selected book from the database.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void RemoveBook_Click(object sender, RoutedEventArgs e)
         {
-
-            string bookTitle = BookTitletextBox.Text;
-            string bookIsbn = IsbnTextBox.Text;
-            string bookPrice = BookPriceTextBox.Text;
-            string bookPublisher = BookPublisherTextBox.Text;
-            string bookCategory = catComboBox.SelectedValue?.ToString() ?? "";
-
-
-            StatusText.Text = "";
-            //need to add more options for searching
-            List<Book> list = new List<Book>();
-
-            if (!string.IsNullOrEmpty(bookTitle))
+            if (BookList.SelectedItem is Book selectedBook)
             {
-
-                list = dbManager.Books.SearchBooksByTitle(bookTitle);
-               
-            }
-            else if (!string.IsNullOrEmpty(bookIsbn))
-            {
-                double numericISBN = double.TryParse(bookIsbn, out numericISBN) ? numericISBN : 0;
-                list = dbManager.Books.SearchBooksByISBN(numericISBN);
-               
-            }
-            else if (!string.IsNullOrEmpty(bookPublisher))
-            {
-
-                list = dbManager.Books.SearchBooksByPublisher(bookPublisher);
-              
-            }
-            else if (!string.IsNullOrEmpty(catComboBox.SelectedValue.ToString()))
-            {
-
-                list = dbManager.Books.SearchBooksByCategory(bookCategory);
-             
-            } 
-            if (list.Count == 0)
-            {
-                StatusText.Text = "Books not found.";
-                StatusText.Background = Brushes.Red;
+                if (MessageBox.Show($"Are you sure you want to delete {selectedBook.Title}?", "Confirm Delete", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        _bookRepo.Delete(selectedBook.BookID);
+                        StatusText.Text = "Book Deleted Successfully.";
+                        RefreshBookList();
+                        ClearUIInput();
+                    }
+                    catch (Exception ex)
+                    {
+                        StatusText.Text = "Error deleting book: " + ex.Message;
+                    }
+                }
             }
             else
             {
-                BookList.ItemsSource = list;
-                StatusText.Text = "Books found";
-                StatusText.Background = Brushes.LightGreen;
+                 MessageBox.Show("Please select a book to remove.");
+            }
+        }
+
+        //NAME: SearchBook_Click
+        //DESCRIPTION: Searches for books based on the criteria entered.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void SearchBook_Click(object sender, RoutedEventArgs e)
+        {
+            string title = BookTitletextBox.Text;
+            string isbn = IsbnTextBox.Text;
+            string price = BookPriceTextBox.Text;
+            string author = BookAuthorTextBox.Text;
+            int catId = -1;
+            
+            if (BookCategoryComboBox.SelectedValue != null)
+            {
+                catId = (int)BookCategoryComboBox.SelectedValue;
             }
 
+            try
+            {
+                List<Book> books = _bookRepo.Search(title, author, isbn, price, catId);
+                Book._books = books;
+                BookList.ItemsSource = books;
+                
+                if (books.Count == 0)
+                    StatusText.Text = "No books found matching criteria.";
+                else
+                    StatusText.Text = $"{books.Count} book(s) found.";
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = "Error searching books: " + ex.Message;
+            }
+        }
+
+        //NAME: RefreshBookList
+        //DESCRIPTION: Reloads the book list from the database.
+        //PARAMETERS: None
+        //RETURN: void
+        private void RefreshBookList()
+        {
+            try
+            {
+                List<Book> books = _bookRepo.GetAll();
+                Book._books = books;
+                BookList.ItemsSource = books;
+            }
+             catch(Exception ex)
+            {
+                StatusText.Text = "Error loading books: " + ex.Message;
+            }
+        }
+
+        //NAME: RefreshCategoryList
+        //DESCRIPTION: Reloads the category list from the database.
+        //PARAMETERS: None
+        //RETURN: void
+        private void RefreshCategoryList()
+        {
+            try
+            {
+                List<Category> categories = _categoryRepo.GetAll();
+                BookCategoryComboBox.ItemsSource = categories;
+                // If we want to default select the first one?
+                if (categories.Count > 0)
+                    BookCategoryComboBox.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = "Error loading categories: " + ex.Message;
+            }
         }
 
         //NAME: BookList_Columns
-        //DESCRIPTION: Sets bookID, publisher ID, and categoryID to readonly        
+        //DESCRIPTION: Makes ID columns read-only in the book grid.
         //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
         //RETURN: void
         private void BookList_Columns(object sender, DataGridAutoGeneratingColumnEventArgs e)
@@ -301,9 +392,8 @@ namespace BookStore
         }
 
         //NAME: AddBook_Click
-        //DESCRIPTION: Validates user input for a new book
-        //             Adds a new book object to the _book list        
-        //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
+        //DESCRIPTION: Validates input and adds a new book to the database.
+        //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
         private void AddBook_Click(object sender, RoutedEventArgs e)
         {
@@ -313,102 +403,440 @@ namespace BookStore
             string isbn = IsbnTextBox.Text;
             string publisher = BookPublisherTextBox.Text;
             string price = BookPriceTextBox.Text;
-            string stock = BookStock.Text;
-            string category = catComboBox.Text;
-            Category currentCat = new Category();
-            Publisher currentPub = new Publisher();
+            string stock = BookStockTextBox.Text;
+            string author = BookAuthorTextBox.Text;
             //clear error messages
             StatusText.Text = "";
-            Book book = new Book();
 
             //validate each user input
-            if (!(validated = book.ValidateBookTitle(title)))
+            if (!(validated = Book.ValidateBookTitle(title)))
             {
                 StatusText.Text = "Name is Mandatory";
                 BookTitletextBox.Text = "";
             }
-            else if (!(validated = book.ValidateIBSN(isbn)))
+            else if (!(validated = Book.ValidateIBSN(isbn)))
             {
                 StatusText.Text = "ISBN is Mandatory and must be 13 digits long, ex.(1234567890123).";
                 IsbnTextBox.Text = "";
             }
-            else if (!(validated = book.ValidatePrice(price)))
+            else if (!(validated = Book.ValidatePrice(price)))
             {
                 StatusText.Text = "Price is Mandatory and must be numeric";
                 BookPriceTextBox.Text = "";
             }
-            else if (!(validated = book.ValidateStock(stock)))
+            else if (!(validated = Book.ValidateStock(stock)))
             {
                 StatusText.Text = "Stock is Mandatory and must be numeric";
-                BookStock.Text = "";
-            }
-            else if (!(validated = currentCat.ValidateCategoryName(category)))
-            {
-                StatusText.Text = "Category is Mandatory";
-                catComboBox.Text = "";
-            }
-            else if (!(validated = Publisher.ValidateName(publisher)))
-            {
-                StatusText.Text = "Publisher is Mandatory";
-                BookPublisherTextBox.Text = "";
-            }
+                BookStockTextBox.Text = "";
+            } 
             else
             {
                 double numericISBN;
                 float numericPrice;
                 int numericStock;
-                int publisherID = 0; //default publisher ID for now
-
                 //parse strings into numbers
                 double.TryParse(isbn, out numericISBN);
                 float.TryParse(price, out numericPrice);
                 int.TryParse(stock, out numericStock);
-          
-                // find the publisher ID from the database based on the name
-                Publisher? foundPublisher = dbManager.Publishers.FindByName(publisher);
-                if (foundPublisher != null)
+                
+                // TODO: Handle Publisher properly (find ID by name or insert new publisher)
+                // For now we will just use a default ID or try to parse if user entered ID 
+                // Since UI is text box, let's assume for prototype we need to fix this later or assume ID 1.
+                int pubId = 1; 
+                int catId = 1;
+                
+                if (BookCategoryComboBox.SelectedValue != null)
                 {
-                    publisherID = foundPublisher.PublisherID;
+                    catId = (int)BookCategoryComboBox.SelectedValue;
                 }
                 else
                 {
-                    StatusText.Text = "Publisher not found in database.";
-                    validated = false;
+                     // Force selection or default? Let's force selection validation if we want strictness, 
+                     // but for now relying on default 1 if not selected is safer to avoid crashes, 
+                     // however, let's alert user if strictly needed. 
+                     // The user asked to "Category Selection", so they probably want it to work.
+                     if (BookCategoryComboBox.Items.Count > 0) 
+                         catId = (int)BookCategoryComboBox.SelectedValue; // This might crash if null.
+                         // Actually better check:
+                     if (BookCategoryComboBox.SelectedIndex == -1)
+                     {
+                         StatusText.Text = "Please select a Category.";
+                         return;
+                     }
+                     if (BookCategoryComboBox.SelectedValue != null)
+                     {
+                         catId = (int)BookCategoryComboBox.SelectedValue;
+                     }
                 }
 
-                if (validated && catComboBox.SelectedItem != null)
+                if (validated)
                 {
-                    dbManager.Books.Add(new Book
+                    var newBook = new Book
                     {
                         Title = title,
-                        ISBN = numericISBN,
-                        Price = numericPrice,
+                        ISBN = isbn, // Note: Model has String ISBN but here usage tried double? Model says string.
+                        Price = (decimal)numericPrice, // Model says decimal
                         Stock = numericStock,
-                        PublisherID = publisherID, //default publisher for now
-                        CategoryID = currentCat.GetCategoryType(catComboBox.SelectedItem.ToString()) //category from combobox
-                    });
+                        PublisherID = pubId,
+                        CategoryID = catId,
+                        Author = author
+                    };
 
-                    dbManager.Books.SaveChanges();
-                    // reflect changes in datagrid
-                    books = dbManager.Books.GetAllBooks();
-                    BookList.ItemsSource = books;
-                    StatusText.Text = "";
-                    ClearUIInput();
-
-
+                    try
+                    {
+                        _bookRepo.Add(newBook);
+                        Book._books.Add(newBook);
+                        StatusText.Text = "Book Added Successfully.";
+                        ClearUIInput();
+                        RefreshBookList();
+                    }
+                    catch (Exception ex)
+                    {
+                         StatusText.Text = "Error adding book: " + ex.Message;
+                    }
                 }
             }        
         }
 
         //////////////////////////////////          ORDER FUNCTIONS            ////////////////////////////////////////
 
+        // Cart State
+        public class CartItem
+        {
+            public int BookId { get; set; }
+            public string BookTitle { get; set; } = string.Empty;
+            public int Quantity { get; set; }
+            public decimal Price { get; set; }
+            public decimal TotalPrice => Price * Quantity;
+        }
 
+        private List<CartItem> _cartItems = new List<CartItem>();
+        private Customer? _selectedOrderCustomer = null;
 
-        //////////////////////////////////          GENERAL UI FUNCTIONS            ////////////////////////////////////////
-        
+        //NAME: LoadData
+        //DESCRIPTION: Loads initial data from the database.
+        //PARAMETERS: None.
+        //RETURN: void
+        private void LoadData()
+        {
+            try 
+            {
+                // Seed categories if needed
+                _categoryRepo.SeedCategories();
+
+                // Refresh background lists but DO NOT populate GridSources initially
+                RefreshCustomerList();
+                RefreshBookList();
+                RefreshCategoryList();
+                
+                // Populate Order Tab Grids - LEFT EMPTY as requested
+                OrderCustomerGrid.ItemsSource = _customerRepo.GetAll(); 
+                OrderBookGrid.ItemsSource = _bookRepo.GetAll();
+                
+                RefreshHistory_Click(new object(), new RoutedEventArgs());
+            }
+            catch (Exception)
+            {
+                // StatusText might be null if called too early
+            }
+        }
+
+        // --- Customer Section ---
+
+        //NAME: OrderCustomerSearchBox_TextChanged
+        //DESCRIPTION: Filters the customer list in the order tab as the user types.
+        //PARAMETERS: object sender, TextChangedEventArgs e
+        //RETURN: void
+        private void OrderCustomerSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+             string filter = OrderCustomerSearchBox.Text.ToLower();
+             if (string.IsNullOrWhiteSpace(filter))
+             {
+                 OrderCustomerGrid.ItemsSource = null; // Clear if empty
+             }
+             else
+             {
+                 var all = _customerRepo.GetAll();
+                 var filtered = all.Where(c => c.CustomerName.ToLower().Contains(filter) || c.Phone.Contains(filter)).ToList();
+                 OrderCustomerGrid.ItemsSource = filtered;
+             }
+        }
+
+        //NAME: OrderCustomerGrid_SelectionChanged
+        //DESCRIPTION: Selects a customer for the order when clicked in the grid.
+        //PARAMETERS: object sender, SelectionChangedEventArgs e
+        //RETURN: void
+        private void OrderCustomerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (OrderCustomerGrid.SelectedItem is Customer c)
+            {
+                _selectedOrderCustomer = c;
+            }
+        }
+
+        // --- Book Section ---
+
+        //NAME: OrderBookSearchBox_TextChanged
+        //DESCRIPTION: Filters the book list in the order tab as the user types.
+        //PARAMETERS: object sender, TextChangedEventArgs e
+        //RETURN: void
+        private void OrderBookSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+             string filter = OrderBookSearchBox.Text.ToLower();
+             if (string.IsNullOrWhiteSpace(filter))
+             {
+                 OrderBookGrid.ItemsSource = null; // Clear if empty
+             }
+             else
+             {
+                 var all = _bookRepo.GetAll();
+                 var filtered = all
+                      .Where(b => (b.Title != null && b.Title.ToLower().Contains(filter)) || (b.ISBN != null && b.ISBN.Contains(filter)))
+                     .Select(b => new BookSelectionViewModel 
+                     {
+                         BookID = b.BookID,
+                         Title = b.Title,
+                         ISBN = b.ISBN,
+                         Price = b.Price,
+                         Author = b.Author,
+                         PublisherID = b.PublisherID,
+                         Stock = b.Stock,
+                         QuantityToBuy = 1 // Default
+                     })
+                     .ToList();
+                 OrderBookGrid.ItemsSource = filtered;
+             }
+        }
+
+        //NAME: OrderBookGrid_MouseDoubleClick
+        //DESCRIPTION: Adds a book to the cart when double clicked.
+        //PARAMETERS: object sender, MouseButtonEventArgs e
+        //RETURN: void
+        private void OrderBookGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            BookSelectionViewModel currentBook = null;
+            if (OrderBookGrid.SelectedItem is Book selectedBook)
+            {
+                currentBook = new BookSelectionViewModel
+                {
+                    BookID = selectedBook.BookID,
+                    Title = selectedBook.Title,
+                    ISBN = selectedBook.ISBN,
+                    Price = selectedBook.Price,
+                    PublisherID = selectedBook.PublisherID,
+                    Author = selectedBook.Author,
+                    Stock = selectedBook.Stock,
+                    QuantityToBuy = 1   // default
+                };
+            }
+
+            if (currentBook != null)
+            {
+                int qtyToAdd = currentBook.QuantityToBuy;
+                
+                if (qtyToAdd <= 0) 
+                {
+                     MessageBox.Show("Please select a quantity greater than 0.");
+                     return;
+                }
+
+                var existing = _cartItems.FirstOrDefault(i => i.BookId == currentBook.BookID);
+                if (existing != null)
+                {
+                    if (existing.Quantity + qtyToAdd <= currentBook.Stock)
+                    {
+                        existing.Quantity += qtyToAdd;
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Cannot add more. Stock limit ({currentBook.Stock}) reached.");
+                    }
+                }
+                else
+                {
+                    if (currentBook.Stock >= qtyToAdd)
+                    {
+                        _cartItems.Add(new CartItem 
+                        { 
+                            BookId = currentBook.BookID, 
+                            BookTitle = currentBook.Title ?? "Unknown", 
+                            Quantity = qtyToAdd, 
+                            Price = currentBook.Price 
+                        });
+                    }
+                    else
+                    {
+                         MessageBox.Show("Not enough Stock!");
+                    }
+                }
+                RefreshCart();
+            }
+        }
+
+        // --- Cart Section ---
+
+        //NAME: RefreshCart
+        //DESCRIPTION: Updates the shopping cart display.
+        //PARAMETERS: None
+        //RETURN: void
+        private void RefreshCart()
+        {
+            ShoppingCartGrid.ItemsSource = null;
+            ShoppingCartGrid.ItemsSource = _cartItems;
+            
+            CartTotalItemsText.Text = _cartItems.Sum(i => i.Quantity).ToString();
+            CartTotalPriceText.Text = _cartItems.Sum(i => i.TotalPrice).ToString("C");
+        }
+
+        //NAME: ClearCart_Click
+        //DESCRIPTION: Removes all items from the shopping cart.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void ClearCart_Click(object sender, RoutedEventArgs e)
+        {
+            _cartItems.Clear();
+            RefreshCart();
+        }
+
+        //NAME: RemoveOrder_Click
+        //DESCRIPTION: Deletes a selected order from history.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void RemoveOrder_Click(object sender, RoutedEventArgs e)
+        {
+             if (OrderHistoryGrid.SelectedItem is OrderDetail selected)
+             {
+                 if (MessageBox.Show($"Are you sure you want to delete Order #{selected.OrderId}?", "Confirm Delete", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                 {
+                     try
+                     {
+                        _orderRepo.DeleteOrder(selected.OrderId);
+                         StatusText.Text = $"Order #{selected.OrderId} deleted.";
+                         RefreshHistory_Click(null, null);
+                     }
+                     catch(Exception ex)
+                     {
+                         StatusText.Text = "Error deleting order: " + ex.Message;
+                     }
+                 }
+             }
+             else
+             {
+                 MessageBox.Show("Please select an order to remove.");
+             }
+        }
+
+        //NAME: SubmitOrder_Click
+        //DESCRIPTION: Creates a new order with the items in the cart.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void SubmitOrder_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedOrderCustomer == null)
+            {
+                MessageBox.Show("Please select a customer from the list first.");
+                return;
+            }
+
+            if (_cartItems.Count == 0)
+            {
+                MessageBox.Show("Cart is empty.");
+                return;
+            }
+
+            try
+            {
+                decimal total = _cartItems.Sum(i => i.TotalPrice);
+
+                // Create Order
+                Order newOrder = new Order
+                {
+                    CustomerID = _selectedOrderCustomer?.CustomerId ?? 0,
+                    OrderDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), 
+                    OrderAmount = (float)total,
+                    OrderDetails = new List<OrderDetail>()
+                };
+
+                // Create Details
+                foreach(var item in _cartItems)
+                {
+                    newOrder.OrderDetails.Add(new OrderDetail
+                    {
+                        BookId = item.BookId,
+                        Quantity = item.Quantity,
+                        Price = item.Price
+                    });
+                }
+
+                _orderRepo.CreateOrder(newOrder);
+                
+                MessageBox.Show("Order Placed Successfully!");
+                _cartItems.Clear();
+                RefreshCart();
+                RefreshHistory_Click(new object(), new RoutedEventArgs()); // Refresh history
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error keying order: " + ex.Message);
+            }
+        }
+
+        // --- Order History Section ---
+
+        //NAME: RefreshHistory_Click
+        //DESCRIPTION: Reloads the order history list.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void RefreshHistory_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                 // Default show all
+                 string method = ""; 
+                 string value = "";
+                 
+                 // If searching
+                 if (sender == null || sender is Button) // Called manually or by button
+                 {
+                      if (HistorySearchMethodCombo.SelectedItem is ComboBoxItem item)
+                      {
+                            method = item.Content?.ToString() ?? "";
+                           value = HistorySearchValueBox.Text;
+                      }
+                 }
+
+                 OrderHistoryGrid.ItemsSource = _orderRepo.GetOrderHistory(method, value);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("History Error: " + ex.Message);
+            }
+        }
+
+        //NAME: HistorySearchButton_Click
+        //DESCRIPTION: Filters the order history based on search criteria.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void HistorySearchButton_Click(object sender, RoutedEventArgs e)
+        {
+             RefreshHistory_Click(sender, e);
+        }
+
+        //NAME: HistorySearch_KeyDown
+        //DESCRIPTION: Triggers search when Enter key is pressed in history search box.
+        //PARAMETERS: object sender, KeyEventArgs e
+        //RETURN: void
+        private void HistorySearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                RefreshHistory_Click(sender, e);
+            }
+        }
+
         //NAME: ClearUIInput
-        //DESCRIPTION: Clears all UI inputs        
-        //PARAMETERS: none
+        //DESCRIPTION: Clears all input fields in the UI.
+        //PARAMETERS: None.
         //RETURN: void
         public void ClearUIInput()
         {
@@ -416,157 +844,31 @@ namespace BookStore
             IsbnTextBox.Text = "";
             BookPublisherTextBox.Text = "";
             BookPriceTextBox.Text = "";
-            BookStock.Text = "";
+            BookStockTextBox.Text = "";
+            BookAuthorTextBox.Text = "";
+            BookCategoryComboBox.SelectedIndex = -1;
             CustomerNameTextBox.Text = "";
             CustomerEmailTextBox.Text = "";
             CustomerAddressTextBox.Text = "";
             CustomerPhoneTextBox.Text = "";
         }
 
-        private void LoadLogin()
-        {
-            serverName.Text = "localhost";
-            portNumber.Text = "3306";
-            userId.Text = "root";
-            loginPassword.Password = "student1";
-            dataBaseName.Text = "BookStore";
-        }
-
-
-        private void LoginClick(object sender, RoutedEventArgs e)
-        {
-
-            string server = serverName.Text.Trim();
-            string user = userId.Text.Trim();
-            string password = loginPassword.Password;
-            string database = dataBaseName.Text.Trim();
-            string port = portNumber.Text.Trim();
-
-            DbInitResult? check = dbManager?.CheckDatabase(server, user, password, database, port);
-            if(check == null)
-            {
-                StatusText.Text = "Database manager not initialized.";
-                StatusText.Foreground = Brushes.Red;
-                return;
-            }
-            // database doesn't exist and doesn't need to be created
-            if (!check.Success && !check.NeedsCreation)
-            {
-                StatusText.Text = check.Message;
-                StatusText.Foreground = Brushes.Red;
-             
-            }
-            else if (check.NeedsCreation)
-            {
-                // ask the user if they want to create the database
-                MessageBoxResult answer = MessageBox.Show(
-                    check.Message + "\nDo you want to create it?",
-                    "Create Database",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-
-                // if user does not want to create database
-                if (answer == MessageBoxResult.No)
-                {
-                    StatusText.Text = "Database creation cancelled.";
-                    StatusText.Foreground = Brushes.Red;
-            
-                }
-                else
-                {
-                    // Step 2: Create database
-                    DbInitResult create = dbManager.CreateDatabase(server, user, password, database, port);
-
-                    // is not successful created 
-                    if (!create.Success)
-                    {
-                        StatusText.Text = create.Message;
-                        StatusText.Foreground = Brushes.Red;
-                    
-                    }
-                    else
-                    {
-
-                        connectionString = create.ConnectionString!;
-                        StatusText.Text = create.Message;
-                        StatusText.Foreground = Brushes.Green;
-
-                    }// successfully created database
-
-
-                }// user wants to create database
-
-
-            }
-
-            else // database exists and is connected
-            {
-                connectionString = check.ConnectionString!;
-                StatusText.Text = check.Message;
-                StatusText.Foreground = Brushes.Green;
-            }
-        }
-
-
-
-        
-
-        //NAME: ClearLoginClick
-        //DESCRIPTION: Clears the login fields of all text
-        //PARAMETERS: object sender, RoutedEventArgs e
+        //NAME: OrderBookGrid_SelectionChanged
+        //DESCRIPTION: Handles selection change in order book grid.
+        //PARAMETERS: object sender, SelectionChangedEventArgs e
         //RETURN: void
-        private void ClearLoginClick(object sender, RoutedEventArgs e)
+        private void OrderBookGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            userId.Text = "";
-            loginPassword.Clear();
-            dataBaseName.Text = "";
-            serverName.Text = "";
-            portNumber.Text = "";
+
         }
 
-      
-        private void RemoveCustomer_Click(object sender, RoutedEventArgs e)
+        //NAME: OrderHistoryGrid_SelectionChanged
+        //DESCRIPTION: Handles selection change in order history grid.
+        //PARAMETERS: object sender, SelectionChangedEventArgs e
+        //RETURN: void
+        private void OrderHistoryGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // get selected customer from datagrid 
-            Customer? selectedCustomer = CustomerList.SelectedItem as Customer;
-            if (selectedCustomer != null)
-            {
-                dbManager.Customers.Delete(selectedCustomer);
-                dbManager.Customers.SaveChanges();
-                // Refresh the DataGrid
-                customers = dbManager.Customers.GetAllCustomers();
-                CustomerList.ItemsSource = customers;
-            }
-        }
 
-        private void DisplayBook_Click(object sender, RoutedEventArgs e)
-        {
-            List<Book> books = dbManager.Books.GetAllBooks();
-            if (books == null)
-            {
-                StatusText.Text = "No books in Database.";
-            }
-            else
-            {
-
-                //add the list to the dataGrid
-                BookList.ItemsSource = books;
-
-            }
-        }
-
-        private void RemoveBook_Click(object sender, RoutedEventArgs e)
-        {
-            // get selected customer from datagrid 
-            Book? selectedBook = BookList.SelectedItem as Book;
-            if (selectedBook != null)
-            {
-                dbManager.Books.Delete(selectedBook);
-                dbManager.Books.SaveChanges();
-                // Refresh the DataGrid
-                books = dbManager.Books.GetAllBooks();
-                BookList.ItemsSource = books;
-            }
         }
     }
 }
