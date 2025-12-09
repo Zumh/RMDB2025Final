@@ -377,154 +377,245 @@ namespace BookStore
 
 
 
-        // Order State
-        private List<OrderDetail> _currentOrderDetails = new List<OrderDetail>();
-        private List<Book> _currentOrderBooksDisplay = new List<Book>(); // For display in ListBox
+        //////////////////////////////////          ORDER FUNCTIONS            ////////////////////////////////////////
+
+        // Cart State
+        public class CartItem
+        {
+            public int BookId { get; set; }
+            public string BookTitle { get; set; }
+            public int Quantity { get; set; }
+            public decimal Price { get; set; }
+            public decimal TotalPrice => Price * Quantity;
+        }
+
+        private List<CartItem> _cartItems = new List<CartItem>();
+        private Customer _selectedOrderCustomer = null;
 
         private void LoadData()
         {
             try 
             {
+                // Refresh background lists but DO NOT populate GridSources initially
                 RefreshCustomerList();
                 RefreshBookList();
                 
-                // Populate Order Tab Lists
-                OrderCustomerComboBox.ItemsSource = _customerRepo.GetAll();
-                OrderBookList.ItemsSource = _bookRepo.GetAll();
+                // Populate Order Tab Grids - LEFT EMPTY as requested
+                OrderCustomerGrid.ItemsSource = null;
+                OrderBookGrid.ItemsSource = null;
                 
-                InitializeSearch();
+                RefreshHistory_Click(null, null);
             }
             catch (Exception ex)
             {
-                // StatusText might be null if called too early, but InitializeComponent is done.
+                // StatusText might be null if called too early
             }
         }
 
-        private void OrderBookList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        // --- Customer Section ---
+        private void OrderCustomerSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (OrderBookList.SelectedItem is Book selectedBook)
-            {
-                SelectedBookTitle.Text = selectedBook.Title;
-                SelectedBookISBN.Text = selectedBook.ISBN;
-                SelectedBookPrice.Text = selectedBook.Price.ToString("C");
-                SelectedBookStock.Text = selectedBook.Stock.ToString();
-                SelectedBookPublisher.Text = selectedBook.PublisherID.ToString(); // Ideally fetch Publisher Name
-            }
-        }
-
-        private void AddToOrder_Click(object sender, RoutedEventArgs e)
-        {
-            if (OrderBookList.SelectedItem is Book selectedBook)
-            {
-                int quantity = 1;
-                int.TryParse(OrderQuantityTextBox.Text, out quantity);
-
-                if (quantity <= 0) 
-                {
-                     MessageBox.Show("Quantity must be greater than 0");
-                     return;
-                }
-                
-                if (quantity > selectedBook.Stock)
-                {
-                     MessageBox.Show("Not enough stock!");
-                     return;
-                }
-
-                // Add to Current Order
-                _currentOrderDetails.Add(new OrderDetail 
-                {
-                    BookId = selectedBook.BookID,
-                    Quantity = quantity,
-                    Price = selectedBook.Price
-                });
-
-                // Add to Display list (using Book object for now, or a wrapper)
-                // For simplicity, just adding the book again to display list or similar
-                _currentOrderBooksDisplay.Add(selectedBook);
-                
-                UpdateOrderSummary();
-            }
-            else
-            {
-                MessageBox.Show("Please select a book.");
-            }
-        }
-
-        private void RemoveFromOrder_Click(object sender, RoutedEventArgs e)
-        {
-             if (CurrentOrderList.SelectedIndex >= 0)
+             string filter = OrderCustomerSearchBox.Text.ToLower();
+             if (string.IsNullOrWhiteSpace(filter))
              {
-                 int index = CurrentOrderList.SelectedIndex;
-                 _currentOrderDetails.RemoveAt(index);
-                 _currentOrderBooksDisplay.RemoveAt(index);
-                 UpdateOrderSummary();
+                 OrderCustomerGrid.ItemsSource = null; // Clear if empty
+             }
+             else
+             {
+                 var all = _customerRepo.GetAll();
+                 var filtered = all.Where(c => c.CustomerName.ToLower().Contains(filter) || c.Phone.Contains(filter)).ToList();
+                 OrderCustomerGrid.ItemsSource = filtered;
              }
         }
 
-        private void UpdateOrderSummary()
+        private void OrderCustomerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            CurrentOrderList.ItemsSource = null;
-            CurrentOrderList.ItemsSource = _currentOrderBooksDisplay; // Shows titles
-
-            decimal total = 0;
-            int count = 0;
-            for(int i=0; i< _currentOrderDetails.Count; i++)
+            if (OrderCustomerGrid.SelectedItem is Customer c)
             {
-                total += _currentOrderDetails[i].Price * _currentOrderDetails[i].Quantity;
-                count += _currentOrderDetails[i].Quantity;
+                _selectedOrderCustomer = c;
             }
+        }
+
+        // --- Book Section ---
+        private void OrderBookSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+             string filter = OrderBookSearchBox.Text.ToLower();
+             if (string.IsNullOrWhiteSpace(filter))
+             {
+                 OrderBookGrid.ItemsSource = null; // Clear if empty
+             }
+             else
+             {
+                 var all = _bookRepo.GetAll();
+                 var filtered = all
+                     .Where(b => b.Title.ToLower().Contains(filter) || b.ISBN.Contains(filter))
+                     .Select(b => new BookSelectionViewModel 
+                     {
+                         BookID = b.BookID,
+                         Title = b.Title,
+                         ISBN = b.ISBN,
+                         Price = b.Price,
+                         PublisherID = b.PublisherID,
+                         Stock = b.Stock,
+                         QuantityToBuy = 1 // Default
+                     })
+                     .ToList();
+                 OrderBookGrid.ItemsSource = filtered;
+             }
+        }
+
+        private void OrderBookGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (OrderBookGrid.SelectedItem is BookSelectionViewModel b)
+            {
+                int qtyToAdd = b.QuantityToBuy;
+                
+                if (qtyToAdd <= 0) 
+                {
+                     MessageBox.Show("Please select a quantity greater than 0.");
+                     return;
+                }
+
+                var existing = _cartItems.FirstOrDefault(i => i.BookId == b.BookID);
+                if (existing != null)
+                {
+                    if (existing.Quantity + qtyToAdd <= b.Stock)
+                    {
+                        existing.Quantity += qtyToAdd;
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Cannot add more. Stock limit ({b.Stock}) reached.");
+                    }
+                }
+                else
+                {
+                    if (b.Stock >= qtyToAdd)
+                    {
+                        _cartItems.Add(new CartItem 
+                        { 
+                            BookId = b.BookID, 
+                            BookTitle = b.Title, 
+                            Quantity = qtyToAdd, 
+                            Price = b.Price 
+                        });
+                    }
+                    else
+                    {
+                         MessageBox.Show("Not enough Stock!");
+                    }
+                }
+                RefreshCart();
+            }
+        }
+
+        // --- Cart Section ---
+        private void RefreshCart()
+        {
+            ShoppingCartGrid.ItemsSource = null;
+            ShoppingCartGrid.ItemsSource = _cartItems;
             
-            TotalPriceText.Text = total.ToString("C");
-            TotalItemsText.Text = count.ToString();
+            CartTotalItemsText.Text = _cartItems.Sum(i => i.Quantity).ToString();
+            CartTotalPriceText.Text = _cartItems.Sum(i => i.TotalPrice).ToString("C");
+        }
+
+        private void ClearCart_Click(object sender, RoutedEventArgs e)
+        {
+            _cartItems.Clear();
+            RefreshCart();
         }
 
         private void SubmitOrder_Click(object sender, RoutedEventArgs e)
         {
-            if (OrderCustomerComboBox.SelectedValue == null)
+            if (_selectedOrderCustomer == null)
             {
-                MessageBox.Show("Please select a customer.");
+                MessageBox.Show("Please select a customer from the list first.");
                 return;
             }
 
-            if (_currentOrderDetails.Count == 0)
+            if (_cartItems.Count == 0)
             {
-                 MessageBox.Show("Order is empty.");
-                 return;
+                MessageBox.Show("Cart is empty.");
+                return;
             }
 
             try
             {
-                int customerId = (int)OrderCustomerComboBox.SelectedValue;
-                
-                // Calculate total again or use computed
-                decimal total = 0;
-                foreach(var d in _currentOrderDetails) total += d.Price * d.Quantity;
+                decimal total = _cartItems.Sum(i => i.TotalPrice);
 
+                // Create Order
                 Order newOrder = new Order
                 {
-                    CustomerID = customerId,
-                    OrderDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                    CustomerID = _selectedOrderCustomer.CustomerId,
+                    OrderDate = DateTime.Now.ToString("yyyy-MM-dd"), 
                     OrderAmount = (float)total,
-                    OrderDetails = _currentOrderDetails
+                    OrderDetails = new List<OrderDetail>()
                 };
+
+                // Create Details
+                foreach(var item in _cartItems)
+                {
+                    newOrder.OrderDetails.Add(new OrderDetail
+                    {
+                        BookId = item.BookId,
+                        Quantity = item.Quantity,
+                        Price = item.Price
+                    });
+                }
 
                 _orderRepo.CreateOrder(newOrder);
                 
                 MessageBox.Show("Order Placed Successfully!");
-                
-                // Reset UI
-                _currentOrderDetails.Clear();
-                _currentOrderBooksDisplay.Clear();
-                UpdateOrderSummary();
-                OrderQuantityTextBox.Text = "1";
+                _cartItems.Clear();
+                RefreshCart();
+                RefreshHistory_Click(null, null); // Refresh history
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error submitting order: " + ex.Message);
+                MessageBox.Show("Error keying order: " + ex.Message);
             }
         }
-        
+
+        // --- Order History Section ---
+        private void RefreshHistory_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                 // Default show all
+                 string method = ""; 
+                 string value = "";
+                 
+                 // If searching
+                 if (sender == null || sender is Button) // Called manually or by button
+                 {
+                      if (HistorySearchMethodCombo.SelectedItem is ComboBoxItem item)
+                      {
+                           method = item.Content.ToString();
+                           value = HistorySearchValueBox.Text;
+                      }
+                 }
+
+                 OrderHistoryGrid.ItemsSource = _orderRepo.GetOrderHistory(method, value);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("History Error: " + ex.Message);
+            }
+        }
+
+        private void HistorySearchButton_Click(object sender, RoutedEventArgs e)
+        {
+             RefreshHistory_Click(sender, e);
+        }
+
+        private void HistorySearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                RefreshHistory_Click(sender, e);
+            }
+        }
+
         //NAME: ClearUIInput
         //DESCRIPTION: Clears all UI inputs        
         //PARAMETERS: none
@@ -540,69 +631,6 @@ namespace BookStore
             CustomerEmailTextBox.Text = "";
             CustomerAddressTextBox.Text = "";
             CustomerPhoneTextBox.Text = "";
-        }
-
-        //////////////////////////////////          SEARCH LOGIC            ////////////////////////////////////////
-
-        private void InitializeSearch()
-        {
-           SearchMethodComboBox.Items.Add("Order ID");
-           SearchMethodComboBox.Items.Add("Customer Name");
-           SearchMethodComboBox.Items.Add("Book Title");
-           SearchMethodComboBox.SelectedIndex = 0;
-        }
-
-        private void SearchValue_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                string method = SearchMethodComboBox.SelectedItem?.ToString();
-                string value = SearchValueTextBox.Text;
-
-                if (string.IsNullOrEmpty(method) || string.IsNullOrEmpty(value)) return;
-
-                try
-                {
-                    List<Order> results = _orderRepo.SearchOrders(method, value);
-                    SearchResultsListBox.ItemsSource = results;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Search Error: " + ex.Message);
-                }
-            }
-        }
-
-        private void SearchResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (SearchResultsListBox.SelectedItem is Order selectedOrder)
-            {
-                // Fetch details
-                try
-                {
-                    List<OrderDetail> details = _orderRepo.GetOrderDetails(selectedOrder.Id);
-                    
-                    // Enhancement needed: OrderDetail only has BookID. We want to see Book Title.
-                    // Quick fix: Fetch all books and lookup title (cache it) or extend OrderDetail.
-                    // Or since we already have _bookRepo, maybe just map it here.
-                    
-                    List<string> displayDetails = new List<string>();
-                    foreach (var d in details)
-                    {
-                        // Find book title from local cache if possible, or fetch. 
-                        // _bookRepo.GetAll() might be expensive to call every time. 
-                        // Simplest: `Book._books` is public static and loaded. Use that!
-                        var book = Book._books.FirstOrDefault(b => b.BookID == d.BookId);
-                        string title = book != null ? book.Title : "Unknown Book";
-                        displayDetails.Add($"{title} (Qty: {d.Quantity}) - {d.Price:C}");
-                    }
-                    OrderDetailsListBox.ItemsSource = displayDetails;
-                }
-                catch (Exception ex)
-                {
-                     MessageBox.Show("Error loading details: " + ex.Message);
-                }
-            }
         }
     }
 }

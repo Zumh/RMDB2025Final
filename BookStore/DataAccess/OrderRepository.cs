@@ -101,5 +101,52 @@ namespace BookStore.DataAccess
             }
             return details;
         }
+
+        public List<OrderDisplayItem> GetOrderHistory(string method, string value)
+        {
+            List<OrderDisplayItem> history = new List<OrderDisplayItem>();
+            string query = "SELECT o.id, c.name as CustomerName, b.title as BookTitle, od.quantity, o.totalAmount, o.orderDate " +
+                           "FROM `order` o " +
+                           "JOIN customer c ON o.customerID = c.id " +
+                           "JOIN orderdetail od ON o.id = od.orderID " +
+                           "JOIN book b ON od.bookID = b.id";
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                if (method == "Order ID")
+                {
+                     if (int.TryParse(value, out int id))
+                     {
+                         query += $" WHERE o.id = {id}";
+                     }
+                }
+                else if (method == "Customer Name")
+                {
+                     query += $" WHERE c.name LIKE '%{value}%'";
+                }
+                else if (method == "Book Title")
+                {
+                     query += $" WHERE b.title LIKE '%{value}%'";
+                }
+            }
+            
+            // Order by ID descending usually looks best
+            query += " ORDER BY o.id DESC";
+
+            DataTable table = db.DataBaseQuery(query);
+            foreach (DataRow row in table.Rows)
+            {
+                history.Add(new OrderDisplayItem
+                {
+                    OrderId = Convert.ToInt32(row["id"]),
+                    CustomerName = row["CustomerName"].ToString(),
+                    BookTitle = row["BookTitle"].ToString(),
+                    Quantity = Convert.ToInt32(row["quantity"]),
+                    TotalAmount = Convert.ToSingle(row["totalAmount"]),
+                    OrderDate = row["orderDate"].ToString()
+                });
+            }
+            return history;
+        }
     }
 }
