@@ -57,26 +57,6 @@ namespace BookStore
                 // Test connection by trying to load data
                 LoadData();
                 MessageBox.Show("Connected and Data Loaded!");
-
-                // DEBUG: Probe Schema
-                try {
-                    var db = new BookStore.DBManager();
-                    string debugInfo = "Schema Debug:\n";
-                    try {
-                        DataTable t1 = db.DataBaseQuery("DESCRIBE `order`");
-                        debugInfo += "ORDER TABLE:\n";
-                        foreach(DataRow r in t1.Rows) debugInfo += r["Field"] + "\n";
-                    } catch(Exception ex1) { debugInfo += "Order Table Error: " + ex1.Message + "\n"; }
-                    try {
-                        DataTable t2 = db.DataBaseQuery("DESCRIBE `orderdetail`");
-                        debugInfo += "\nORDERDETAIL TABLE:\n";
-                        foreach(DataRow r in t2.Rows) debugInfo += r["Field"] + "\n";
-                    } catch(Exception ex2) { debugInfo += "OrderDetail Table Error: " + ex2.Message + "\n"; }
-                    // Write to a known location
-                    string path = @"d:\cone\Second grade 1st semester\Relational Databases2111(queries)\assginment\TeamP\RMDB2025Final\BookStore\schema_info.txt";
-                    System.IO.File.WriteAllText(path, debugInfo);
-                    MessageBox.Show("Schema details saved to schema_info.txt");
-                } catch (Exception exProbe) { MessageBox.Show("Probe failed: " + exProbe.Message); }
             }
             catch (Exception ex)
             {
