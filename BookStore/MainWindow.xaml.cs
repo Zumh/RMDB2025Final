@@ -310,7 +310,7 @@ namespace BookStore
                 int.TryParse(stock, out numericStock);
 
                 // TODO: Handle Publisher properly (find ID by name or insert new publisher)
-                // For now we will just use a default ID or try to parse if user entered ID... // Since UI is text box, let's assume for prototype we need to fix this later or assume ID 1.
+                // For now we will just use a default ID or try to parse if user entered ID
                 int pubId = 1;
                 int catId = 1;
 
@@ -319,8 +319,8 @@ namespace BookStore
                     var newBook = new Book
                     {
                         Title = title,
-                        ISBN = isbn, // Note: Model has String ISBN but here usage tried double? Model says string.
-                        Price = (decimal)numericPrice, // Model says decimal
+                        ISBN = isbn,
+                        Price = (decimal)numericPrice,
                         Stock = numericStock,
                         PublisherID = pubId,
                         CategoryID = catId
@@ -348,14 +348,14 @@ namespace BookStore
         public class CartItem
         {
             public int BookId { get; set; }
-            public string BookTitle { get; set; }
+            public string BookTitle { get; set; } = string.Empty;
             public int Quantity { get; set; }
             public decimal Price { get; set; }
             public decimal TotalPrice => Price * Quantity;
         }
 
         private List<CartItem> _cartItems = new List<CartItem>();
-        private Customer _selectedOrderCustomer = null;
+        private Customer? _selectedOrderCustomer = null;
 
         private void LoadData()
         {
@@ -370,7 +370,7 @@ namespace BookStore
                 OrderBookGrid.ItemsSource = null;
                 RefreshHistory_Click(null, null);
             }
-            catch (Exception ex)
+            catch
             {
                 // StatusText might be null if called too early
             }
@@ -387,17 +387,14 @@ namespace BookStore
             else
             {
                 var all = _customerRepo.GetAll();
-                var filtered = all.Where(c => c.CustomerName.ToLower().Contains(filter) || c.Phone.Contains(filter)).ToList();
+                var filtered = all.Where(c => (c.CustomerName ?? "").ToLower().Contains(filter) || (c.Phone ?? "").Contains(filter)).ToList();
                 OrderCustomerGrid.ItemsSource = filtered;
             }
         }
 
         private void OrderCustomerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (OrderCustomerGrid.SelectedItem is Customer c)
-            {
-                _selectedOrderCustomer = c;
-            }
+            _selectedOrderCustomer = OrderCustomerGrid.SelectedItem as Customer;
         }
 
         // --- Book Section ---
@@ -413,7 +410,7 @@ namespace BookStore
                 var all = _bookRepo.GetAll();
                 // ✅ FIXED: Now using Book directly instead of BookSelectionViewModel
                 var filtered = all
-                    .Where(b => b.Title.ToLower().Contains(filter) || b.ISBN.Contains(filter))
+                    .Where(b => (b.Title ?? "").ToLower().Contains(filter) || (b.ISBN ?? "").Contains(filter))
                     .ToList();
                 OrderBookGrid.ItemsSource = filtered;
             }
@@ -425,7 +422,6 @@ namespace BookStore
             if (OrderBookGrid.SelectedItem is Book b)
             {
                 // For now, we'll add with default quantity of 1
-                // You can implement a dialog to let users select quantity
                 int qtyToAdd = 1;
 
                 if (qtyToAdd <= 0)
@@ -453,7 +449,7 @@ namespace BookStore
                         _cartItems.Add(new CartItem
                         {
                             BookId = b.BookID,
-                            BookTitle = b.Title,
+                            BookTitle = b.Title ?? string.Empty,
                             Quantity = qtyToAdd,
                             Price = b.Price
                         });
@@ -533,7 +529,7 @@ namespace BookStore
         }
 
         // --- Order History Section ---
-        private void RefreshHistory_Click(object sender, RoutedEventArgs e)
+        private void RefreshHistory_Click(object? sender, RoutedEventArgs? e)
         {
             try
             {
@@ -546,8 +542,8 @@ namespace BookStore
                 {
                     if (HistorySearchMethodCombo.SelectedItem is ComboBoxItem item)
                     {
-                        method = item.Content.ToString();
-                        value = HistorySearchValueBox.Text;
+                        method = item.Content?.ToString() ?? "";
+                        value = HistorySearchValueBox.Text ?? "";
                     }
                 }
 
