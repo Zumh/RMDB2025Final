@@ -64,6 +64,7 @@ namespace BookStore
             string customerEmail = CustomerEmailTextBox.Text;
             string customerAddress = CustomerAddressTextBox.Text;
             string customerPhoneNumber = CustomerPhoneTextBox.Text;
+
             //clear error messages
             StatusText.Text = "";
 
@@ -102,6 +103,7 @@ namespace BookStore
                             Phone = customerPhoneNumber
                         });
                         dbManager.Customers.SaveChanges();
+                        ClearUIInput();
                     }
                     catch (System.Exception ex)
                     {
@@ -109,11 +111,12 @@ namespace BookStore
                     }
                 }
 
-                ClearUIInput();
+               
                 
             }
         }
 
+        
         //NAME: DisplayAllCustomers_Click
         //DESCRIPTION: Creates a datatable that contains all customers in the database        
         //             Handles no data returns and user feedback
