@@ -26,9 +26,9 @@ namespace BookStore
         static public List<Customer> _customers = new List<Customer>(); 
 
         //NAME: ValidateName
-        //DESCRIPTION: Validates the customer name is not blank
-        //PARAMETERS: string customerName - name of customer
-        //RETURN: bool isValid - true if name is valid otherwise false
+        //DESCRIPTION: Checks if the customer name is empty.
+        //PARAMETERS: string customerName
+        //RETURN: sValid
         public static bool ValidateName(string customerName)
         {
             bool isValid = true;
@@ -40,9 +40,9 @@ namespace BookStore
                 return isValid;
         }
         //NAME: ValidateAddress
-        //DESCRIPTION: Validates the customer address is not blank
-        //PARAMETERS: string address - address of customer
-        //RETURN: bool isValid - true if address is valid otherwise false
+        //DESCRIPTION: Checks if the customer address is empty.
+        //PARAMETERS: string address
+        //RETURN: isValid
         public static bool ValidateAddress(string address)
         {
             bool isValid = true;
@@ -53,9 +53,9 @@ namespace BookStore
             return isValid;
         }
         //NAME: ValidatePhoneNumber
-        //DESCRIPTION: Validates the customer phone number is not blank and in proper format
-        //PARAMETERS: string phone - phone number of customer
-        //RETURN: bool isValid - true if phone number is valid otherwise false
+        //DESCRIPTION: Checks if the phone number is valid and not empty.
+        //PARAMETERS: string phone
+        //RETURN: isValid
         public static bool ValidatePhoneNumber(string phone) 
         {
             bool isValid = true;
@@ -69,9 +69,9 @@ namespace BookStore
             return isValid;
         }
         //NAME: ValidateEmail
-        //DESCRIPTION: Validates the customer email is not blank and in proper format
-        //PARAMETERS: string email - email of customer
-        //RETURN: bool isValid - true if email is valid otherwise false
+        //DESCRIPTION: Checks if the email is valid and not empty.
+        //PARAMETERS: string email
+        //RETURN: isValid
         public static bool ValidateEmail(string email) 
         {
             bool isValid = true;
@@ -86,8 +86,8 @@ namespace BookStore
         }
 
         //NAME: LoadCustomerData
-        //DESCRIPTION: Adds the dataTable to a Customer List
-        //PARAMETERS: DataTable data - customer data from database
+        //DESCRIPTION: Gets customer data from the database and adds it to the list.
+        //PARAMETERS: DataTable data
         //RETURN: void
         public static void LoadCustomerData (DataTable data)
         {
@@ -105,9 +105,9 @@ namespace BookStore
                 }
         }
         //NAME: SearchByName
-        //DESCRIPTION: Searches through customer list to filter by name
-        //PARAMETERS: none
-        //RETURN: void
+        //DESCRIPTION: Searches for customers by their name.
+        //PARAMETERS: string name
+        //RETURN: list
         public static List<Customer> SearchByName(string name)
         {
             List<Customer> list = new List<Customer>();

@@ -1,4 +1,13 @@
-﻿using System;
+﻿//FILE : CustomerRepository.cs
+//PROJECT : PROG2111 Final Project
+//PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+//FIRST VERSION : 03/12/2025
+/*DESCRIPTION: 
+This class handles customer data operations.
+It allows saving new customers and finding existing ones.
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +21,10 @@ namespace BookStore.DataAccess
     {
         private DBManager db = new DBManager();
 
+        //NAME: GetAll
+        //DESCRIPTION: Gets all customers from the database.
+        //PARAMETERS: None
+        //RETURN: customers
         public List<Customer> GetAll()
         {
             List<Customer> customers = new List<Customer>();
@@ -33,18 +46,30 @@ namespace BookStore.DataAccess
             return customers;
         }
 
+        //NAME: Add
+        //DESCRIPTION: Adds a new customer to the database.
+        //PARAMETERS: Customer customer
+        //RETURN: void
         public void Add(Customer customer)
         {
             string query = $"INSERT INTO customer (name, address, email, phonenumber) VALUES ('{customer.CustomerName}', '{customer.Address}', '{customer.Email}', '{customer.Phone}')";
             db.ExecuteNonQuery(query);
         }
         
+        //NAME: Delete
+        //DESCRIPTION: Deletes a customer from the database.
+        //PARAMETERS: int id
+        //RETURN: void
         public void Delete(int id)
         {
             string query = $"DELETE FROM customer WHERE id = {id}";
             db.ExecuteNonQuery(query);
         }
 
+        //NAME: Search
+        //DESCRIPTION: Searches for customers using multiple criteria (Name, Email, Address, Phone).
+        //PARAMETERS: string name, string email, string address, string phone
+        //RETURN: customers
         public List<Customer> Search(string name, string email, string address, string phone)
         {
             List<Customer> customers = new List<Customer>();

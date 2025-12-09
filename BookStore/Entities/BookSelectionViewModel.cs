@@ -1,3 +1,12 @@
+//FILE : BookSelectionViewModel.cs
+//PROJECT : PROG2111 Final Project
+//PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+//FIRST VERSION : 03/12/2025
+/*DESCRIPTION: 
+This class helps to show book details in the UI. 
+It holds information like title, specific codes, and prices for display.
+*/
+
 using System;
 
 namespace BookStore.Entities

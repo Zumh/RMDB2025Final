@@ -1,4 +1,13 @@
-﻿using System;
+﻿//FILE : BookRepository.cs
+//PROJECT : PROG2111 Final Project
+//PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+//FIRST VERSION : 03/12/2025
+/*DESCRIPTION: 
+This class handles all database operations for books.
+It allows adding, updating, deleting, and searching for books.
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using MySql.Data.MySqlClient;
@@ -12,6 +21,10 @@ namespace BookStore.DataAccess
         // Flag to check if we've already verified the column
         private static bool _authorColumnChecked = false;
 
+        //NAME: EnsureAuthorColumnExists
+        //DESCRIPTION: Checks if the 'author' column exists in the database and adds it if missing.
+        //PARAMETERS: None.
+        //RETURN: void
         private void EnsureAuthorColumnExists()
         {
             if (_authorColumnChecked) return;
@@ -34,7 +47,10 @@ namespace BookStore.DataAccess
             }
         }
 
-        //READ
+        //NAME: GetAll
+        //DESCRIPTION: Gets all books from the database.
+        //PARAMETERS: None.
+        //RETURN: books
         public List<Book> GetAll()
         {
             EnsureAuthorColumnExists();
@@ -50,8 +66,11 @@ namespace BookStore.DataAccess
             return books;
         }
 
-        // READ - ID
-        public Book GetById(int bookId)
+        //NAME: GetById
+        //DESCRIPTION: Finds a book by its ID.
+        //PARAMETERS: int bookId
+        //RETURN: MapRowToBook(data.Rows[0]), or null if not found.
+        public Book? GetById(int bookId)
         {
             string query = "SELECT * FROM book WHERE id = @id";
             DataTable data = db.DataBaseQuery(query, new[] { "@id", bookId.ToString() });
@@ -62,7 +81,10 @@ namespace BookStore.DataAccess
             return null;
         }
 
-        // READ - Title
+        //NAME: SearchByTitle
+        //DESCRIPTION: Searches for books by title.
+        //PARAMETERS: string title
+        //RETURN: books
         public List<Book> SearchByTitle(string title)
         {
             List<Book> books = new List<Book>();
@@ -78,7 +100,10 @@ namespace BookStore.DataAccess
             return books;
         }
 
-        // READ - Author
+        //NAME: SearchByAuthor
+        //DESCRIPTION: Searches for books by author.
+        //PARAMETERS: string author
+        //RETURN: books
         public List<Book> SearchByAuthor(string author)
         {
             List<Book> books = new List<Book>();
@@ -94,7 +119,10 @@ namespace BookStore.DataAccess
             return books;
         }
 
-        // READ - category
+        //NAME: SearchByCategory
+        //DESCRIPTION: Searches for books in a specific category.
+        //PARAMETERS: int categoryId
+        //RETURN: books
         public List<Book> SearchByCategory(int categoryId)
         {
             List<Book> books = new List<Book>();
@@ -110,6 +138,10 @@ namespace BookStore.DataAccess
             return books;
         }
 
+        //NAME: Search
+        //DESCRIPTION: Searches for books using multiple criteria (Title, Author, ISBN, Price, Category).
+        //PARAMETERS: string title, string author, string isbn, string price, int categoryId
+        //RETURN: books
         public List<Book> Search(string title, string author, string isbn, string price, int categoryId)
         {
             List<Book> books = new List<Book>();
@@ -144,6 +176,10 @@ namespace BookStore.DataAccess
         }
 
         // CREATE - Add book
+        //NAME: Add
+        //DESCRIPTION: Adds a new book to the database.
+        //PARAMETERS: Book book
+        //RETURN: bool - True if adding was successful, False otherwise.
         public bool Add(Book book)
         {
             EnsureAuthorColumnExists();
@@ -152,8 +188,8 @@ namespace BookStore.DataAccess
 
             var parameters = new Dictionary<string, string>
             {
-                { "@title", book.Title },
-                { "@isbn", book.ISBN },
+                { "@title", book.Title ?? "" },
+                { "@isbn", book.ISBN ?? "" },
                 { "@price", book.Price.ToString() },
                 { "@stock", book.Stock.ToString() },
                 { "@publisherId", book.PublisherID.ToString() },
@@ -165,7 +201,10 @@ namespace BookStore.DataAccess
             return result > 0;
         }
 
-        // UPDATE - BookInfo
+        //NAME: Update
+        //DESCRIPTION: Updates an existing book in the database.
+        //PARAMETERS: Book book
+        //RETURN: bool - True if update was successful, False otherwise.
         public bool Update(Book book)
         {
              EnsureAuthorColumnExists();
@@ -176,8 +215,8 @@ namespace BookStore.DataAccess
             var parameters = new Dictionary<string, string>
             {
                 { "@id", book.BookID.ToString() },
-                { "@title", book.Title },
-                { "@isbn", book.ISBN },
+                { "@title", book.Title ?? "" },
+                { "@isbn", book.ISBN ?? "" },
                 { "@price", book.Price.ToString() },
                 { "@stock", book.Stock.ToString() },
                 { "@publisherId", book.PublisherID.ToString() },
@@ -189,7 +228,10 @@ namespace BookStore.DataAccess
             return result > 0;
         }
 
-        // DELETE - Delete Book
+        //NAME: Delete
+        //DESCRIPTION: Deletes a book from the database.
+        //PARAMETERS: int bookId
+        //RETURN: bool - True if delete was successful, False otherwise.
         public bool Delete(int bookId)
         {
             string query = "DELETE FROM book WHERE id = @id";
@@ -197,7 +239,10 @@ namespace BookStore.DataAccess
             return result > 0;
         }
 
-        // Helper - Invert DataRows Book object 
+        //NAME: MapRowToBook
+        //DESCRIPTION: Converts a database row into a Book object.
+        //PARAMETERS: DataRow row
+        //RETURN: new Book
         private Book MapRowToBook(DataRow row)
         {
             return new Book

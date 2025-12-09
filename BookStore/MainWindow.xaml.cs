@@ -1,4 +1,13 @@
-﻿using MySqlX.XDevAPI.Relational;
+﻿//FILE : MainWindow.xaml.cs
+//PROJECT : PROG2111 Final Project
+//PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+//FIRST VERSION : 03/12/2025
+/*DESCRIPTION: 
+This is the main window of the application where users interact with the system.
+It handles navigation between tabs and user events like clicking buttons to add or search items.
+*/
+
+using MySqlX.XDevAPI.Relational;
 using System.Data;
 using System.Text;
 using System.Windows;
@@ -33,12 +42,10 @@ namespace BookStore
 
         ////////////////////////////////////////        LOGIN FUNCTIONS      ///////////////////////////////////////////////////////////
 
-        //NAME: ClearLogin_Click
-        //DESCRIPTION: Clears the login fields of all text
+        //NAME: LoginBtn_Click
+        //DESCRIPTION: Updates the connection string and tries to load data.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        //NAME: LoginBtn_Click
-        //DESCRIPTION: Updates connection string and loads data
         private void LoginBtn_Click(object sender, RoutedEventArgs e)
         {
             string user = userId.Text;
@@ -69,21 +76,23 @@ namespace BookStore
             }
         }
 
+        //NAME: ClearLogin_Click
+        //DESCRIPTION: Clears the login text boxes.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void ClearLogin_Click(object sender, RoutedEventArgs e)
         {
             userId.Text = "";
             loginPassword.Text = "";
             dataBaseName.Text = "";
         }
-        //NAME: AddCustomerBtn_Click
-        //DESCRIPTION: Validates the customer input
-        //             Adds the customer to the dataTable
-        //             Handles input errors and UI clean up
-        //PARAMETERS: object sender, RoutedEventArgs e
-        //RETURN: void
 
         //////////////////////////////             CUSTOMER FUNCTIONS             //////////////////////////////////////////////////////
 
+        //NAME: AddCustomerBtn_Click
+        //DESCRIPTION: Validates input and adds a new customer to the database.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void AddCustomerBtn_Click(object sender, RoutedEventArgs e)
         {
             bool validated = true;
@@ -146,8 +155,7 @@ namespace BookStore
         }
 
         //NAME: DisplayAllCustomers_Click
-        //DESCRIPTION: Creates a datatable that contains all customers in the database        
-        //             Handles no data returns and user feedback
+        //DESCRIPTION: Shows all customers in the list.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
         private void DisplayAllCustomers_Click(object sender, RoutedEventArgs e)
@@ -155,6 +163,10 @@ namespace BookStore
             RefreshCustomerList();
         }
 
+        //NAME: RefreshCustomerList
+        //DESCRIPTION: Reloads the customer list from the database.
+        //PARAMETERS: None
+        //RETURN: void
         private void RefreshCustomerList()
         {
             try
@@ -179,7 +191,7 @@ namespace BookStore
         }
 
         //NAME: CustomerList_Columns
-        //DESCRIPTION: Sets the first column to read only so users cannot edit primary key        
+        //DESCRIPTION: Makes the ID column read-only in the data grid.
         //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
         //RETURN: void
         private void CustomerList_Columns(object sender, DataGridAutoGeneratingColumnEventArgs e)
@@ -190,12 +202,11 @@ namespace BookStore
                 e.Column.IsReadOnly = true;
             }
         }
-        //NAME: SearchForCustomer_Click
-        //DESCRIPTION: Searches for customer based on name        
-        //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
-        //RETURN: void
+
         //NAME: RemoveCustomer_Click
-        //DESCRIPTION: Removes selected customer from database
+        //DESCRIPTION: Removes the selected customer from the database.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void RemoveCustomer_Click(object sender, RoutedEventArgs e)
         {
             if (CustomerList.SelectedItem is Customer selectedCustomer)
@@ -222,7 +233,7 @@ namespace BookStore
         }
 
         //NAME: SearchForCustomer_Click
-        //DESCRIPTION: Searches for customer based on criteria (AND logic)
+        //DESCRIPTION: Searches for customers based on the criteria entered.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
         private void SearchForCustomer_Click(object sender, RoutedEventArgs e)
@@ -259,7 +270,9 @@ namespace BookStore
         //////////////////////////////             BOOK FUNCTIONS             //////////////////////////////////////////////////////
 
         //NAME: RemoveBook_Click
-        //DESCRIPTION: Removes selected book from database
+        //DESCRIPTION: Removes the selected book from the database.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void RemoveBook_Click(object sender, RoutedEventArgs e)
         {
             if (BookList.SelectedItem is Book selectedBook)
@@ -285,6 +298,10 @@ namespace BookStore
             }
         }
 
+        //NAME: SearchBook_Click
+        //DESCRIPTION: Searches for books based on the criteria entered.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void SearchBook_Click(object sender, RoutedEventArgs e)
         {
             string title = BookTitletextBox.Text;
@@ -315,6 +332,10 @@ namespace BookStore
             }
         }
 
+        //NAME: RefreshBookList
+        //DESCRIPTION: Reloads the book list from the database.
+        //PARAMETERS: None
+        //RETURN: void
         private void RefreshBookList()
         {
             try
@@ -329,6 +350,10 @@ namespace BookStore
             }
         }
 
+        //NAME: RefreshCategoryList
+        //DESCRIPTION: Reloads the category list from the database.
+        //PARAMETERS: None
+        //RETURN: void
         private void RefreshCategoryList()
         {
             try
@@ -346,7 +371,7 @@ namespace BookStore
         }
 
         //NAME: BookList_Columns
-        //DESCRIPTION: Sets bookID, publisher ID, and categoryID to readonly        
+        //DESCRIPTION: Makes ID columns read-only in the book grid.
         //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
         //RETURN: void
         private void BookList_Columns(object sender, DataGridAutoGeneratingColumnEventArgs e)
@@ -367,9 +392,8 @@ namespace BookStore
         }
 
         //NAME: AddBook_Click
-        //DESCRIPTION: Validates user input for a new book
-        //             Adds a new book object to the _book list        
-        //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
+        //DESCRIPTION: Validates input and adds a new book to the database.
+        //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
         private void AddBook_Click(object sender, RoutedEventArgs e)
         {
@@ -476,10 +500,6 @@ namespace BookStore
 
         //////////////////////////////////          ORDER FUNCTIONS            ////////////////////////////////////////
 
-
-
-        //////////////////////////////////          ORDER FUNCTIONS            ////////////////////////////////////////
-
         // Cart State
         public class CartItem
         {
@@ -493,6 +513,10 @@ namespace BookStore
         private List<CartItem> _cartItems = new List<CartItem>();
         private Customer? _selectedOrderCustomer = null;
 
+        //NAME: LoadData
+        //DESCRIPTION: Loads initial data from the database.
+        //PARAMETERS: None.
+        //RETURN: void
         private void LoadData()
         {
             try 
@@ -518,6 +542,11 @@ namespace BookStore
         }
 
         // --- Customer Section ---
+
+        //NAME: OrderCustomerSearchBox_TextChanged
+        //DESCRIPTION: Filters the customer list in the order tab as the user types.
+        //PARAMETERS: object sender, TextChangedEventArgs e
+        //RETURN: void
         private void OrderCustomerSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
              string filter = OrderCustomerSearchBox.Text.ToLower();
@@ -533,6 +562,10 @@ namespace BookStore
              }
         }
 
+        //NAME: OrderCustomerGrid_SelectionChanged
+        //DESCRIPTION: Selects a customer for the order when clicked in the grid.
+        //PARAMETERS: object sender, SelectionChangedEventArgs e
+        //RETURN: void
         private void OrderCustomerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (OrderCustomerGrid.SelectedItem is Customer c)
@@ -542,6 +575,11 @@ namespace BookStore
         }
 
         // --- Book Section ---
+
+        //NAME: OrderBookSearchBox_TextChanged
+        //DESCRIPTION: Filters the book list in the order tab as the user types.
+        //PARAMETERS: object sender, TextChangedEventArgs e
+        //RETURN: void
         private void OrderBookSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
              string filter = OrderBookSearchBox.Text.ToLower();
@@ -570,6 +608,10 @@ namespace BookStore
              }
         }
 
+        //NAME: OrderBookGrid_MouseDoubleClick
+        //DESCRIPTION: Adds a book to the cart when double clicked.
+        //PARAMETERS: object sender, MouseButtonEventArgs e
+        //RETURN: void
         private void OrderBookGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (OrderBookGrid.SelectedItem is BookSelectionViewModel b)
@@ -616,6 +658,11 @@ namespace BookStore
         }
 
         // --- Cart Section ---
+
+        //NAME: RefreshCart
+        //DESCRIPTION: Updates the shopping cart display.
+        //PARAMETERS: None
+        //RETURN: void
         private void RefreshCart()
         {
             ShoppingCartGrid.ItemsSource = null;
@@ -625,12 +672,20 @@ namespace BookStore
             CartTotalPriceText.Text = _cartItems.Sum(i => i.TotalPrice).ToString("C");
         }
 
+        //NAME: ClearCart_Click
+        //DESCRIPTION: Removes all items from the shopping cart.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void ClearCart_Click(object sender, RoutedEventArgs e)
         {
             _cartItems.Clear();
             RefreshCart();
         }
 
+        //NAME: RemoveOrder_Click
+        //DESCRIPTION: Deletes a selected order from history.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void RemoveOrder_Click(object sender, RoutedEventArgs e)
         {
              if (OrderHistoryGrid.SelectedItem is OrderDetail selected)
@@ -655,6 +710,10 @@ namespace BookStore
              }
         }
 
+        //NAME: SubmitOrder_Click
+        //DESCRIPTION: Creates a new order with the items in the cart.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void SubmitOrder_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedOrderCustomer == null)
@@ -707,6 +766,11 @@ namespace BookStore
         }
 
         // --- Order History Section ---
+
+        //NAME: RefreshHistory_Click
+        //DESCRIPTION: Reloads the order history list.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void RefreshHistory_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -733,11 +797,19 @@ namespace BookStore
             }
         }
 
+        //NAME: HistorySearchButton_Click
+        //DESCRIPTION: Filters the order history based on search criteria.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void HistorySearchButton_Click(object sender, RoutedEventArgs e)
         {
              RefreshHistory_Click(sender, e);
         }
 
+        //NAME: HistorySearch_KeyDown
+        //DESCRIPTION: Triggers search when Enter key is pressed in history search box.
+        //PARAMETERS: object sender, KeyEventArgs e
+        //RETURN: void
         private void HistorySearch_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -747,8 +819,8 @@ namespace BookStore
         }
 
         //NAME: ClearUIInput
-        //DESCRIPTION: Clears all UI inputs        
-        //PARAMETERS: none
+        //DESCRIPTION: Clears all input fields in the UI.
+        //PARAMETERS: None.
         //RETURN: void
         public void ClearUIInput()
         {
@@ -765,11 +837,19 @@ namespace BookStore
             CustomerPhoneTextBox.Text = "";
         }
 
+        //NAME: OrderBookGrid_SelectionChanged
+        //DESCRIPTION: Handles selection change in order book grid.
+        //PARAMETERS: object sender, SelectionChangedEventArgs e
+        //RETURN: void
         private void OrderBookGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
         }
 
+        //NAME: OrderHistoryGrid_SelectionChanged
+        //DESCRIPTION: Handles selection change in order history grid.
+        //PARAMETERS: object sender, SelectionChangedEventArgs e
+        //RETURN: void
         private void OrderHistoryGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 

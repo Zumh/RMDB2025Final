@@ -18,6 +18,10 @@ namespace BookStore
         public static string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
         MySqlConnection connection = new(connectionString);
 
+        //NAME: ExecuteNonQuery
+        //DESCRIPTION: Executes a SQL command that does not return data
+        //PARAMETERS: string query. Dictionary<string, string> parameters = null
+        //RETURN: command.ExecuteNonQuery(), or -1 if there was an error.
         public int ExecuteNonQuery(string query, Dictionary<string, string> parameters = null)
         {
             try
@@ -45,6 +49,10 @@ namespace BookStore
             }
         }
 
+        //NAME: DataBaseQuery
+        //DESCRIPTION: Executes a SQL command that returns data
+        //PARAMETERS: string query. string[] parameters =null
+        //RETURN: dataTable
         public DataTable DataBaseQuery(string query, string[] parameters = null)
         {
             DataTable dataTable = new DataTable();

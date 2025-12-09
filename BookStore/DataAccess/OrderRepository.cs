@@ -1,4 +1,13 @@
-﻿using System;
+﻿//FILE : OrderRepository.cs
+//PROJECT : PROG2111 Final Project
+//PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+//FIRST VERSION : 03/12/2025
+/*DESCRIPTION: 
+This class manages orders in the database.
+It handles creating orders, saving order details, and searching order history.
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +21,10 @@ namespace BookStore.DataAccess
     {
         private DBManager db = new DBManager();
 
+        //NAME: CreateOrder
+        //DESCRIPTION: Creates a new order in the database, including the order details.
+        //PARAMETERS: Order order
+        //RETURN: void
         public void CreateOrder(Order order)
         {
             // 1. Insert Order
@@ -29,7 +42,6 @@ namespace BookStore.DataAccess
             }
 
             // 3. Insert Order Details
-            // Schema: id, orderID, bookID, quantity, unitPrice
             foreach (var detail in order.OrderDetails)
             {
                 string detailQuery = $"INSERT INTO orderdetail (orderID, bookID, quantity, unitPrice) VALUES ({newOrderId}, {detail.BookId}, {detail.Quantity}, {detail.Price})";
@@ -37,6 +49,10 @@ namespace BookStore.DataAccess
             }
         }
 
+        //NAME: SearchOrders
+        //DESCRIPTION: Searches for orders based on ID, customer name, or book title.
+        //PARAMETERS: string method, string value
+        //RETURN: orders
         public List<Order> SearchOrders(string method, string value)
         {
             List<Order> orders = new List<Order>();
@@ -83,6 +99,10 @@ namespace BookStore.DataAccess
             return orders;
         }
 
+        //NAME: GetOrderDetails
+        //DESCRIPTION: Gets the details of a specific order.
+        //PARAMETERS: int orderId
+        //RETURN: details
         public List<OrderDetail> GetOrderDetails(int orderId)
         {
             List<OrderDetail> details = new List<OrderDetail>();
@@ -102,6 +122,10 @@ namespace BookStore.DataAccess
             return details;
         }
 
+        //NAME: GetOrderHistory
+        //DESCRIPTION: Gets the full history of orders with customer and book names.
+        //PARAMETERS: string method, string value
+        //RETURN: history
         public List<OrderDetail> GetOrderHistory(string method, string value)
         {
             List<OrderDetail> history = new List<OrderDetail>();
@@ -150,6 +174,11 @@ namespace BookStore.DataAccess
             }
             return history;
         }
+
+        //NAME: DeleteOrder
+        //DESCRIPTION: Deletes an order and its details from the database.
+        //PARAMETERS: int orderId
+        //RETURN: void
         public void DeleteOrder(int orderId)
         {
             // Delete details first due to foreign key constraints

@@ -1,3 +1,12 @@
+//FILE : CategoryRepository.cs
+//PROJECT : PROG2111 Final Project
+//PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+//FIRST VERSION : 03/12/2025
+/*DESCRIPTION: 
+This class manages category data in the database.
+It is used to get all categories and create default ones if needed.
+*/
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,6 +17,10 @@ namespace BookStore.DataAccess
     {
         private DBManager db = new DBManager();
 
+        //NAME: GetNameColumn
+        //DESCRIPTION: Finds the correct name for the category column in the table.
+        //PARAMETERS: DataTable dt
+        //RETURN: "name"
         private string GetNameColumn(DataTable dt)
         {
             if (dt.Columns.Contains("name")) return "name";
@@ -24,6 +37,10 @@ namespace BookStore.DataAccess
             return "name"; // Default failure
         }
 
+        //NAME: GetAll
+        //DESCRIPTION: Gets all categories from the database.
+        //PARAMETERS: None.
+        //RETURN: list
         public List<Category> GetAll()
         {
             List<Category> list = new List<Category>();
@@ -49,6 +66,10 @@ namespace BookStore.DataAccess
             return list;
         }
 
+        //NAME: SeedCategories
+        //DESCRIPTION: Adds default categories to the database if they are missing.
+        //PARAMETERS: None
+        //RETURN: void
         public void SeedCategories()
         {
             // Check if any categories exist
