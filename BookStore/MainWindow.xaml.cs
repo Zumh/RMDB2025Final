@@ -10,6 +10,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MySql.Data.MySqlClient;
+using System.Data.Common;
 
 namespace BookStore
 {
@@ -35,18 +37,20 @@ namespace BookStore
             loginPassword.Text = "";
             dataBaseName.Text = "";
         }
+
+        //////////////////////////////             CUSTOMER FUNCTIONS             //////////////////////////////////////////////////////
+        
+
         //NAME: AddCustomerBtn_Click
         //DESCRIPTION: Validates the customer input
         //             Adds the customer to the dataTable
         //             Handles input errors and UI clean up
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-
-        //////////////////////////////             CUSTOMER FUNCTIONS             //////////////////////////////////////////////////////
-
         private void AddCustomerBtn_Click(object sender, RoutedEventArgs e)
         {
             bool validated = true;
+            int failedCRUD = -1;
 
             string customerName = CustomerNameTextBox.Text;
             string customerEmail = CustomerEmailTextBox.Text;
@@ -81,13 +85,12 @@ namespace BookStore
                 //add customer to customer list
                 if (validated)
                 {
-                    Customer._customers.Add(new Customer
+                 int result = DBManager.DataBaseCRUD("INSERT INTO customer (name, email, address, phoneNumber)" +
+                        $" VALUES\r\n('{customerName}', '{customerEmail}', '{customerAddress}', '{customerPhoneNumber}')");
+                    if (result == failedCRUD) 
                     {
-                        CustomerName = customerName,
-                        Email = customerEmail,
-                        Address = customerAddress,
-                        Phone = customerPhoneNumber
-                    });
+                        StatusText.Text = "Failed to add Customer to Database.";
+                    }
                     ClearUIInput();
                 }
             }
