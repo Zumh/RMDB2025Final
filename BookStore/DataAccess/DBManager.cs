@@ -9,139 +9,79 @@
 
 using MySql.Data.MySqlClient;
 using System.Data;
-
-
+using System.Windows;
 
 namespace BookStore
 {
-    public class DBManager
+    internal class DBManager
     {
-        public string ConnectionString { get; private set; }
+        public static string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
+        MySqlConnection connection = new(connectionString);
 
-        // Lazy-loaded repositories
-        private CustomerRepository? customerRepo = null;
-        private BookRepository? bookRepo = null;
-        private OrderRepository? orderRepo = null;
-        public DataSet? Data = null;
-        public DBManager()
+        //NAME: ExecuteNonQuery
+        //DESCRIPTION: Executes a SQL command that does not return data
+        //PARAMETERS: string query. Dictionary<string, string> parameters = null
+        //RETURN: command.ExecuteNonQuery(), or -1 if there was an error.
+        public int ExecuteNonQuery(string query, Dictionary<string, string> parameters = null)
         {
-            Data = new DataSet();
-
-        }
-      
-        public CustomerRepository Customers => customerRepo ??= new CustomerRepository(ConnectionString, Data);
-        public BookRepository Books => bookRepo ??= new BookRepository(ConnectionString, Data);
-
-        public PublisherRepository Publishers => new PublisherRepository(ConnectionString, Data);
-
-        //public OrderRepository Orders => orderRepo ??= new OrderRepository(ConnectionString);
-
-        public DbInitResult CheckDatabase(
-           string server,
-           string user,
-           string password,
-           string database,
-           string port)
-        {
-            // Validate input
-            if (string.IsNullOrWhiteSpace(server) ||
-                string.IsNullOrWhiteSpace(user) ||
-                string.IsNullOrWhiteSpace(password) ||
-                string.IsNullOrWhiteSpace(database) ||
-                string.IsNullOrWhiteSpace(port))
-            {
-                return new DbInitResult
-                {
-                    Success = false,
-                    Message = "All fields are required."
-                };
-            }
-
-            string connStr = $"server={server};port={port};uid={user};pwd={password};";
-
             try
             {
-                using MySqlConnection conn = new MySqlConnection(connStr);
-                conn.Open();
-
-                using MySqlCommand cmd = new MySqlCommand(
-                    "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = @db;",
-                    conn);
-                cmd.Parameters.AddWithValue("@db", database);
-
-                object? result = cmd.ExecuteScalar();
-
-                if (result == null)
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
-                    return new DbInitResult
+                    connection.Open();
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
-                        Success = false,
-                        DatabaseExists = false,
-                        NeedsCreation = true,
-                        Message = $"Database '{database}' does not exist."
-                    };
+                        if (parameters != null)
+                        {
+                            foreach (var param in parameters)
+                            {
+                                command.Parameters.AddWithValue(param.Key, param.Value);
+                            }
+                        }
+                        return command.ExecuteNonQuery();
+                    }
                 }
-
-                ConnectionString = $"server={server};port={port};uid={user};pwd={password};database={database};";
-
-                return new DbInitResult
-                {
-                    Success = true,
-                    DatabaseExists = true,
-                    Message = "Database exists.",
-                    ConnectionString = ConnectionString
-                };
             }
             catch (Exception ex)
             {
-                return new DbInitResult
-                {
-                    Success = false,
-                    Message = $"Connection failed: {ex.Message}"
-                };
+                MessageBox.Show("Error: " + ex.Message);
+                return -1;
             }
         }
 
-
-
-        public DbInitResult CreateDatabase(
-            string server,
-            string user,
-            string password,
-            string database,
-            string port)
+        //NAME: DataBaseQuery
+        //DESCRIPTION: Executes a SQL command that returns data
+        //PARAMETERS: string query. string[] parameters =null
+        //RETURN: dataTable
+        public DataTable DataBaseQuery(string query, string[] parameters = null)
         {
-            string connStr = $"server={server};port={port};uid={user};pwd={password};";
-
+            DataTable dataTable = new DataTable();
             try
             {
-                using MySqlConnection conn = new MySqlConnection(connStr);
-                conn.Open();
-
-                using MySqlCommand createCmd =
-                    new MySqlCommand($"CREATE DATABASE `{database}`;", conn);
-                createCmd.ExecuteNonQuery();
-
-                ConnectionString =
-                    $"server={server};port={port};uid={user};pwd={password};database={database};";
-
-                return new DbInitResult
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
-                    Success = true,
-                    DatabaseExists = true,
-                    Message = $"Database '{database}' created.",
-                    ConnectionString = ConnectionString
-                };
+                    connection.Open();
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        if (parameters != null)
+                        {
+                            for (int i = 0; i < parameters.Length; i += 2)
+                            {
+                                command.Parameters.AddWithValue(parameters[i], parameters[i + 1]);
+                            }
+                        }
+                        using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                        {
+                            adapter.Fill(dataTable);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                return new DbInitResult
-                {
-                    Success = false,
-                    Message = $"Database creation failed: {ex.Message}"
-                };
+                MessageBox.Show("Error: " + ex.Message);
             }
+            return dataTable;
         }
-
     }
 }

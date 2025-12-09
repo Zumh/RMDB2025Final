@@ -21,10 +21,20 @@ namespace BookStore
         public int Id { get; set; }
         public int CustomerID { get; set; }
         public string? OrderDate { get; set; }
-        public float OrderAmount { get; set; }  
+        public float OrderAmount { get; set; }
+        public List<Entities.OrderDetail> OrderDetails { get; set; } = new List<Entities.OrderDetail>();
+
+        public override string ToString()
+        {
+            return $"Order #{Id} - {OrderDate} ({OrderAmount:C})";
+        }
 
         static public List<Order> _orders = new List<Order>();
 
+        //NAME: ValidateOrderDate
+        //DESCRIPTION: Checks if the order date format is correct.
+        //PARAMETERS: string orderDate
+        //RETURN: isValid
         public static bool ValidateOrderDate(string orderDate)
         {
             bool isValid = true;
@@ -40,6 +50,10 @@ namespace BookStore
             return isValid;
         }
 
+        //NAME: ValidateOrderAmount
+        //DESCRIPTION: Checks if the order amount is a valid number.
+        //PARAMETERS: string orderAmount
+        //RETURN: isValid
         public static bool ValidateOrderAmount(string orderAmount)
         {
             bool isValid = true;
@@ -54,6 +68,10 @@ namespace BookStore
             return isValid;
         }
 
+        //NAME: LoadOrders
+        //DESCRIPTION: Loads orders from the database into a list.
+        //PARAMETERS: DataTable data
+        //RETURN: void
         public static void LoadOrders(DataTable data)
         {
             

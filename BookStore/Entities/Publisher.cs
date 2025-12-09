@@ -1,32 +1,24 @@
-﻿//FILE : Publisher.cs
+//FILE : Publisher.cs
 //PROJECT : PROG2111 Final Project
 //PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
 //FIRST VERSION : 03/12/2025
-/*DESCRIPTION: This is the Customer class that manages the customer objects created when the database information is retrieved.
- *             It contains all the functions necessary to validate new customers, existing customers and load datatables with data.
+/*DESCRIPTION: 
+This class represents the company that publishes the books.
+It stores the publisher's name and other details.
 */
 
-namespace BookStore
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BookStore.Entities
 {
-    public class Publisher
+    internal class Publisher
     {
-        public int PublisherID { get; set; }
-        public string? Name { get; set; }
-
-        //NAME: ValidateName
-        //DESCRIPTION: Validates the publisher name is not blank
-        //PARAMETERS: string publisherName - name of publisher
-        //RETURN: bool isValid - true if name is valid otherwise false
-        public static bool ValidateName(string publisherName)
-        {
-            bool isValid = true;
-
-            if (string.IsNullOrEmpty(publisherName.Trim()))
-            {
-                isValid = false;
-            }
-            return isValid;
-        }
-
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Content { get; set; }
     }
 }

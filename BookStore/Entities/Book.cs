@@ -11,22 +11,24 @@ using System.Data;
 
 namespace BookStore
 {
-    public class Book
+    internal class Book
     {
         public int BookID { get; set; }
         public int PublisherID { get; set; }
         public int CategoryID { get; set; }
         public string? Title { get; set; }
-        public double ISBN { get; set; }
-        public float Price { get; set; }
+        public string? ISBN { get; set; }
+        public string? Author { get; set; }
+        public decimal Price { get; set; }
         public int Stock { get; set; }
 
+        static public List<Book> _books = new List<Book>();
 
         //NAME: ValidateBookTitle
-        //DESCRIPTION: Validates the title is not blank
-        //PARAMETERS: string author - author of the book
-        //RETURN: bool isValid - true if author is valid otherwise false
-        public bool ValidateBookTitle (string bookName)
+        //DESCRIPTION: Checks if the book title is empty.
+        //PARAMETERS: string bookName
+        //RETURN: isValid
+        public static bool ValidateBookTitle (string bookName)
         {
             bool isValid = true;
             if(string.IsNullOrEmpty(bookName.Trim()))
@@ -37,10 +39,10 @@ namespace BookStore
         }
 
         //NAME: ValidateIBSN
-        //DESCRIPTION: Validates the IBSN is not blank, an int type, and not negative
-        //PARAMETERS: string ibsn - IBSN number of the book
-        //RETURN: bool isValid - true if IBSN is valid otherwise false
-        public bool ValidateIBSN(string ibsn)
+        //DESCRIPTION: Checks if the ISBN is 13 numbers long and not negative.
+        //PARAMETERS: string ibsn
+        //RETURN: isValid
+        public static bool ValidateIBSN(string ibsn)
         {
             int ibsnLength = 13;
             bool isValid = true;
@@ -69,10 +71,10 @@ namespace BookStore
             return isValid;
         }
         //NAME: ValidatePrice
-        //DESCRIPTION: Validates the price is not blank, a float type, and not negative
-        //PARAMETERS: string price - price value of book
-        //RETURN: bool isValid - true if price is valid otherwise false
-        public bool ValidatePrice(string price)
+        //DESCRIPTION: Checks if the price is a valid number and not negative.
+        //PARAMETERS: string price
+        //RETURN: isValid
+        public static bool ValidatePrice(string price)
         {
             bool isValid = true;
             float tempPrice = 0;
@@ -93,10 +95,10 @@ namespace BookStore
             return isValid;
         }
         //NAME: ValidateStock
-        //DESCRIPTION: Validates the stock is not blank, an int type, and not negative
-        //PARAMETERS: string stock - stock value of books
-        //RETURN: bool isValid - true if stock is valid otherwise false
-        public bool ValidateStock(string stock)
+        //DESCRIPTION: Checks if the stock amount is a number and not negative.
+        //PARAMETERS: string stock
+        //RETURN: isValid
+        public static bool ValidateStock(string stock)
         {
             bool isValid = true;
             int tempStock = 0;
@@ -118,7 +120,26 @@ namespace BookStore
             return isValid;
         }
 
-       
-        
+        //NAME: LoadBookData
+        //DESCRIPTION: Gets book data from the database and puts it into a list.
+        //PARAMETERS: DataTable data
+        //RETURN: void
+        public static void LoadBookData(DataTable data)
+        {
+            //create a new customer object for each customer in database
+            foreach (DataRow row in data.Rows)
+            {
+                _books.Add(new Book
+                {
+                    BookID = Convert.ToInt32(row["id"]),
+                    PublisherID = Convert.ToInt32(row["publisherID"]),
+                    CategoryID = Convert.ToInt32(row["categoryID"]),
+                    Title = row["title"].ToString(),
+                    ISBN = row["isbn"].ToString(),
+                    Price = Convert.ToDecimal(row["price"]),
+                    Stock = Convert.ToInt32(row["stock"])
+                });
+            }
+        }
     }
 }

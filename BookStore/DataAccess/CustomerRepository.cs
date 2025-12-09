@@ -1,238 +1,107 @@
-﻿ using MySql.Data.MySqlClient;
- using System.Collections.Generic;
+﻿//FILE : CustomerRepository.cs
+//PROJECT : PROG2111 Final Project
+//PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+//FIRST VERSION : 03/12/2025
+/*DESCRIPTION: 
+This class handles customer data operations.
+It allows saving new customers and finding existing ones.
+*/
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using BookStore.Entities;
 using System.Data;
 
-namespace BookStore
+namespace BookStore.DataAccess
 {
-
-    public class CustomerRepository
+    internal class CustomerRepository
     {
+        private DBManager db = new DBManager();
 
-        private readonly string connectionString;
-        private DataSet dataset;
-        private MySqlDataAdapter adapter;
-        public DataTable? Table;
-
-        public CustomerRepository(string connectionString, DataSet ds)
-        {
-            this.connectionString = connectionString;
-            dataset = ds;
-
-            InitializeAdapter();
-            LoadCustomers();
-        }
-
-        private void InitializeAdapter()
-        {
-            adapter = new MySqlDataAdapter("SELECT * FROM customer", connectionString);
-            new MySqlCommandBuilder(adapter);
-        }
-
-        private void LoadCustomers()
-        {
-            // If the table exists, clear it so we get ONLY the latest data
-            if (dataset.Tables.Contains("Customer"))
-            {
-                dataset.Tables["Customer"].Clear();
-            }
-
-            // Reload schema from database (fresh structure)
-            adapter.FillSchema(dataset, SchemaType.Source, "Customer");
-
-            // Reload latest data
-            adapter.Fill(dataset, "Customer");
-
-            Table = dataset.Tables["Customer"];
-
-            // Let MySQL handle auto-increment, NOT the DataSet
-            Table.Columns["id"].AutoIncrement = true;
-
-            // Set primary key
-            Table.PrimaryKey = new DataColumn[] { Table.Columns["id"] };
-        }
-
-
-        public void Add(Customer currentCustomer)
-        {
-
-            DataRow row = Table.NewRow();
-            row["name"] = currentCustomer.CustomerName;
-            row["email"] = currentCustomer.Email;
-            row["address"] = currentCustomer.Address;
-            row["phoneNumber"] = currentCustomer.Phone;
-            Table.Rows.Add(row);
-        }
-
-        public void SaveChanges() => adapter.Update(Table);
-
-        public void Delete(Customer customer)
-        {
-            DataRow? row = Table.Rows.Find(customer.CustomerId);
-            if (row != null)
-            {
-                row.Delete();
-            }
-      
-
-        }
-
-        // Get all customers
-        public List<Customer> GetAllCustomers()
+        //NAME: GetAll
+        //DESCRIPTION: Gets all customers from the database.
+        //PARAMETERS: None
+        //RETURN: customers
+        public List<Customer> GetAll()
         {
             List<Customer> customers = new List<Customer>();
-            // get all fresh customers from datatable
-            LoadCustomers();
-            foreach (DataRow row in Table.Rows)
+            DataTable data = db.DataBaseQuery("SELECT * FROM customer");
+            if (data != null)
             {
-                if (row.RowState != DataRowState.Deleted)
+                foreach (DataRow row in data.Rows)
                 {
-                    Customer customer = new Customer
+                    customers.Add(new Customer
                     {
                         CustomerId = Convert.ToInt32(row["id"]),
                         CustomerName = row["name"].ToString(),
-                        Email = row["email"].ToString(),
                         Address = row["address"].ToString(),
-                        Phone = row["phoneNumber"].ToString()
-                    };
-                    customers.Add(customer);
+                        Email = row["email"].ToString(),
+                        Phone = row["phonenumber"].ToString()
+                    });
                 }
             }
             return customers;
         }
 
-        // find customer by id 
-        public Customer? FindById(int customerId)
+        //NAME: Add
+        //DESCRIPTION: Adds a new customer to the database.
+        //PARAMETERS: Customer customer
+        //RETURN: void
+        public void Add(Customer customer)
         {
-            LoadCustomers();
-            DataRow? row = Table.Rows.Find(customerId);
-            if (row != null)
-            {
-                return new Customer
-                {
-                    CustomerId = Convert.ToInt32(row["id"]),
-                    CustomerName = row["name"].ToString(),
-                    Email = row["email"].ToString(),
-                    Address = row["address"].ToString(),
-                    Phone = row["phoneNumber"].ToString()
-                };
-            }
-            return null;
-
+            string query = $"INSERT INTO customer (name, address, email, phonenumber) VALUES ('{customer.CustomerName}', '{customer.Address}', '{customer.Email}', '{customer.Phone}')";
+            db.ExecuteNonQuery(query);
+        }
+        
+        //NAME: Delete
+        //DESCRIPTION: Deletes a customer from the database.
+        //PARAMETERS: int id
+        //RETURN: void
+        public void Delete(int id)
+        {
+            string query = $"DELETE FROM customer WHERE id = {id}";
+            db.ExecuteNonQuery(query);
         }
 
-        // find customer by name
-        public Customer? FindByName(string customerName)
+        //NAME: Search
+        //DESCRIPTION: Searches for customers using multiple criteria (Name, Email, Address, Phone).
+        //PARAMETERS: string name, string email, string address, string phone
+        //RETURN: customers
+        public List<Customer> Search(string name, string email, string address, string phone)
         {
-            LoadCustomers();
-            foreach (DataRow row in Table.Rows)
+            List<Customer> customers = new List<Customer>();
+            // Start with a base query
+            string query = "SELECT * FROM customer WHERE 1=1";
+            
+            // Append conditions
+            if (!string.IsNullOrWhiteSpace(name))
+                query += $" AND name LIKE '%{name}%'";
+            if (!string.IsNullOrWhiteSpace(email))
+                query += $" AND email LIKE '%{email}%'";
+            if (!string.IsNullOrWhiteSpace(address))
+                query += $" AND address LIKE '%{address}%'";
+            if (!string.IsNullOrWhiteSpace(phone))
+                query += $" AND phonenumber LIKE '%{phone}%'";
+
+            DataTable data = db.DataBaseQuery(query);
+            if (data != null)
             {
-                if (row.RowState != DataRowState.Deleted && row["name"].ToString() == customerName)
+                foreach (DataRow row in data.Rows)
                 {
-                    return new Customer
+                    customers.Add(new Customer
                     {
                         CustomerId = Convert.ToInt32(row["id"]),
                         CustomerName = row["name"].ToString(),
-                        Email = row["email"].ToString(),
                         Address = row["address"].ToString(),
-                        Phone = row["phoneNumber"].ToString()
-                    };
+                        Email = row["email"].ToString(),
+                        Phone = row["phonenumber"].ToString()
+                    });
                 }
             }
-            return null;
+            return customers;
         }
-
-        // find customer by email
-        public Customer? FindByEmail(string email)
-        {
-            LoadCustomers();
-            foreach (DataRow row in Table.Rows)
-            {
-                if (row.RowState != DataRowState.Deleted && row["email"].ToString() == email)
-                {
-                    return new Customer
-                    {
-                        CustomerId = Convert.ToInt32(row["id"]),
-                        CustomerName = row["name"].ToString(),
-                        Email = row["email"].ToString(),
-                        Address = row["address"].ToString(),
-                        Phone = row["phoneNumber"].ToString()
-                    };
-                }
-            }
-            return null;
-        }
-
-        // find customer by phone number
-        public Customer? FindByPhone(string phoneNumber)
-        {
-            LoadCustomers();
-            foreach (DataRow row in Table.Rows)
-            {
-                if (row.RowState != DataRowState.Deleted && row["phoneNumber"].ToString() == phoneNumber)
-                {
-                    return new Customer
-                    {
-                        CustomerId = Convert.ToInt32(row["id"]),
-                        CustomerName = row["name"].ToString(),
-                        Email = row["email"].ToString(),
-                        Address = row["address"].ToString(),
-                        Phone = row["phoneNumber"].ToString()
-                    };
-                }
-            }
-            return null;
-        }
-
-        // find customer by address
-        public Customer? FindByAddress(string address)
-        {
-            LoadCustomers();
-            foreach (DataRow row in Table.Rows)
-            {
-                if (row.RowState != DataRowState.Deleted && row["address"].ToString() == address)
-                {
-                    return new Customer
-                    {
-                        CustomerId = Convert.ToInt32(row["id"]),
-                        CustomerName = row["name"].ToString(),
-                        Email = row["email"].ToString(),
-                        Address = row["address"].ToString(),
-                        Phone = row["phoneNumber"].ToString()
-                    };
-                }
-            }
-            return null;
-        }
-
-        // Delete customer by name and check if orders exist for that customer.
-        // if orders exist, do not delete customer and return false. 
-        public bool DeleteCustomerByName(string customerName, OrderRepository orderRepo)
-        {
-            Customer? customer = FindByName(customerName);
-            if (customer != null)
-            {
-                Delete(customer);
-                return true;
-                //List<Order> orders = orderRepo.GetOrdersByCustomerId(customer.CustomerId);
-                //if (orders.Count == 0)
-                //{
-                //    Delete(customer);
-                //    return true;
-                //}
-            }
-            return false;
-        }
-
-        // delete customer if only orders do not exist for customer
-        //public bool DeleteCustomerIfNoOrders(Customer customer, OrderRepository orderRepo)
-        //{
-        //    List<Order> orders = orderRepo.GetOrdersByCustomerId(customer.CustomerId);
-        //    if (orders.Count == 0)
-        //    {
-        //        Delete(customer);
-        //        return true;
-        //    }
-        //    return false;
-        //}
     }
 }
