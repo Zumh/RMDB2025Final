@@ -8,22 +8,56 @@ namespace BookStore
     public class CustomerRepository
     {
 
+        private readonly string connectionString;
+        private DataSet dataset;
+        private MySqlDataAdapter adapter;
+        public DataTable? Table;
 
-        private readonly MySqlDataAdapter adapter;
-        public DataTable? Table = null;
         public CustomerRepository(string connectionString, DataSet ds)
+        {
+            this.connectionString = connectionString;
+            dataset = ds;
+
+            InitializeAdapter();
+            LoadCustomers();
+        }
+
+        private void InitializeAdapter()
         {
             adapter = new MySqlDataAdapter("SELECT * FROM customer", connectionString);
             new MySqlCommandBuilder(adapter);
-            adapter.Fill(ds, "Customer");
-            Table = ds.Tables["Customer"];
-            Table.PrimaryKey = new DataColumn[] { Table.Columns["CustomerId"] };
         }
+
+        private void LoadCustomers()
+        {
+            // If the table exists, clear it so we get ONLY the latest data
+            if (dataset.Tables.Contains("Customer"))
+            {
+                dataset.Tables["Customer"].Clear();
+            }
+
+            // Reload schema from database (fresh structure)
+            adapter.FillSchema(dataset, SchemaType.Source, "Customer");
+
+            // Reload latest data
+            adapter.Fill(dataset, "Customer");
+
+            Table = dataset.Tables["Customer"];
+
+            // Let MySQL handle auto-increment, NOT the DataSet
+            Table.Columns["id"].AutoIncrement = true;
+
+            // Set primary key
+            Table.PrimaryKey = new DataColumn[] { Table.Columns["id"] };
+        }
+
 
         public void Add(Customer currentCustomer)
         {
 
             DataRow row = Table.NewRow();
+    
+     
             row["name"] = currentCustomer.CustomerName;
             row["email"] = currentCustomer.Email;
             row["address"] = currentCustomer.Address;
@@ -40,12 +74,16 @@ namespace BookStore
             {
                 row.Delete();
             }
+            // find fucstomer by id and delete
+
         }
 
         // Get all customers
         public List<Customer> GetAllCustomers()
         {
             List<Customer> customers = new List<Customer>();
+            // get all fresh customers from datatable
+            LoadCustomers();
             foreach (DataRow row in Table.Rows)
             {
                 if (row.RowState != DataRowState.Deleted)
@@ -162,5 +200,36 @@ namespace BookStore
             }
             return null;
         }
+
+        // Delete customer by name and check if orders exist for that customer.
+        // if orders exist, do not delete customer and return false. 
+        public bool DeleteCustomerByName(string customerName, OrderRepository orderRepo)
+        {
+            Customer? customer = FindByName(customerName);
+            if (customer != null)
+            {
+                Delete(customer);
+                return true;
+                //List<Order> orders = orderRepo.GetOrdersByCustomerId(customer.CustomerId);
+                //if (orders.Count == 0)
+                //{
+                //    Delete(customer);
+                //    return true;
+                //}
+            }
+            return false;
+        }
+
+        // delete customer if only orders do not exist for customer
+        //public bool DeleteCustomerIfNoOrders(Customer customer, OrderRepository orderRepo)
+        //{
+        //    List<Order> orders = orderRepo.GetOrdersByCustomerId(customer.CustomerId);
+        //    if (orders.Count == 0)
+        //    {
+        //        Delete(customer);
+        //        return true;
+        //    }
+        //    return false;
+        //}
     }
 }

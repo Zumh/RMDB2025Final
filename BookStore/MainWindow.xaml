@@ -116,7 +116,7 @@ DESCRIPTION: This is the Customer class that manages the customer objects create
                     <!-- RIGHT SIDE: Buttons -->
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
                         <Button Content="Add Customer" Width="140" Margin="0,0,0,10" x:Name="AddCustomerBtn" Click="AddCustomerBtn_Click"/>
-                        <Button Content="Remove Customer" Width="140" Margin="0,0,0,10"/>
+                        <Button Content="Remove Customer" Width="140" Margin="0,0,0,10"  Click="RemoveCustomer_Click"/>
                         <Button Content="Search Customer" Width="140" Margin="0,0,0,10" x:Name="SearchCustomer" Click="SearchForCustomer_Click"/>
                         <Button Content="Display All Customers" Width="140" Margin="0,0,0,10" x:Name="DisplayAllCustomers" Click="DisplayAllCustomers_Click"/>
                     </StackPanel>

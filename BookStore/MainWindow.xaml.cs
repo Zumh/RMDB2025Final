@@ -15,6 +15,7 @@ namespace BookStore
         DBManager? dbManager = null;
         List<Category>? categories = null;
         private string connectionString = string.Empty;
+        List<Customer> customers = null;
 
         public MainWindow()
         {
@@ -96,13 +97,19 @@ namespace BookStore
                 {
                     try
                     {
+                        // add latest customer id plus one to new customer
                         dbManager.Customers.Add(new Customer { 
-                            CustomerName = customerName, 
+                          
+                            CustomerName = customerName,
                             Email = customerEmail,
                             Address = customerAddress,
                             Phone = customerPhoneNumber
                         });
                         dbManager.Customers.SaveChanges();
+                        // reflect changes in datagrid
+                        customers = dbManager.Customers.GetAllCustomers();
+                        CustomerList.ItemsSource = customers;
+
                         ClearUIInput();
                     }
                     catch (System.Exception ex)
@@ -126,7 +133,7 @@ namespace BookStore
         {
             //query to get all customers
             //DataTable dataTable = db.DataBaseQuery("SELECT * FROM customer");
-            List<Customer> customers = dbManager.Customers.GetAllCustomers();
+            customers = dbManager.Customers.GetAllCustomers();
             if (customers == null)
             {
                 StatusText.Text = "No Customers in Database.";
@@ -430,6 +437,21 @@ namespace BookStore
             dataBaseName.Text = "";
             serverName.Text = "";
             portNumber.Text = "";
+        }
+
+      
+        private void RemoveCustomer_Click(object sender, RoutedEventArgs e)
+        {
+            // get selected customer from datagrid 
+            Customer? selectedCustomer = CustomerList.SelectedItem as Customer;
+            if (selectedCustomer != null)
+            {
+                dbManager.Customers.Delete(selectedCustomer);
+                dbManager.Customers.SaveChanges();
+                // Refresh the DataGrid
+                customers = dbManager.Customers.GetAllCustomers();
+                CustomerList.ItemsSource = customers;
+            }
         }
     }
 }

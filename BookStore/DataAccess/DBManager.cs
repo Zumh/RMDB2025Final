@@ -25,7 +25,7 @@ namespace BookStore
         public DataSet? Data = null;
         public DBManager(){
             Data = new DataSet();
-           
+          //Data.EnforceConstraints = true;
 
         }
       
