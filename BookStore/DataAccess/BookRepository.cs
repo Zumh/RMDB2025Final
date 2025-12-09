@@ -1,8 +1,12 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace BookStore
+namespace BookStore.DataAccess
 {
-    public class BookRepository
+    internal class BookRepository
     {
     }
 }

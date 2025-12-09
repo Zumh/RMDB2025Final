@@ -1,9 +1,11 @@
-﻿
-using MySql.Data.MySqlClient;
+﻿using MySqlX.XDevAPI.Relational;
 using System.Data;
-using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -16,21 +18,14 @@ namespace BookStore
     public partial class MainWindow : Window
     {
         //database manager for sending queries
-        DBManager? dbManager = null;
-        List<Category>? categories = null;
-        private string connectionString = string.Empty;
-        List<Customer> customers = null;
-
+        DBManager db = new DBManager();
+    
         public MainWindow()
         {
             InitializeComponent();
-         
-            dbManager = new DBManager();
-            InitializeCategories();
-            LoadLogin();
-
-
+           
         }
+        ////////////////////////////////////////        LOGIN FUNCTIONS      ///////////////////////////////////////////////////////////
 
         private void LoginBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -44,16 +39,9 @@ namespace BookStore
         //RETURN: void
         private void ClearLogin_Click(object sender, RoutedEventArgs e)
         {
-            categories = new List<Category>
-            {
-                new Category { Id = 1, Name = "Fiction" },
-                new Category { Id = 2, Name = "Non-Fiction" },
-                new Category { Id = 2, Name = "Other" }
-            };
-
-            catComboBox.ItemsSource = categories;
-            catComboBox.DisplayMemberPath = "Name";
-            catComboBox.SelectedValuePath = "Id";
+            userId.Text = "";
+            loginPassword.Text = "";
+            dataBaseName.Text = "";
         }
 
         //////////////////////////////             CUSTOMER FUNCTIONS             //////////////////////////////////////////////////////
@@ -74,7 +62,6 @@ namespace BookStore
             string customerEmail = CustomerEmailTextBox.Text;
             string customerAddress = CustomerAddressTextBox.Text;
             string customerPhoneNumber = CustomerPhoneTextBox.Text;
-
             //clear error messages
             StatusText.Text = "";
 
@@ -112,12 +99,8 @@ namespace BookStore
                     }
                     ClearUIInput();
                 }
-
-               
-                
             }
         }
-
 
         //NAME: DisplayAllCustomers_Click
         //DESCRIPTION: Creates a datatable that contains all customers in the database        
@@ -127,18 +110,17 @@ namespace BookStore
         private void DisplayAllCustomers_Click(object sender, RoutedEventArgs e)
         {
             //query to get all customers
-            //DataTable dataTable = db.DataBaseQuery("SELECT * FROM customer");
-            customers = dbManager.Customers.GetAllCustomers();
-            if (customers == null)
+            DataTable dataTable = db.DataBaseQuery("SELECT * FROM customer");
+            
+            if (dataTable == null) 
             {
                 StatusText.Text = "No Customers in Database.";
-            }
+            } 
             else
             {
-
+                Customer.LoadCustomerData(dataTable);
                 //add the list to the dataGrid
-                CustomerList.ItemsSource = customers;
-
+                CustomerList.ItemsSource = Customer._customers;
             }
         }
 
@@ -164,56 +146,29 @@ namespace BookStore
             string customerEmail = CustomerEmailTextBox.Text;
             string customerAddress = CustomerAddressTextBox.Text;
             string customerPhoneNumber = CustomerPhoneTextBox.Text;
-            Customer? foundCustomer = null;
+
             StatusText.Text = "";
             //need to add more options for searching
             List<Customer> list = new List<Customer>();
 
             if (!string.IsNullOrEmpty(customerName)) 
             {
-                
-                foundCustomer = dbManager.Customers.FindByName(customerName);
-                if (foundCustomer != null)
+                if (Customer._customers.Count == 0)
                 {
-                    list.Add(foundCustomer);
+                    StatusText.Text = "Customer DataSet not found.";
+                } 
+                else
+                {
+                    list = Customer.SearchByName(customerName);
+                    StatusText.Text = "";
                 }
             }
-            else if (!string.IsNullOrEmpty(customerEmail))
-            {
-
-                foundCustomer = dbManager.Customers.FindByEmail(customerEmail);
-                if (foundCustomer != null)
-                {
-                    list.Add(foundCustomer);
-                }
-            }
-           else  if (!string.IsNullOrEmpty(customerAddress))
-            {
-
-                foundCustomer = dbManager.Customers.FindByAddress(customerAddress);
-                if (foundCustomer != null)
-                {
-                    list.Add(foundCustomer);
-                }
-            }
-            else if (!string.IsNullOrEmpty(customerPhoneNumber))
-            {
-
-                foundCustomer = dbManager.Customers.FindByPhone(customerPhoneNumber);
-                if (foundCustomer != null)
-                {
-                    list.Add(foundCustomer);
-                }
-            }
-            if (list.Count == 0)
+            if(list.Count == 0)
             {
                 StatusText.Text = "Customer Name not found.";
-                Background = Brushes.Red;
             } else
             {
                 CustomerList.ItemsSource = list;
-                StatusText.Text = "Customer found";
-                Background = Brushes.LightGreen;
             }
             
         }
@@ -224,7 +179,9 @@ namespace BookStore
         {
 
             //Successfully loads data ------ this is just for test purposes, need to implement actual search
-           
+            DataTable dataTable = db.DataBaseQuery("SELECT * FROM book");
+            Book.LoadBookData(dataTable);
+            BookList.ItemsSource = Book._books;
         }
 
         //NAME: BookList_Columns
@@ -261,7 +218,7 @@ namespace BookStore
             string isbn = IsbnTextBox.Text;
             string publisher = BookPublisherTextBox.Text;
             string price = BookPriceTextBox.Text;
-            string stock = BookStock.Text;
+            string stock = BookStockTextBox.Text;
             //clear error messages
             StatusText.Text = "";
 
@@ -284,7 +241,7 @@ namespace BookStore
             else if (!(validated = Book.ValidateStock(stock)))
             {
                 StatusText.Text = "Stock is Mandatory and must be numeric";
-                BookStock.Text = "";
+                BookStockTextBox.Text = "";
             } 
             else
             {
@@ -326,7 +283,7 @@ namespace BookStore
             IsbnTextBox.Text = "";
             BookPublisherTextBox.Text = "";
             BookPriceTextBox.Text = "";
-            BookStock.Text = "";
+            BookStockTextBox.Text = "";
             CustomerNameTextBox.Text = "";
             CustomerEmailTextBox.Text = "";
             CustomerAddressTextBox.Text = "";
