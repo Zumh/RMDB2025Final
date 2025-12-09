@@ -16,6 +16,7 @@ namespace BookStore
         List<Category>? categories = null;
         private string connectionString = string.Empty;
         List<Customer> customers = null;
+        List<Book> books = null;
 
         public MainWindow()
         {
@@ -36,7 +37,7 @@ namespace BookStore
             {
                 new Category { Id = 1, Name = "Fiction" },
                 new Category { Id = 2, Name = "Non-Fiction" },
-                new Category { Id = 2, Name = "Other" }
+                new Category { Id = 3, Name = "Other" }
             };
 
             catComboBox.ItemsSource = categories;
@@ -268,6 +269,9 @@ namespace BookStore
             string publisher = BookPublisherTextBox.Text;
             string price = BookPriceTextBox.Text;
             string stock = BookStock.Text;
+            string category = catComboBox.Text;
+            Category currentCat = new Category();
+            Publisher currentPub = new Publisher();
             //clear error messages
             StatusText.Text = "";
             Book book = new Book();
@@ -292,28 +296,50 @@ namespace BookStore
             {
                 StatusText.Text = "Stock is Mandatory and must be numeric";
                 BookStock.Text = "";
-            } 
+            }
+            else if (!(validated = currentCat.ValidateCategoryName(category)))
+            {
+                StatusText.Text = "Category is Mandatory";
+                catComboBox.Text = "";
+            }
+            else if (!(validated = Publisher.ValidateName(publisher)))
+            {
+                StatusText.Text = "Publisher is Mandatory";
+                BookPublisherTextBox.Text = "";
+            }
             else
             {
                 double numericISBN;
                 float numericPrice;
                 int numericStock;
+                int publisherID = 0; //default publisher ID for now
+
                 //parse strings into numbers
-                //double.TryParse(isbn, out numericISBN);
-                //float.TryParse(price, out numericPrice);
-                //int.TryParse(stock, out numericStock);
-                //if (validated)
-                //{
-                //    Book._books.Add(new Book
-                //    {
-                //        Title = title,
-                //        ISBN = numericISBN,
-                //        Price = numericPrice,
-                //        Stock = numericStock
-                //    });
-                //    StatusText.Text = "";
-                //    ClearUIInput();
-                //}
+                double.TryParse(isbn, out numericISBN);
+                float.TryParse(price, out numericPrice);
+                int.TryParse(stock, out numericStock);
+                int.TryParse(publisher, out publisherID);
+                if (validated && catComboBox.SelectedItem != null)
+                {
+                    dbManager.Books.Add(new Book
+                    {
+                        Title = title,
+                        ISBN = numericISBN,
+                        Price = numericPrice,
+                        Stock = numericStock,
+                        PublisherID = publisherID, //default publisher for now
+                        CategoryID = currentCat.GetCategoryType(catComboBox.SelectedItem.ToString()) //category from combobox
+                    });
+
+                    dbManager.Books.SaveChanges();
+                    // reflect changes in datagrid
+                    books = dbManager.Books.GetAllBooks();
+                    BookList.ItemsSource = books;
+                    StatusText.Text = "";
+                    ClearUIInput();
+
+
+                }
             }        
         }
 
@@ -469,6 +495,20 @@ namespace BookStore
                 //add the list to the dataGrid
                 BookList.ItemsSource = books;
 
+            }
+        }
+
+        private void RemoveBook_Click(object sender, RoutedEventArgs e)
+        {
+            // get selected customer from datagrid 
+            Book? selectedBook = BookList.SelectedItem as Book;
+            if (selectedBook != null)
+            {
+                dbManager.Books.Delete(selectedBook);
+                dbManager.Books.SaveChanges();
+                // Refresh the DataGrid
+                books = dbManager.Books.GetAllBooks();
+                BookList.ItemsSource = books;
             }
         }
     }

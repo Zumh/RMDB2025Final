@@ -54,7 +54,7 @@ namespace BookStore
             Table = dataset.Tables["Book"];
 
             // Let MySQL handle identity
-            Table.Columns["id"].AutoIncrement = false;
+            Table.Columns["id"].AutoIncrement = true;
             Table.PrimaryKey = new[] { Table.Columns["id"] };
 
             CreateRelations();
@@ -63,7 +63,10 @@ namespace BookStore
         private void ClearTable(string name)
         {
             if (dataset.Tables.Contains(name))
+            {
                 dataset.Tables[name].Clear();
+            }
+                
         }
 
         private void CreateRelations()
@@ -88,6 +91,23 @@ namespace BookStore
                 );
             }
         }
+        public void Add(Book currentBook)
+        {
+
+            DataRow row = Table.NewRow();
+
+
+            row["title"] = currentBook.Title;
+            row["price"] = currentBook.Price;
+            row["stock"] = currentBook.Stock;
+            row["publisherID"] = currentBook.PublisherID;
+            row["categoryID"] = currentBook.CategoryID;
+            row["isbn"] = currentBook.ISBN;
+
+
+            Table.Rows.Add(row);
+        }
+        public void SaveChanges() => bookAdapter.Update(Table);
 
         // Get all books
 
@@ -101,11 +121,13 @@ namespace BookStore
             LoadAll();
             foreach (DataRow row in Table.Rows)
             {
+         
+          
                 books.Add(new Book
                 {
                     BookID = Convert.ToInt32(row["id"]),
                     Title = row["title"].ToString(),
-       
+                    ISBN = Convert.ToDouble(row["isbn"]),
                     Price = Convert.ToSingle(row["price"]),
                     Stock = Convert.ToInt32(row["stock"]),
                     PublisherID = Convert.ToInt32(row["publisherID"]),
@@ -115,7 +137,16 @@ namespace BookStore
             return books;
         }
 
+        public void Delete(Book currentBook)
+        {
+            DataRow? row = Table.Rows.Find(currentBook.BookID);
+            if (row != null)
+            {
+                row.Delete();
+            }
+   
 
+        }
 
 
     }

@@ -56,8 +56,6 @@ namespace BookStore
         {
 
             DataRow row = Table.NewRow();
-    
-     
             row["name"] = currentCustomer.CustomerName;
             row["email"] = currentCustomer.Email;
             row["address"] = currentCustomer.Address;
@@ -74,7 +72,7 @@ namespace BookStore
             {
                 row.Delete();
             }
-            // find fucstomer by id and delete
+      
 
         }
 
