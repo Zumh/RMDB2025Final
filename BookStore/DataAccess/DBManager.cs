@@ -16,12 +16,18 @@ namespace BookStore
     {
         static public string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
 
+        static public string BuildConnectionString (string name, string password, string database)
+        {
+             return $"Server=localhost;Port=3306;Uid={name};Pwd={password};Database={database};";
+        }
+
         //NAME: DataBaseQuery
         //DESCRIPTION: takes the query string and sends it to the database to retreive data
         //PARAMETERS: string query - mySQL statement used to query the database
         //RETURN: DataTable - datatable with relevant search results
         public DataTable DataBaseQuery(string query)
         {
+            
             DataTable dataTable = new DataTable();
             try
             {

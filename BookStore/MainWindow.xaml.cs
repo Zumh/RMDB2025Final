@@ -27,6 +27,12 @@ namespace BookStore
         }
         ////////////////////////////////////////        LOGIN FUNCTIONS      ///////////////////////////////////////////////////////////
 
+        private void LoginBtn_Click(object sender, RoutedEventArgs e)
+        {
+           string connectionString = DBManager.BuildConnectionString(userId.Text, loginPassword.Text, dataBaseName.Text);
+           DBManager.connectionString = connectionString;
+        }
+
         //NAME: ClearLogin_Click
         //DESCRIPTION: Clears the login fields of all text
         //PARAMETERS: object sender, RoutedEventArgs e
@@ -283,5 +289,6 @@ namespace BookStore
             CustomerAddressTextBox.Text = "";
             CustomerPhoneTextBox.Text = "";
         }
+
     }
 }
