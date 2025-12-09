@@ -18,31 +18,7 @@ namespace BookStore
         public static string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
         MySqlConnection connection = new(connectionString);
 
-        public DataTable DataBaseQuery(string query)
-        {
-            DataTable dataTable = new DataTable();
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    // Console.WriteLine("Application Connected to DB"); // Removed spammy log
-
-                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(query, connection))
-                    {
-                        adapter.Fill(dataTable); // Fill the DataTable with results
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message); // Show error to user
-            }
-            return dataTable;
-        }
-
-        public int ExecuteNonQuery(string query)
+        public int ExecuteNonQuery(string query, Dictionary<string, string> parameters = null)
         {
             try
             {
@@ -51,6 +27,13 @@ namespace BookStore
                     connection.Open();
                     using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
+                        if (parameters != null)
+                        {
+                            foreach (var param in parameters)
+                            {
+                                command.Parameters.AddWithValue(param.Key, param.Value);
+                            }
+                        }
                         return command.ExecuteNonQuery();
                     }
                 }
@@ -61,7 +44,36 @@ namespace BookStore
                 return -1;
             }
         }
-      
 
+        public DataTable DataBaseQuery(string query, string[] parameters = null)
+        {
+            DataTable dataTable = new DataTable();
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        if (parameters != null)
+                        {
+                            for (int i = 0; i < parameters.Length; i += 2)
+                            {
+                                command.Parameters.AddWithValue(parameters[i], parameters[i + 1]);
+                            }
+                        }
+                        using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                        {
+                            adapter.Fill(dataTable);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+            return dataTable;
+        }
     }
 }

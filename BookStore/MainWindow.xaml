@@ -97,15 +97,16 @@
                     <!-- RIGHT SIDE: Buttons -->
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
                         <Button Content="Add Customer" Width="140" Margin="0,0,0,10" x:Name="AddCustomerBtn" Click="AddCustomerBtn_Click"/>
-                        <Button Content="Remove Customer" Width="140" Margin="0,0,0,10"/>
+                        <Button Content="Remove Customer" Width="140" Margin="0,0,0,10" Click="RemoveCustomer_Click"/>
                         <Button Content="Search Customer" Width="140" Margin="0,0,0,10" x:Name="SearchCustomer" Click="SearchForCustomer_Click"/>
                         <Button Content="Display All Customers" Width="140" Margin="0,0,0,10" x:Name="DisplayAllCustomers" Click="DisplayAllCustomers_Click"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Book" HorizontalAlignment="Left" Width="39">
-                <Grid Margin="10">
+            <TabItem Header="Book">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <!-- Left side (inputs) -->
@@ -120,6 +121,11 @@
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Title:" Width="100"/>
                             <TextBox Width="200" x:Name="BookTitletextBox"/>
+                        </StackPanel>
+                        <!-- Author -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Author:" Width="100"/>
+                            <TextBox Width="200" x:Name="BookAuthorTextBox"/>
                         </StackPanel>
                         <!-- ISBN -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
@@ -136,6 +142,11 @@
                             <TextBlock Text="Publisher:" Width="100"/>
                             <TextBox Width="200" x:Name="BookPublisherTextBox"/>
                         </StackPanel>
+                        <!-- Category -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Category:" Width="100"/>
+                            <ComboBox Width="200" x:Name="BookCategoryComboBox" DisplayMemberPath="Name" SelectedValuePath="Id"/>
+                        </StackPanel>
                         <!-- Stock -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                             <TextBlock Text="Stock:" Width="100"/>
@@ -150,10 +161,11 @@
                     <!-- RIGHT SIDE: Buttons -->
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
                         <Button Content="Add Book" Width="140" Margin="0,0,0,10" x:Name="AddBook" Click="AddBook_Click"/>
-                        <Button Content="Remove Book" Width="140" Margin="0,0,0,10"/>
+                        <Button Content="Remove Book" Width="140" Margin="0,0,0,10" Click="RemoveBook_Click"/>
                         <Button Content="Search Book" Width="140" x:Name="SearchBook" Click="SearchBook_Click"/>
                     </StackPanel>
                 </Grid>
+                </ScrollViewer>
             </TabItem>
             
             <!-- Order -->
@@ -191,7 +203,7 @@
                                     <DataGrid Grid.Row="1" x:Name="OrderCustomerGrid" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" SelectionChanged="OrderCustomerGrid_SelectionChanged">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Header="ID" Binding="{Binding CustomerId}" Width="40"/>
-                                            <DataGridTextColumn Header="Name" Binding="{Binding CustomerName}" Width="150"/>
+                                            <DataGridTextColumn Header="Name" Binding="{Binding CustomerName}" Width="90"/>
                                             <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="120"/>
                                             <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*"/>
                                         </DataGrid.Columns>
@@ -210,12 +222,13 @@
                                         <TextBlock Text="Search" VerticalAlignment="Center" Margin="0,0,5,0"/>
                                         <TextBox x:Name="OrderBookSearchBox" Width="200" TextChanged="OrderBookSearchBox_TextChanged"/>
                                     </StackPanel>
-                                    <DataGrid Grid.Row="1" x:Name="OrderBookGrid" AutoGenerateColumns="False" SelectionMode="Single" MouseDoubleClick="OrderBookGrid_MouseDoubleClick">
+                                    <DataGrid Grid.Row="1" x:Name="OrderBookGrid" AutoGenerateColumns="False" SelectionMode="Single" MouseDoubleClick="OrderBookGrid_MouseDoubleClick" SelectionChanged="OrderBookGrid_SelectionChanged">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Name" Binding="{Binding Title}" Width="150" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="ISBN" Binding="{Binding ISBN}" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Name" Binding="{Binding Title}" Width="90" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="ISBN" Binding="{Binding ISBN}" Width="100" IsReadOnly="True"/>
                                             <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat=C}" IsReadOnly="True"/>
-                                            <DataGridTextColumn Header="Pub" Binding="{Binding PublisherID}" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Author" Binding="{Binding Author}" Width="90" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Publisher" Binding="{Binding PublisherID}" Width="90" IsReadOnly="True"/>
                                             <DataGridTextColumn Header="Stock" Binding="{Binding Stock}" IsReadOnly="True"/>
                                             <!-- Qty Column for User Input -->
                                             <DataGridTemplateColumn Header="Qty" Width="50">
@@ -292,7 +305,7 @@
                                 <Button Content="Refresh" Width="60" Margin="10,0,0,0" Click="RefreshHistory_Click"/>
                             </StackPanel>
 
-                            <DataGrid Grid.Row="1" x:Name="OrderHistoryGrid" AutoGenerateColumns="False" IsReadOnly="True">
+                            <DataGrid Grid.Row="1" x:Name="OrderHistoryGrid" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="OrderHistoryGrid_SelectionChanged">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="OrderID" Binding="{Binding OrderId}"/>
                                     <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="*"/>

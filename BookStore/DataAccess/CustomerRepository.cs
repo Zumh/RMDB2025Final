@@ -39,7 +39,44 @@ namespace BookStore.DataAccess
             db.ExecuteNonQuery(query);
         }
         
-        // Additional methods like Update, Delete, GetById could be added here
-        // For now, focusing on requirements for search and add.
+        public void Delete(int id)
+        {
+            string query = $"DELETE FROM customer WHERE id = {id}";
+            db.ExecuteNonQuery(query);
+        }
+
+        public List<Customer> Search(string name, string email, string address, string phone)
+        {
+            List<Customer> customers = new List<Customer>();
+            // Start with a base query
+            string query = "SELECT * FROM customer WHERE 1=1";
+            
+            // Append conditions
+            if (!string.IsNullOrWhiteSpace(name))
+                query += $" AND name LIKE '%{name}%'";
+            if (!string.IsNullOrWhiteSpace(email))
+                query += $" AND email LIKE '%{email}%'";
+            if (!string.IsNullOrWhiteSpace(address))
+                query += $" AND address LIKE '%{address}%'";
+            if (!string.IsNullOrWhiteSpace(phone))
+                query += $" AND phonenumber LIKE '%{phone}%'";
+
+            DataTable data = db.DataBaseQuery(query);
+            if (data != null)
+            {
+                foreach (DataRow row in data.Rows)
+                {
+                    customers.Add(new Customer
+                    {
+                        CustomerId = Convert.ToInt32(row["id"]),
+                        CustomerName = row["name"].ToString(),
+                        Address = row["address"].ToString(),
+                        Email = row["email"].ToString(),
+                        Phone = row["phonenumber"].ToString()
+                    });
+                }
+            }
+            return customers;
+        }
     }
 }

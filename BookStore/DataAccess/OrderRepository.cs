@@ -102,10 +102,10 @@ namespace BookStore.DataAccess
             return details;
         }
 
-        public List<OrderDisplayItem> GetOrderHistory(string method, string value)
+        public List<OrderDetail> GetOrderHistory(string method, string value)
         {
-            List<OrderDisplayItem> history = new List<OrderDisplayItem>();
-            string query = "SELECT o.id, c.name as CustomerName, b.title as BookTitle, od.quantity, o.totalAmount, o.orderDate " +
+            List<OrderDetail> history = new List<OrderDetail>();
+            string query = "SELECT o.id, c.name as CustomerName, b.title as BookTitle, od.bookID, od.quantity, od.unitPrice, o.totalAmount, o.orderDate " +
                            "FROM `order` o " +
                            "JOIN customer c ON o.customerID = c.id " +
                            "JOIN orderdetail od ON o.id = od.orderID " +
@@ -130,18 +130,20 @@ namespace BookStore.DataAccess
                 }
             }
             
-            // Order by ID descending usually looks best
+            // Order by ID descending
             query += " ORDER BY o.id DESC";
 
             DataTable table = db.DataBaseQuery(query);
             foreach (DataRow row in table.Rows)
             {
-                history.Add(new OrderDisplayItem
+                history.Add(new OrderDetail
                 {
                     OrderId = Convert.ToInt32(row["id"]),
+                    BookId = Convert.ToInt32(row["bookID"]),
                     CustomerName = row["CustomerName"].ToString(),
                     BookTitle = row["BookTitle"].ToString(),
                     Quantity = Convert.ToInt32(row["quantity"]),
+                    Price = Convert.ToDecimal(row["unitPrice"]),
                     TotalAmount = Convert.ToSingle(row["totalAmount"]),
                     OrderDate = row["orderDate"].ToString()
                 });

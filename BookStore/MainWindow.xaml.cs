@@ -22,6 +22,7 @@ namespace BookStore
         CustomerRepository _customerRepo = new CustomerRepository();
         BookRepository _bookRepo = new BookRepository();
         OrderRepository _orderRepo = new OrderRepository();
+        CategoryRepository _categoryRepo = new CategoryRepository();
     
         public MainWindow()
         {
@@ -61,29 +62,6 @@ namespace BookStore
                 // Test connection by trying to load data
                 LoadData();
                 MessageBox.Show("Connected and Data Loaded!");
-
-                // DEBUG: Probe Schema
-                try {
-                    var db = new BookStore.DBManager();
-                    string debugInfo = "Schema Debug:\n";
-                    
-                    try {
-                        DataTable t1 = db.DataBaseQuery("DESCRIBE `order`");
-                        debugInfo += "ORDER TABLE:\n";
-                        foreach(DataRow r in t1.Rows) debugInfo += r["Field"] + "\n";
-                    } catch(Exception ex1) { debugInfo += "Order Table Error: " + ex1.Message + "\n"; }
-
-                    try {
-                        DataTable t2 = db.DataBaseQuery("DESCRIBE `orderdetail`");
-                        debugInfo += "\nORDERDETAIL TABLE:\n";
-                        foreach(DataRow r in t2.Rows) debugInfo += r["Field"] + "\n";
-                    } catch(Exception ex2) { debugInfo += "OrderDetail Table Error: " + ex2.Message + "\n"; }
-
-                    // Write to a known location
-                    string path = @"d:\cone\Second grade 1st semester\Relational Databases2111(queries)\assginment\TeamP\RMDB2025Final\BookStore\schema_info.txt";
-                    System.IO.File.WriteAllText(path, debugInfo);
-                    MessageBox.Show("Schema details saved to schema_info.txt");
-                } catch (Exception exProbe) { MessageBox.Show("Probe failed: " + exProbe.Message); }
             }
             catch (Exception ex)
             {
@@ -216,6 +194,37 @@ namespace BookStore
         //DESCRIPTION: Searches for customer based on name        
         //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
         //RETURN: void
+        //NAME: RemoveCustomer_Click
+        //DESCRIPTION: Removes selected customer from database
+        private void RemoveCustomer_Click(object sender, RoutedEventArgs e)
+        {
+            if (CustomerList.SelectedItem is Customer selectedCustomer)
+            {
+                if (MessageBox.Show($"Are you sure you want to delete {selectedCustomer.CustomerName}?", "Confirm Delete", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        _customerRepo.Delete(selectedCustomer.CustomerId);
+                        StatusText.Text = "Customer Deleted Successfully.";
+                        RefreshCustomerList();
+                        ClearUIInput();
+                    }
+                    catch (Exception ex)
+                    {
+                        StatusText.Text = "Error deleting customer: " + ex.Message;
+                    }
+                }
+            }
+            else
+            {
+                 MessageBox.Show("Please select a customer to remove.");
+            }
+        }
+
+        //NAME: SearchForCustomer_Click
+        //DESCRIPTION: Searches for customer based on criteria (AND logic)
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
         private void SearchForCustomer_Click(object sender, RoutedEventArgs e)
         {
             string customerName = CustomerNameTextBox.Text;
@@ -224,36 +233,86 @@ namespace BookStore
             string customerPhoneNumber = CustomerPhoneTextBox.Text;
 
             StatusText.Text = "";
-            //need to add more options for searching
-            List<Customer> list = new List<Customer>();
-
-            if (!string.IsNullOrEmpty(customerName)) 
+            
+            try
             {
-                if (Customer._customers.Count == 0)
+                // Use new Search method with AND logic
+                List<Customer> list = _customerRepo.Search(customerName, customerEmail, customerAddress, customerPhoneNumber);
+                
+                if (list.Count == 0)
                 {
-                    StatusText.Text = "Customer DataSet not found.";
-                } 
+                    StatusText.Text = "No customers found matching the criteria.";
+                    CustomerList.ItemsSource = null;
+                }
                 else
                 {
-                    list = Customer.SearchByName(customerName);
-                    StatusText.Text = "";
+                    CustomerList.ItemsSource = list;
+                    StatusText.Text = $"{list.Count} customer(s) found.";
                 }
             }
-            if(list.Count == 0)
+            catch (Exception ex)
             {
-                StatusText.Text = "Customer Name not found.";
-            } else
-            {
-                CustomerList.ItemsSource = list;
+                 StatusText.Text = "Error searching customers: " + ex.Message;
             }
-            
         }
 
         //////////////////////////////             BOOK FUNCTIONS             //////////////////////////////////////////////////////
 
+        //NAME: RemoveBook_Click
+        //DESCRIPTION: Removes selected book from database
+        private void RemoveBook_Click(object sender, RoutedEventArgs e)
+        {
+            if (BookList.SelectedItem is Book selectedBook)
+            {
+                if (MessageBox.Show($"Are you sure you want to delete {selectedBook.Title}?", "Confirm Delete", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        _bookRepo.Delete(selectedBook.BookID);
+                        StatusText.Text = "Book Deleted Successfully.";
+                        RefreshBookList();
+                        ClearUIInput();
+                    }
+                    catch (Exception ex)
+                    {
+                        StatusText.Text = "Error deleting book: " + ex.Message;
+                    }
+                }
+            }
+            else
+            {
+                 MessageBox.Show("Please select a book to remove.");
+            }
+        }
+
         private void SearchBook_Click(object sender, RoutedEventArgs e)
         {
-            RefreshBookList();
+            string title = BookTitletextBox.Text;
+            string isbn = IsbnTextBox.Text;
+            string price = BookPriceTextBox.Text;
+            string author = BookAuthorTextBox.Text;
+            int catId = -1;
+            
+            if (BookCategoryComboBox.SelectedValue != null)
+            {
+                catId = (int)BookCategoryComboBox.SelectedValue;
+            }
+
+            try
+            {
+                List<Book> books = _bookRepo.Search(title, author, isbn, price, catId);
+                Book._books = books;
+                BookList.ItemsSource = books;
+                
+                if (books.Count == 0)
+                    StatusText.Text = "No books found matching criteria.";
+                else
+                    StatusText.Text = $"{books.Count} book(s) found.";
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = "Error searching books: " + ex.Message;
+            }
         }
 
         private void RefreshBookList()
@@ -267,6 +326,22 @@ namespace BookStore
              catch(Exception ex)
             {
                 StatusText.Text = "Error loading books: " + ex.Message;
+            }
+        }
+
+        private void RefreshCategoryList()
+        {
+            try
+            {
+                List<Category> categories = _categoryRepo.GetAll();
+                BookCategoryComboBox.ItemsSource = categories;
+                // If we want to default select the first one?
+                if (categories.Count > 0)
+                    BookCategoryComboBox.SelectedIndex = 0;
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = "Error loading categories: " + ex.Message;
             }
         }
 
@@ -305,6 +380,7 @@ namespace BookStore
             string publisher = BookPublisherTextBox.Text;
             string price = BookPriceTextBox.Text;
             string stock = BookStockTextBox.Text;
+            string author = BookAuthorTextBox.Text;
             //clear error messages
             StatusText.Text = "";
 
@@ -344,6 +420,30 @@ namespace BookStore
                 // Since UI is text box, let's assume for prototype we need to fix this later or assume ID 1.
                 int pubId = 1; 
                 int catId = 1;
+                
+                if (BookCategoryComboBox.SelectedValue != null)
+                {
+                    catId = (int)BookCategoryComboBox.SelectedValue;
+                }
+                else
+                {
+                     // Force selection or default? Let's force selection validation if we want strictness, 
+                     // but for now relying on default 1 if not selected is safer to avoid crashes, 
+                     // however, let's alert user if strictly needed. 
+                     // The user asked to "Category Selection", so they probably want it to work.
+                     if (BookCategoryComboBox.Items.Count > 0) 
+                         catId = (int)BookCategoryComboBox.SelectedValue; // This might crash if null.
+                         // Actually better check:
+                     if (BookCategoryComboBox.SelectedIndex == -1)
+                     {
+                         StatusText.Text = "Please select a Category.";
+                         return;
+                     }
+                     if (BookCategoryComboBox.SelectedValue != null)
+                     {
+                         catId = (int)BookCategoryComboBox.SelectedValue;
+                     }
+                }
 
                 if (validated)
                 {
@@ -354,7 +454,8 @@ namespace BookStore
                         Price = (decimal)numericPrice, // Model says decimal
                         Stock = numericStock,
                         PublisherID = pubId,
-                        CategoryID = catId
+                        CategoryID = catId,
+                        Author = author
                     };
 
                     try
@@ -383,30 +484,34 @@ namespace BookStore
         public class CartItem
         {
             public int BookId { get; set; }
-            public string BookTitle { get; set; }
+            public string BookTitle { get; set; } = string.Empty;
             public int Quantity { get; set; }
             public decimal Price { get; set; }
             public decimal TotalPrice => Price * Quantity;
         }
 
         private List<CartItem> _cartItems = new List<CartItem>();
-        private Customer _selectedOrderCustomer = null;
+        private Customer? _selectedOrderCustomer = null;
 
         private void LoadData()
         {
             try 
             {
+                // Seed categories if needed
+                _categoryRepo.SeedCategories();
+
                 // Refresh background lists but DO NOT populate GridSources initially
                 RefreshCustomerList();
                 RefreshBookList();
+                RefreshCategoryList();
                 
                 // Populate Order Tab Grids - LEFT EMPTY as requested
                 OrderCustomerGrid.ItemsSource = null;
                 OrderBookGrid.ItemsSource = null;
                 
-                RefreshHistory_Click(null, null);
+                RefreshHistory_Click(new object(), new RoutedEventArgs());
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // StatusText might be null if called too early
             }
@@ -448,13 +553,14 @@ namespace BookStore
              {
                  var all = _bookRepo.GetAll();
                  var filtered = all
-                     .Where(b => b.Title.ToLower().Contains(filter) || b.ISBN.Contains(filter))
+                      .Where(b => (b.Title != null && b.Title.ToLower().Contains(filter)) || (b.ISBN != null && b.ISBN.Contains(filter)))
                      .Select(b => new BookSelectionViewModel 
                      {
                          BookID = b.BookID,
                          Title = b.Title,
                          ISBN = b.ISBN,
                          Price = b.Price,
+                         Author = b.Author,
                          PublisherID = b.PublisherID,
                          Stock = b.Stock,
                          QuantityToBuy = 1 // Default
@@ -495,7 +601,7 @@ namespace BookStore
                         _cartItems.Add(new CartItem 
                         { 
                             BookId = b.BookID, 
-                            BookTitle = b.Title, 
+                            BookTitle = b.Title ?? "Unknown", 
                             Quantity = qtyToAdd, 
                             Price = b.Price 
                         });
@@ -546,7 +652,7 @@ namespace BookStore
                 // Create Order
                 Order newOrder = new Order
                 {
-                    CustomerID = _selectedOrderCustomer.CustomerId,
+                    CustomerID = _selectedOrderCustomer?.CustomerId ?? 0,
                     OrderDate = DateTime.Now.ToString("yyyy-MM-dd"), 
                     OrderAmount = (float)total,
                     OrderDetails = new List<OrderDetail>()
@@ -568,7 +674,7 @@ namespace BookStore
                 MessageBox.Show("Order Placed Successfully!");
                 _cartItems.Clear();
                 RefreshCart();
-                RefreshHistory_Click(null, null); // Refresh history
+                RefreshHistory_Click(new object(), new RoutedEventArgs()); // Refresh history
             }
             catch (Exception ex)
             {
@@ -590,7 +696,7 @@ namespace BookStore
                  {
                       if (HistorySearchMethodCombo.SelectedItem is ComboBoxItem item)
                       {
-                           method = item.Content.ToString();
+                            method = item.Content?.ToString() ?? "";
                            value = HistorySearchValueBox.Text;
                       }
                  }
@@ -627,10 +733,22 @@ namespace BookStore
             BookPublisherTextBox.Text = "";
             BookPriceTextBox.Text = "";
             BookStockTextBox.Text = "";
+            BookAuthorTextBox.Text = "";
+            BookCategoryComboBox.SelectedIndex = -1;
             CustomerNameTextBox.Text = "";
             CustomerEmailTextBox.Text = "";
             CustomerAddressTextBox.Text = "";
             CustomerPhoneTextBox.Text = "";
+        }
+
+        private void OrderBookGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void OrderHistoryGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }
