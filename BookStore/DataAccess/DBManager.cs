@@ -8,6 +8,8 @@
 */
 
 using MySql.Data.MySqlClient;
+using System.Data;
+using static System.Reflection.Metadata.BlobBuilder;
 
 
 namespace BookStore
@@ -20,10 +22,14 @@ namespace BookStore
         private CustomerRepository? customerRepo = null;
         private BookRepository? bookRepo = null;
         private OrderRepository? orderRepo = null;
+        public DataSet? Data = null;
+        public DBManager(){
+            Data = new DataSet();
+           
 
-        public DBManager(){}
+        }
       
-        public CustomerRepository Customers => customerRepo ??= new CustomerRepository(ConnectionString);
+        public CustomerRepository Customers => customerRepo ??= new CustomerRepository(ConnectionString, Data);
         //public BookRepository Books => bookRepo ??= new BookRepository(ConnectionString);
         //public OrderRepository Orders => orderRepo ??= new OrderRepository(ConnectionString);
 

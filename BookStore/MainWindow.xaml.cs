@@ -93,15 +93,24 @@ namespace BookStore
                 //add customer to customer list
                 if (validated)
                 {
-                    //Customer._customers.Add(new Customer
-                    //{
-                    //    CustomerName = customerName,
-                    //    Email = customerEmail,
-                    //    Address = customerAddress,
-                    //    Phone = customerPhoneNumber
-                    //});
-                    ClearUIInput();
+                    try
+                    {
+                        dbManager.Customers.Add(new Customer { 
+                            CustomerName = customerName, 
+                            Email = customerEmail,
+                            Address = customerAddress,
+                            Phone = customerPhoneNumber
+                        });
+                        dbManager.Customers.SaveChanges();
+                    }
+                    catch (System.Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
                 }
+
+                ClearUIInput();
+                
             }
         }
 
