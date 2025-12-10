@@ -236,7 +236,7 @@ We manupilate these object behind the code using .NET code.
                                     
                                     <DataGrid Grid.Row="1" x:Name="OrderBookGrid" AutoGenerateColumns="False" SelectionMode="Single" MouseDoubleClick="OrderBookGrid_MouseDoubleClick" SelectionChanged="OrderBookGrid_SelectionChanged">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="ID" Binding="{Binding BookId}" Width="40" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="ID" Binding="{Binding BookID}" Width="40" IsReadOnly="True"/>
                                             <DataGridTextColumn Header="Name" Binding="{Binding Title}" Width="90" IsReadOnly="True"/>
                                             <DataGridTextColumn Header="ISBN" Binding="{Binding ISBN}" Width="100" IsReadOnly="True"/>
                                             <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat=C}" IsReadOnly="True"/>

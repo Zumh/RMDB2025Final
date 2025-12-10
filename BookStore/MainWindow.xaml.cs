@@ -554,9 +554,23 @@ namespace BookStore
                 RefreshBookList();
                 RefreshCategoryList();
                 
-                // Populate Order Tab Grids - LEFT EMPTY as requested
-                OrderCustomerGrid.ItemsSource = _customerRepo.GetAll(); 
-                OrderBookGrid.ItemsSource = _bookRepo.GetAll();
+                // Populate Order Tab Grids
+                OrderCustomerGrid.ItemsSource = _customerRepo.GetAll();
+                
+                // Convert books to BookSelectionViewModel for proper quantity binding
+                var books = _bookRepo.GetAll();
+                var bookViewModels = books.Select(b => new BookSelectionViewModel
+                {
+                    BookID = b.BookID,
+                    Title = b.Title,
+                    ISBN = b.ISBN,
+                    Price = b.Price,
+                    Author = b.Author,
+                    PublisherID = b.PublisherID,
+                    Stock = b.Stock,
+                    QuantityToBuy = 1 // Default quantity
+                }).ToList();
+                OrderBookGrid.ItemsSource = bookViewModels;
                 
                 RefreshHistory_Click(new object(), new RoutedEventArgs());
             }
@@ -574,7 +588,20 @@ namespace BookStore
         {
             try
             {
-                OrderBookGrid.ItemsSource = _bookRepo.GetAll();
+                // Convert books to BookSelectionViewModel for proper quantity binding
+                var books = _bookRepo.GetAll();
+                var bookViewModels = books.Select(b => new BookSelectionViewModel
+                {
+                    BookID = b.BookID,
+                    Title = b.Title,
+                    ISBN = b.ISBN,
+                    Price = b.Price,
+                    Author = b.Author,
+                    PublisherID = b.PublisherID,
+                    Stock = b.Stock,
+                    QuantityToBuy = 1 // Default quantity
+                }).ToList();
+                OrderBookGrid.ItemsSource = bookViewModels;
             }
             catch (Exception ex)
             {
@@ -676,7 +703,14 @@ namespace BookStore
         private void OrderBookGrid_MouseDoubleClick(object? sender, MouseButtonEventArgs? e)
         {
             BookSelectionViewModel? currentBook = null;
-            if (OrderBookGrid.SelectedItem is Book selectedBook)
+            
+            // Check if the selected item is already a BookSelectionViewModel (from search results)
+            if (OrderBookGrid.SelectedItem is BookSelectionViewModel selectedViewModel)
+            {
+                currentBook = selectedViewModel;
+            }
+            // Otherwise, if it's a Book object, convert it
+            else if (OrderBookGrid.SelectedItem is Book selectedBook)
             {
                 currentBook = new BookSelectionViewModel
                 {
