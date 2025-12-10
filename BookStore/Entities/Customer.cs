@@ -11,6 +11,17 @@ using System.Data;
 
 namespace BookStore
 {
+    /*
+* Class: Customer
+* Purpose: The Customer class has been created to represent a customer within the
+ *  bookstore system. It contains members to track the customer’s unique ID,
+ *  name, email, phone number, and address. The class provides validation
+ *  methods to ensure that customer information is properly formatted before
+ *  being stored or processed. Additionally, it supports loading customer data
+ *  from the database into an in-memory collection and searching customers by
+ *  name, facilitating efficient access and management of customer records.
+ */
+
     internal class Customer
     {
         //regex patterns for email and phone number

@@ -11,6 +11,20 @@ using System.Data;
 
 namespace BookStore
 {
+
+
+    /*
+     * Class: Book
+     * Purpose: The Book class has been created to accurately model a single book record
+    *  within the bookstore system. The Book class contains members to track key
+    *  information such as the book ID, publisher, category, title, ISBN, author,
+    *  price, and stock quantity. The Book class also provides validation methods
+    *  to ensure that book data entered by the user is correct before being stored
+    *  or processed. In addition, the Book class supports loading book data from
+    *  a database into an in-memory collection for easy access by other parts of
+    *  the application.
+    */
+
     internal class Book
     {
         public int BookID { get; set; }

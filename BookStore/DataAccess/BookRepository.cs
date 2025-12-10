@@ -7,13 +7,23 @@ This class handles all database operations for books.
 It allows adding, updating, deleting, and searching for books.
 */
 
-using System;
-using System.Collections.Generic;
+
 using System.Data;
-using MySql.Data.MySqlClient;
+
 
 namespace BookStore.DataAccess
 {
+    /*
+* Class: BookRepository
+* Purpose: The BookRepository class has been created to manage all database operations
+ *  related to books within the bookstore system. It provides methods to retrieve,
+ *  search, add, update, and delete book records. The class handles mapping database
+ *  rows to Book objects, ensures required columns exist in the database, and
+ *  supports complex searches using multiple criteria such as title, author, ISBN,
+ *  price, and category. This class serves as a bridge between the application logic
+ *  and the underlying database for all book-related functionality.
+ */
+
     internal class BookRepository
     {
         private DBManager db = new DBManager();
