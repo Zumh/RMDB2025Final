@@ -145,9 +145,9 @@ UPDATE customer
 SET address = '321 Elm Street'
 WHERE id = 2;
 
--- Delete
+/*-- Delete
 DELETE FROM customer
-WHERE id = 2; -- Only works if no orders exist
+WHERE id = 2; -- Only works if no orders exist*/
 
 
 -- =============================
@@ -195,18 +195,24 @@ WHERE id = 1; -- order details are automatically deleted
 
 -- =============================
 -- OrderDetails CRUD
+-- OrderDetails CRUD
 -- =============================
 
--- Create
+-- Create: Many book in the NEW order
+INSERT INTO `Order` (customerID, orderDate, totalAmount)
+VALUES (1, '2025-12-04', 100.00);
+
+-- add numbers of books in OrderDetail.
 INSERT INTO OrderDetail (orderID, bookID, quantity, unitPrice)
-VALUES (1, 2, 1, 45.50);
+VALUES 
+(3, 1, 2, 15.99), 
+(3, 2, 1, 45.50);
 
 -- Read
 SELECT od.id, o.id AS orderID, b.title, od.quantity, od.unitPrice
 FROM OrderDetail od
 JOIN `Order` o ON od.orderID = o.id
 JOIN book b ON od.bookID = b.id;
-
 
 -- Update
 UPDATE OrderDetail
@@ -216,7 +222,3 @@ WHERE id = 1;
 -- Delete
 DELETE FROM OrderDetail
 WHERE id = 2;
-
-
-
-
