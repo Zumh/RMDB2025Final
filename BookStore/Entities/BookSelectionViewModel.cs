@@ -11,6 +11,16 @@ using System;
 
 namespace BookStore.Entities
 {
+    /*
+* Class: BookSelectionViewModel
+* Purpose: The BookSelectionViewModel class has been created to represent a book
+ *  in the context of a user’s selection for purchase within the bookstore
+ *  system. It contains key book information such as ID, title, ISBN, price,
+ *  author, publisher, and stock, along with a QuantityToBuy property to track
+ *  how many copies the user intends to purchase. This class is primarily used
+ *  to bind book data to the user interface for shopping and order creation.
+ */
+
     public class BookSelectionViewModel
     {
         public int BookID { get; set; }

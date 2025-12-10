@@ -13,6 +13,16 @@ using System.Text.RegularExpressions;
 
 namespace BookStore
 {
+    /*
+* Class: Order
+* Purpose: The Order class has been created to represent a customer order within
+ *  the bookstore system. It contains members to track the order ID, customer
+ *  ID, order date, total amount, and a list of associated order details.
+ *  The class provides validation methods to ensure that the order date and
+ *  amount are correctly formatted before storing or processing. It also
+ *  supports loading orders from the database into an in-memory collection,
+ *  allowing easy access and management of order records within the application.
+ */
     internal class Order
     {
         //regex for mySQL date format

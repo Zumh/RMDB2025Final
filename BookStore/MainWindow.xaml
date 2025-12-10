@@ -1,4 +1,14 @@
-﻿<Window x:Class="BookStore.MainWindow"
+﻿ <!--
+FILE : MainWindow.xaml
+PROJECT : PROG2111 Final Project | BOOKSTORE
+PROGRAMMER : Zumhliansang Lung Ler | Sungmin Leem | Nick Turco
+FIRST VERSION : 03/12/2025
+DESCRIPTION: 
+This file contain bookstore project xaml UI code.
+We can use it for adding more buttons and tools for adding more features.
+We manupilate these object behind the code using .NET code.
+-->
+    <Window x:Class="BookStore.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -222,8 +232,10 @@
                                         <TextBlock Text="Search" VerticalAlignment="Center" Margin="0,0,5,0"/>
                                         <TextBox x:Name="OrderBookSearchBox" Width="200" TextChanged="OrderBookSearchBox_TextChanged"/>
                                     </StackPanel>
+                                    
                                     <DataGrid Grid.Row="1" x:Name="OrderBookGrid" AutoGenerateColumns="False" SelectionMode="Single" MouseDoubleClick="OrderBookGrid_MouseDoubleClick" SelectionChanged="OrderBookGrid_SelectionChanged">
                                         <DataGrid.Columns>
+                                            <DataGridTextColumn Header="ID" Binding="{Binding BookId}" Width="40" IsReadOnly="True"/>
                                             <DataGridTextColumn Header="Name" Binding="{Binding Title}" Width="90" IsReadOnly="True"/>
                                             <DataGridTextColumn Header="ISBN" Binding="{Binding ISBN}" Width="100" IsReadOnly="True"/>
                                             <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat=C}" IsReadOnly="True"/>

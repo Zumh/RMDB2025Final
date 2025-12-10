@@ -15,6 +15,17 @@ using System.Threading.Tasks;
 
 namespace BookStore.Entities
 {
+    /*
+   * Class: OrderDetail
+   * Purpose: The OrderDetail class has been created to represent the details of a
+     *  specific order within the bookstore system. It contains members to track
+     *  the book, quantity, and price for each item in an order. In addition,
+     *  it includes display-related properties such as customer name, book title,
+     *  order date, and total amount to facilitate presentation in user interfaces
+     *  or reports. This class bridges the raw order data with a more readable format
+     *  for display and processing purposes.
+     */
+
     public class OrderDetail
     {
         public int OrderId { get; set; }
@@ -23,9 +34,9 @@ namespace BookStore.Entities
         public decimal Price { get; set; }
 
         // Display Properties
-        public string CustomerName { get; set; }
-        public string BookTitle { get; set; }
-        public string OrderDate { get; set; }
+        public string? CustomerName { get; set; }
+        public string? BookTitle { get; set; }
+        public string? OrderDate { get; set; }
         public float TotalAmount { get; set; } // Order Total
     }
 }

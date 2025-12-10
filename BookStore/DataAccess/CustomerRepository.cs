@@ -7,16 +7,22 @@ This class handles customer data operations.
 It allows saving new customers and finding existing ones.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BookStore.Entities;
+
 using System.Data;
 
 namespace BookStore.DataAccess
 {
+    /*
+* Class: CustomerRepository
+* Purpose: The CustomerRepository class has been created to manage all database
+ *  operations related to customers within the bookstore system. It provides
+ *  methods to retrieve, add, delete, and search customer records. The class
+ *  handles mapping database rows to Customer objects and supports searching
+ *  using multiple criteria such as name, email, address, and phone number,
+ *  ensuring consistent and convenient access to customer data throughout
+ *  the application.
+ */
+
     internal class CustomerRepository
     {
         private DBManager db = new DBManager();

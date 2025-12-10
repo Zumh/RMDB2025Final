@@ -7,18 +7,11 @@ This is the main window of the application where users interact with the system.
 It handles navigation between tabs and user events like clicking buttons to add or search items.
 */
 
-using MySqlX.XDevAPI.Relational;
 using System.Data;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 using BookStore.DataAccess;
 using BookStore.Entities;
@@ -46,7 +39,7 @@ namespace BookStore
         //DESCRIPTION: Updates the connection string and tries to load data.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void LoginBtn_Click(object sender, RoutedEventArgs e)
+        private void LoginBtn_Click(object? sender, RoutedEventArgs? e)
         {
             string user = userId.Text;
             string pass = loginPassword.Text; // Note: In real app use PasswordBox
@@ -80,7 +73,7 @@ namespace BookStore
         //DESCRIPTION: Clears the login text boxes.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void ClearLogin_Click(object sender, RoutedEventArgs e)
+        private void ClearLogin_Click(object? sender, RoutedEventArgs? e)
         {
             userId.Text = "";
             loginPassword.Text = "";
@@ -93,7 +86,7 @@ namespace BookStore
         //DESCRIPTION: Validates input and adds a new customer to the database.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void AddCustomerBtn_Click(object sender, RoutedEventArgs e)
+        private void AddCustomerBtn_Click(object? sender, RoutedEventArgs? e)
         {
             bool validated = true;
 
@@ -158,7 +151,7 @@ namespace BookStore
         //DESCRIPTION: Shows all customers in the list.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void DisplayAllCustomers_Click(object sender, RoutedEventArgs e)
+        private void DisplayAllCustomers_Click(object? sender, RoutedEventArgs? e)
         {
             RefreshCustomerList();
         }
@@ -194,7 +187,7 @@ namespace BookStore
         //DESCRIPTION: Makes the ID column read-only in the data grid.
         //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
         //RETURN: void
-        private void CustomerList_Columns(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        private void CustomerList_Columns(object? sender, DataGridAutoGeneratingColumnEventArgs e)
         {
             //check if column name is id and make it read only
             if(e.PropertyName == "CustomerId")
@@ -207,7 +200,7 @@ namespace BookStore
         //DESCRIPTION: Removes the selected customer from the database.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void RemoveCustomer_Click(object sender, RoutedEventArgs e)
+        private void RemoveCustomer_Click(object? sender, RoutedEventArgs? e)
         {
             if (CustomerList.SelectedItem is Customer selectedCustomer)
             {
@@ -236,7 +229,7 @@ namespace BookStore
         //DESCRIPTION: Searches for customers based on the criteria entered.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void SearchForCustomer_Click(object sender, RoutedEventArgs e)
+        private void SearchForCustomer_Click(object? sender, RoutedEventArgs? e)
         {
             string customerName = CustomerNameTextBox.Text;
             string customerEmail = CustomerEmailTextBox.Text;
@@ -273,7 +266,7 @@ namespace BookStore
         //DESCRIPTION: Removes the selected book from the database.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void RemoveBook_Click(object sender, RoutedEventArgs e)
+        private void RemoveBook_Click(object? sender, RoutedEventArgs? e)
         {
             if (BookList.SelectedItem is Book selectedBook)
             {
@@ -302,7 +295,7 @@ namespace BookStore
         //DESCRIPTION: Searches for books based on the criteria entered.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void SearchBook_Click(object sender, RoutedEventArgs e)
+        private void SearchBook_Click(object? sender, RoutedEventArgs? e)
         {
             string title = BookTitletextBox.Text;
             string isbn = IsbnTextBox.Text;
@@ -374,7 +367,7 @@ namespace BookStore
         //DESCRIPTION: Makes ID columns read-only in the book grid.
         //PARAMETERS: object sender, DataGridAutoGeneratingColumnEventArgs e
         //RETURN: void
-        private void BookList_Columns(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        private void BookList_Columns(object? sender, DataGridAutoGeneratingColumnEventArgs e)
         {
             //check if column name is id and make it read only
             if (e.PropertyName == "BookID")
@@ -395,7 +388,7 @@ namespace BookStore
         //DESCRIPTION: Validates input and adds a new book to the database.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void AddBook_Click(object sender, RoutedEventArgs e)
+        private void AddBook_Click(object? sender, RoutedEventArgs? e)
         {
             bool validated = true;
 
@@ -451,14 +444,20 @@ namespace BookStore
                 }
                 else
                 {
-                     // Force selection or default? Let's force selection validation if we want strictness, 
-                     // but for now relying on default 1 if not selected is safer to avoid crashes, 
-                     // however, let's alert user if strictly needed. 
-                     // The user asked to "Category Selection", so they probably want it to work.
-                     if (BookCategoryComboBox.Items.Count > 0) 
-                         catId = (int)BookCategoryComboBox.SelectedValue; // This might crash if null.
-                         // Actually better check:
-                     if (BookCategoryComboBox.SelectedIndex == -1)
+                    // Force selection or default? Let's force selection validation if we want strictness, 
+                    // but for now relying on default 1 if not selected is safer to avoid crashes, 
+                    // however, let's alert user if strictly needed. 
+                    // The user asked to "Category Selection", so they probably want it to work.
+                    if (BookCategoryComboBox.Items.Count > 0)
+                    {
+                        if (int.TryParse(BookCategoryComboBox.SelectedValue?.ToString(), out int selectedCatId))
+                        {
+                            catId = selectedCatId;
+                        }
+
+                      
+                    }
+                    if (BookCategoryComboBox.SelectedIndex == -1)
                      {
                          StatusText.Text = "Please select a Category.";
                          return;
@@ -530,8 +529,8 @@ namespace BookStore
                 RefreshCategoryList();
                 
                 // Populate Order Tab Grids - LEFT EMPTY as requested
-                OrderCustomerGrid.ItemsSource = null;
-                OrderBookGrid.ItemsSource = null;
+                OrderCustomerGrid.ItemsSource = _customerRepo.GetAll(); 
+                OrderBookGrid.ItemsSource = _bookRepo.GetAll();
                 
                 RefreshHistory_Click(new object(), new RoutedEventArgs());
             }
@@ -547,7 +546,7 @@ namespace BookStore
         //DESCRIPTION: Filters the customer list in the order tab as the user types.
         //PARAMETERS: object sender, TextChangedEventArgs e
         //RETURN: void
-        private void OrderCustomerSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void OrderCustomerSearchBox_TextChanged(object? sender, TextChangedEventArgs? e)
         {
              string filter = OrderCustomerSearchBox.Text.ToLower();
              if (string.IsNullOrWhiteSpace(filter))
@@ -556,9 +555,13 @@ namespace BookStore
              }
              else
              {
-                 var all = _customerRepo.GetAll();
-                 var filtered = all.Where(c => c.CustomerName.ToLower().Contains(filter) || c.Phone.Contains(filter)).ToList();
-                 OrderCustomerGrid.ItemsSource = filtered;
+                List<Customer> all = _customerRepo.GetAll();
+                IEnumerable<Customer> filtered = all.Where(c =>
+                    (c.CustomerName ?? string.Empty).ToLower().Contains(filter) ||
+                    (c.Phone ?? string.Empty).Contains(filter)
+                    ).ToList();
+
+                OrderCustomerGrid.ItemsSource = filtered;
              }
         }
 
@@ -566,7 +569,7 @@ namespace BookStore
         //DESCRIPTION: Selects a customer for the order when clicked in the grid.
         //PARAMETERS: object sender, SelectionChangedEventArgs e
         //RETURN: void
-        private void OrderCustomerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OrderCustomerGrid_SelectionChanged(object? sender, SelectionChangedEventArgs? e)
         {
             if (OrderCustomerGrid.SelectedItem is Customer c)
             {
@@ -580,7 +583,7 @@ namespace BookStore
         //DESCRIPTION: Filters the book list in the order tab as the user types.
         //PARAMETERS: object sender, TextChangedEventArgs e
         //RETURN: void
-        private void OrderBookSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void OrderBookSearchBox_TextChanged(object? sender, TextChangedEventArgs? e)
         {
              string filter = OrderBookSearchBox.Text.ToLower();
              if (string.IsNullOrWhiteSpace(filter))
@@ -612,11 +615,27 @@ namespace BookStore
         //DESCRIPTION: Adds a book to the cart when double clicked.
         //PARAMETERS: object sender, MouseButtonEventArgs e
         //RETURN: void
-        private void OrderBookGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void OrderBookGrid_MouseDoubleClick(object? sender, MouseButtonEventArgs? e)
         {
-            if (OrderBookGrid.SelectedItem is BookSelectionViewModel b)
+            BookSelectionViewModel? currentBook = null;
+            if (OrderBookGrid.SelectedItem is Book selectedBook)
             {
-                int qtyToAdd = b.QuantityToBuy;
+                currentBook = new BookSelectionViewModel
+                {
+                    BookID = selectedBook.BookID,
+                    Title = selectedBook.Title,
+                    ISBN = selectedBook.ISBN,
+                    Price = selectedBook.Price,
+                    PublisherID = selectedBook.PublisherID,
+                    Author = selectedBook.Author,
+                    Stock = selectedBook.Stock,
+                    QuantityToBuy = 1   // default
+                };
+            }
+
+            if (currentBook != null)
+            {
+                int qtyToAdd = currentBook.QuantityToBuy;
                 
                 if (qtyToAdd <= 0) 
                 {
@@ -624,28 +643,28 @@ namespace BookStore
                      return;
                 }
 
-                var existing = _cartItems.FirstOrDefault(i => i.BookId == b.BookID);
+                var existing = _cartItems.FirstOrDefault(i => i.BookId == currentBook.BookID);
                 if (existing != null)
                 {
-                    if (existing.Quantity + qtyToAdd <= b.Stock)
+                    if (existing.Quantity + qtyToAdd <= currentBook.Stock)
                     {
                         existing.Quantity += qtyToAdd;
                     }
                     else
                     {
-                        MessageBox.Show($"Cannot add more. Stock limit ({b.Stock}) reached.");
+                        MessageBox.Show($"Cannot add more. Stock limit ({currentBook.Stock}) reached.");
                     }
                 }
                 else
                 {
-                    if (b.Stock >= qtyToAdd)
+                    if (currentBook.Stock >= qtyToAdd)
                     {
                         _cartItems.Add(new CartItem 
                         { 
-                            BookId = b.BookID, 
-                            BookTitle = b.Title ?? "Unknown", 
+                            BookId = currentBook.BookID, 
+                            BookTitle = currentBook.Title ?? "Unknown", 
                             Quantity = qtyToAdd, 
-                            Price = b.Price 
+                            Price = currentBook.Price 
                         });
                     }
                     else
@@ -676,7 +695,7 @@ namespace BookStore
         //DESCRIPTION: Removes all items from the shopping cart.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void ClearCart_Click(object sender, RoutedEventArgs e)
+        private void ClearCart_Click(object? sender, RoutedEventArgs? e)
         {
             _cartItems.Clear();
             RefreshCart();
@@ -686,7 +705,7 @@ namespace BookStore
         //DESCRIPTION: Deletes a selected order from history.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void RemoveOrder_Click(object sender, RoutedEventArgs e)
+        private void RemoveOrder_Click(object? sender, RoutedEventArgs? e)
         {
              if (OrderHistoryGrid.SelectedItem is OrderDetail selected)
              {
@@ -714,7 +733,7 @@ namespace BookStore
         //DESCRIPTION: Creates a new order with the items in the cart.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void SubmitOrder_Click(object sender, RoutedEventArgs e)
+        private void SubmitOrder_Click(object? sender, RoutedEventArgs? e)
         {
             if (_selectedOrderCustomer == null)
             {
@@ -771,7 +790,7 @@ namespace BookStore
         //DESCRIPTION: Reloads the order history list.
         //PARAMETERS: object sender, RoutedEventArgs e
         //RETURN: void
-        private void RefreshHistory_Click(object sender, RoutedEventArgs e)
+        private void RefreshHistory_Click(object? sender, RoutedEventArgs? e)
         {
             try
             {
@@ -841,7 +860,7 @@ namespace BookStore
         //DESCRIPTION: Handles selection change in order book grid.
         //PARAMETERS: object sender, SelectionChangedEventArgs e
         //RETURN: void
-        private void OrderBookGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OrderBookGrid_SelectionChanged(object? sender, SelectionChangedEventArgs? e)
         {
 
         }
@@ -850,7 +869,7 @@ namespace BookStore
         //DESCRIPTION: Handles selection change in order history grid.
         //PARAMETERS: object sender, SelectionChangedEventArgs e
         //RETURN: void
-        private void OrderHistoryGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OrderHistoryGrid_SelectionChanged(object? sender, SelectionChangedEventArgs? e)
         {
 
         }

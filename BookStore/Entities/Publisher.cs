@@ -7,18 +7,23 @@ This class represents the company that publishes the books.
 It stores the publisher's name and other details.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BookStore.Entities
 {
+    /*
+    * Class: Publisher
+    * Purpose: The Publisher class has been created to represent a book publisher within
+    *  the bookstore system. It contains members to track the publisher’s unique
+    *  ID, name, and any additional descriptive content. This class serves as a
+    *  simple data model for managing and referencing publishers in relation
+    *  to books and orders.
+    */
+
     internal class Publisher
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Content { get; set; }
+        public string? Name { get; set; }
+        public string? Content { get; set; }
     }
 }
