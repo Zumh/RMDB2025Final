@@ -172,7 +172,8 @@ We manupilate these object behind the code using .NET code.
                     <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
                         <Button Content="Add Book" Width="140" Margin="0,0,0,10" x:Name="AddBook" Click="AddBook_Click"/>
                         <Button Content="Remove Book" Width="140" Margin="0,0,0,10" Click="RemoveBook_Click"/>
-                        <Button Content="Search Book" Width="140" x:Name="SearchBook" Click="SearchBook_Click"/>
+                        <Button Content="Search Book" Width="140" Margin="0,0,0,10" x:Name="SearchBook" Click="SearchBook_Click"/>
+                        <Button Content="Display All Books" Width="140" x:Name="DisplayAllBooks" Click="DisplayAllBooks_Click"/>
                     </StackPanel>
                 </Grid>
                 </ScrollViewer>

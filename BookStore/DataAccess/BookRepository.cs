@@ -23,7 +23,6 @@ namespace BookStore.DataAccess
  *  price, and category. This class serves as a bridge between the application logic
  *  and the underlying database for all book-related functionality.
  */
-
     internal class BookRepository
     {
         private DBManager db = new DBManager();
@@ -213,10 +212,10 @@ namespace BookStore.DataAccess
         }
 
         //NAME: Search
-        //DESCRIPTION: Searches for books using multiple criteria (Title, Author, ISBN, Price, Category).
-        //PARAMETERS: string title, string author, string isbn, string price, int categoryId
+        //DESCRIPTION: Searches for books using multiple criteria (Title, Author, ISBN, Price, Category, Publisher, Stock).
+        //PARAMETERS: string title, string author, string isbn, string price, int categoryId, string publisher, string stock
         //RETURN: books
-        public List<Book> Search(string title, string author, string isbn, string price, int categoryId)
+        public List<Book> Search(string title, string author, string isbn, string price, int categoryId, string publisher, string stock)
         {
             List<Book> books = new List<Book>();
             string query = $"{GetBaseSelectQuery()} WHERE 1=1";
@@ -238,6 +237,18 @@ namespace BookStore.DataAccess
                 query += $" AND b.categoryID = {categoryId}";
             }
 
+            if (!string.IsNullOrWhiteSpace(publisher))
+            {
+                // Use the dynamic publisher column name
+                string pCol = GetPublisherNameColumn();
+                query += $" AND p.{pCol} LIKE '%{publisher}%'";
+            }
+
+            if (int.TryParse(stock, out int s))
+            {
+                query += $" AND b.stock = {s}";
+            }
+
             DataTable data = db.DataBaseQuery(query);
             if (data != null)
             {
@@ -247,6 +258,54 @@ namespace BookStore.DataAccess
                 }
             }
             return books;
+        }
+
+        //NAME: GetOrCreatePublisherId
+        //DESCRIPTION: Finds a publisher by name or creates a new one if it doesn't exist.
+        //PARAMETERS: string publisherName
+        //RETURN: int - Publisher ID
+        public int GetOrCreatePublisherId(string publisherName)
+        {
+            if (string.IsNullOrWhiteSpace(publisherName))
+            {
+                // Return default if empty - or could throw exception
+                return 1; // Default to first publisher
+            }
+
+            try
+            {
+                string pCol = GetPublisherNameColumn();
+                
+                // Try to find existing publisher
+                string query = $"SELECT id FROM publisher WHERE {pCol} = @name";
+                DataTable data = db.DataBaseQuery(query, new[] { "@name", publisherName });
+                
+                if (data != null && data.Rows.Count > 0)
+                {
+                    return Convert.ToInt32(data.Rows[0]["id"]);
+                }
+                
+                // Publisher doesn't exist, create new one
+                string insertQuery = $"INSERT INTO publisher ({pCol}) VALUES (@name)";
+                db.ExecuteNonQuery(insertQuery, new Dictionary<string, string> { { "@name", publisherName } });
+                
+                // Get the newly created ID
+                string getIdQuery = "SELECT LAST_INSERT_ID() as id";
+                DataTable idData = db.DataBaseQuery(getIdQuery);
+                
+                if (idData != null && idData.Rows.Count > 0)
+                {
+                    return Convert.ToInt32(idData.Rows[0]["id"]);
+                }
+                
+                // Fallback
+                return 1;
+            }
+            catch
+            {
+                // On error, return default
+                return 1;
+            }
         }
 
         // CREATE - Add book

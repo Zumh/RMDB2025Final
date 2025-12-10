@@ -138,6 +138,7 @@ namespace BookStore
                          StatusText.Text = "Customer Added Successfully.";
                          ClearUIInput();
                          RefreshCustomerList();
+                         RefreshOrderCustomerGrid();
                     }
                     catch (Exception ex)
                     {
@@ -211,6 +212,7 @@ namespace BookStore
                         _customerRepo.Delete(selectedCustomer.CustomerId);
                         StatusText.Text = "Customer Deleted Successfully.";
                         RefreshCustomerList();
+                        RefreshOrderCustomerGrid();
                         ClearUIInput();
                     }
                     catch (Exception ex)
@@ -277,6 +279,7 @@ namespace BookStore
                         _bookRepo.Delete(selectedBook.BookID);
                         StatusText.Text = "Book Deleted Successfully.";
                         RefreshBookList();
+                        RefreshOrderBookGrid();
                         ClearUIInput();
                     }
                     catch (Exception ex)
@@ -301,6 +304,8 @@ namespace BookStore
             string isbn = IsbnTextBox.Text;
             string price = BookPriceTextBox.Text;
             string author = BookAuthorTextBox.Text;
+            string publisher = BookPublisherTextBox.Text;
+            string stock = BookStockTextBox.Text;
             int catId = -1;
             
             if (BookCategoryComboBox.SelectedValue != null)
@@ -310,7 +315,8 @@ namespace BookStore
 
             try
             {
-                List<Book> books = _bookRepo.Search(title, author, isbn, price, catId);
+                // Updated Search call with new parameters
+                List<Book> books = _bookRepo.Search(title, author, isbn, price, catId, publisher, stock);
                 Book._books = books;
                 BookList.ItemsSource = books;
                 
@@ -323,6 +329,15 @@ namespace BookStore
             {
                 StatusText.Text = "Error searching books: " + ex.Message;
             }
+        }
+
+        //NAME: DisplayAllBooks_Click
+        //DESCRIPTION: Reloads the book list from the database.
+        //PARAMETERS: object sender, RoutedEventArgs e
+        //RETURN: void
+        private void DisplayAllBooks_Click(object? sender, RoutedEventArgs? e)
+        {
+            RefreshBookList();
         }
 
         //NAME: RefreshBookList
@@ -354,8 +369,9 @@ namespace BookStore
                 List<Category> categories = _categoryRepo.GetAll();
                 BookCategoryComboBox.ItemsSource = categories;
                 // If we want to default select the first one?
-                if (categories.Count > 0)
-                    BookCategoryComboBox.SelectedIndex = 0;
+                // if (categories.Count > 0)
+                //    BookCategoryComboBox.SelectedIndex = 0;
+                 BookCategoryComboBox.SelectedIndex = -1;  // Request: Start with nothing selected
             }
             catch (Exception ex)
             {
@@ -442,10 +458,9 @@ namespace BookStore
                 float.TryParse(price, out numericPrice);
                 int.TryParse(stock, out numericStock);
                 
-                // TODO: Handle Publisher properly (find ID by name or insert new publisher)
-                // For now we will just use a default ID or try to parse if user entered ID 
-                // Since UI is text box, let's assume for prototype we need to fix this later or assume ID 1.
-                int pubId = 1; 
+                // Get or create publisher by name
+                string publisherName = BookPublisherTextBox.Text;
+                int pubId = _bookRepo.GetOrCreatePublisherId(publisherName);
                 int catId = 1;
                 
                 if (BookCategoryComboBox.SelectedValue != null)
@@ -498,6 +513,7 @@ namespace BookStore
                         StatusText.Text = "Book Added Successfully.";
                         ClearUIInput();
                         RefreshBookList();
+                        RefreshOrderBookGrid();
                     }
                     catch (Exception ex)
                     {
@@ -547,6 +563,38 @@ namespace BookStore
             catch (Exception)
             {
                 // StatusText might be null if called too early
+            }
+        }
+
+        //NAME: RefreshOrderBookGrid
+        //DESCRIPTION: Refreshes the book list in the Order tab.
+        //PARAMETERS: None
+        //RETURN: void
+        private void RefreshOrderBookGrid()
+        {
+            try
+            {
+                OrderBookGrid.ItemsSource = _bookRepo.GetAll();
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = "Error refreshing order book grid: " + ex.Message;
+            }
+        }
+
+        //NAME: RefreshOrderCustomerGrid
+        //DESCRIPTION: Refreshes the customer list in the Order tab.
+        //PARAMETERS: None
+        //RETURN: void
+        private void RefreshOrderCustomerGrid()
+        {
+            try
+            {
+                OrderCustomerGrid.ItemsSource = _customerRepo.GetAll();
+            }
+            catch (Exception ex)
+            {
+                StatusText.Text = "Error refreshing order customer grid: " + ex.Message;
             }
         }
 
