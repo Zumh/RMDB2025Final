@@ -9,74 +9,89 @@
 
 using MySql.Data.MySqlClient;
 using System.Data;
+using System.Windows;
 
 namespace BookStore
 {
+    /*
+   * Class: DBManager
+   * Purpose: The DBManager class has been created to manage all database connections
+     *  and operations for the bookstore system. It provides methods to execute
+     *  SQL commands that either modify data (ExecuteNonQuery) or retrieve data
+     *  (DataBaseQuery). The class handles opening and closing database connections,
+     *  parameterized queries, and error handling, allowing other parts of the
+     *  application to interact with the database in a consistent and safe manner.
+     */
+
     internal class DBManager
     {
-        static public string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
+        public static string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
+        MySqlConnection connection = new(connectionString);
 
-        static public string BuildConnectionString (string name, string password, string database)
+        //NAME: ExecuteNonQuery
+        //DESCRIPTION: Executes a SQL command that does not return data
+        //PARAMETERS: string query. Dictionary<string, string> parameters = null
+        //RETURN: command.ExecuteNonQuery(), or -1 if there was an error.
+        public int ExecuteNonQuery(string query, Dictionary<string, string>? parameters = null)
         {
-             return $"Server=localhost;Port=3306;Uid={name};Pwd={password};Database={database};";
+            try
+            {
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        if (parameters != null)
+                        {
+                            foreach (var param in parameters)
+                            {
+                                command.Parameters.AddWithValue(param.Key, param.Value);
+                            }
+                        }
+                        return command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+                return -1;
+            }
         }
 
         //NAME: DataBaseQuery
-        //DESCRIPTION: takes the query string and sends it to the database to retreive data
-        //PARAMETERS: string query - mySQL statement used to query the database
-        //RETURN: DataTable - datatable with relevant search results
-        public DataTable DataBaseQuery(string query)
+        //DESCRIPTION: Executes a SQL command that returns data
+        //PARAMETERS: string query. string[] parameters =null
+        //RETURN: dataTable
+        public DataTable DataBaseQuery(string query, string[]? parameters = null)
         {
-            
             DataTable dataTable = new DataTable();
             try
             {
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
-
-                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(query, connection))
-                    {
-                        adapter.Fill(dataTable); // Fill the DataTable with results
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error: " + ex.Message);
-            }
-            return dataTable;
-        }
-
-        //NAME: DataBaseCRUD
-        //DESCRIPTION: takes the query string and performs various CRUD operations on the database
-        //PARAMETERS: string query - mySQL statement used to perform the operation on the database
-        //RETURN: void
-        public static int DataBaseCRUD(string query)
-        {
-            //default set to error value
-            int result = -1;
-            try
-            {
-                //create connection
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    //open connection
-                    connection.Open();
-                    //create command object
                     using (MySqlCommand command = new MySqlCommand(query, connection))
                     {
-                        //get return value
-                        result = command.ExecuteNonQuery();
+                        if (parameters != null)
+                        {
+                            for (int i = 0; i < parameters.Length; i += 2)
+                            {
+                                command.Parameters.AddWithValue(parameters[i], parameters[i + 1]);
+                            }
+                        }
+                        using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+                        {
+                            adapter.Fill(dataTable);
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                MessageBox.Show("Error: " + ex.Message);
             }
-
-            return result;
+            return dataTable;
         }
     }
 }

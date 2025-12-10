@@ -9,22 +9,37 @@ using System.Data;
 
 namespace BookStore
 {
+
+
+    /*
+     * Class: Book
+     * Purpose: The Book class has been created to accurately model a single book record
+    *  within the bookstore system. The Book class contains members to track key
+    *  information such as the book ID, publisher, category, title, ISBN, author,
+    *  price, and stock quantity. The Book class also provides validation methods
+    *  to ensure that book data entered by the user is correct before being stored
+    *  or processed. In addition, the Book class supports loading book data from
+    *  a database into an in-memory collection for easy access by other parts of
+    *  the application.
+    */
+
     internal class Book
     {
         public int BookID { get; set; }
         public int PublisherID { get; set; }
         public int CategoryID { get; set; }
         public string? Title { get; set; }
-        public double ISBN { get; set; }
-        public float Price { get; set; }
+        public string? ISBN { get; set; }
+        public string? Author { get; set; }
+        public decimal Price { get; set; }
         public int Stock { get; set; }
 
         static public List<Book> _books = new List<Book>();
 
         //NAME: ValidateBookTitle
-        //DESCRIPTION: Validates the title is not blank
-        //PARAMETERS: string author - author of the book
-        //RETURN: bool isValid - true if author is valid otherwise false
+        //DESCRIPTION: Checks if the book title is empty.
+        //PARAMETERS: string bookName
+        //RETURN: isValid
         public static bool ValidateBookTitle (string bookName)
         {
             bool isValid = true;
@@ -36,9 +51,9 @@ namespace BookStore
         }
 
         //NAME: ValidateIBSN
-        //DESCRIPTION: Validates the IBSN is not blank, an int type, and not negative
-        //PARAMETERS: string ibsn - IBSN number of the book
-        //RETURN: bool isValid - true if IBSN is valid otherwise false
+        //DESCRIPTION: Checks if the ISBN is 13 numbers long and not negative.
+        //PARAMETERS: string ibsn
+        //RETURN: isValid
         public static bool ValidateIBSN(string ibsn)
         {
             int ibsnLength = 13;
@@ -68,9 +83,9 @@ namespace BookStore
             return isValid;
         }
         //NAME: ValidatePrice
-        //DESCRIPTION: Validates the price is not blank, a float type, and not negative
-        //PARAMETERS: string price - price value of book
-        //RETURN: bool isValid - true if price is valid otherwise false
+        //DESCRIPTION: Checks if the price is a valid number and not negative.
+        //PARAMETERS: string price
+        //RETURN: isValid
         public static bool ValidatePrice(string price)
         {
             bool isValid = true;
@@ -92,9 +107,9 @@ namespace BookStore
             return isValid;
         }
         //NAME: ValidateStock
-        //DESCRIPTION: Validates the stock is not blank, an int type, and not negative
-        //PARAMETERS: string stock - stock value of books
-        //RETURN: bool isValid - true if stock is valid otherwise false
+        //DESCRIPTION: Checks if the stock amount is a number and not negative.
+        //PARAMETERS: string stock
+        //RETURN: isValid
         public static bool ValidateStock(string stock)
         {
             bool isValid = true;
@@ -118,8 +133,8 @@ namespace BookStore
         }
 
         //NAME: LoadBookData
-        //DESCRIPTION: Adds the books from the database to the books List
-        //PARAMETERS: DataTable data - customer data from database
+        //DESCRIPTION: Gets book data from the database and puts it into a list.
+        //PARAMETERS: DataTable data
         //RETURN: void
         public static void LoadBookData(DataTable data)
         {
@@ -132,8 +147,8 @@ namespace BookStore
                     PublisherID = Convert.ToInt32(row["publisherID"]),
                     CategoryID = Convert.ToInt32(row["categoryID"]),
                     Title = row["title"].ToString(),
-                    ISBN = Convert.ToInt64(row["isbn"]),
-                    Price = Convert.ToInt32(row["price"]),
+                    ISBN = row["isbn"].ToString(),
+                    Price = Convert.ToDecimal(row["price"]),
                     Stock = Convert.ToInt32(row["stock"])
                 });
             }
