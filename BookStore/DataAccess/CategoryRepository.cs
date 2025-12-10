@@ -7,8 +7,7 @@ This class manages category data in the database.
 It is used to get all categories and create default ones if needed.
 */
 
-using System;
-using System.Collections.Generic;
+
 using System.Data;
 
 namespace BookStore.DataAccess

@@ -7,12 +7,7 @@ This class handles customer data operations.
 It allows saving new customers and finding existing ones.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BookStore.Entities;
+
 using System.Data;
 
 namespace BookStore.DataAccess

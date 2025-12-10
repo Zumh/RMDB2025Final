@@ -7,11 +7,7 @@ This class represents the company that publishes the books.
 It stores the publisher's name and other details.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BookStore.Entities
 {

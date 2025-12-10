@@ -7,10 +7,9 @@ This class handles all database operations for books.
 It allows adding, updating, deleting, and searching for books.
 */
 
-using System;
-using System.Collections.Generic;
+
 using System.Data;
-using MySql.Data.MySqlClient;
+
 
 namespace BookStore.DataAccess
 {
