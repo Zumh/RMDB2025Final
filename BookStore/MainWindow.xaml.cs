@@ -376,10 +376,20 @@ namespace BookStore
             }
             if(e.PropertyName == "PublisherID")
             {
-                e.Column.IsReadOnly = true;
+                e.Column.Visibility = Visibility.Collapsed;
             }
             if (e.PropertyName == "CategoryID")
             {
+                 e.Column.Visibility = Visibility.Collapsed;
+            }
+            if (e.PropertyName == "PublisherName")
+            {
+                e.Column.Header = "Publisher";
+                e.Column.IsReadOnly = true;
+            }
+            if (e.PropertyName == "CategoryName")
+            {
+                e.Column.Header = "Category";
                 e.Column.IsReadOnly = true;
             }
         }

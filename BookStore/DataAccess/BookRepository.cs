@@ -30,6 +30,10 @@ namespace BookStore.DataAccess
 
         // Flag to check if we've already verified the column
         private static bool _authorColumnChecked = false;
+        
+        // Cache for column names
+        private static string _publisherNameCol = "";
+        private static string _categoryNameCol = "";
 
         //NAME: EnsureAuthorColumnExists
         //DESCRIPTION: Checks if the 'author' column exists in the database and adds it if missing.
@@ -56,6 +60,66 @@ namespace BookStore.DataAccess
                 // silently fail or maybe DB user doesn't have permissions
             }
         }
+        
+        private string GetPublisherNameColumn()
+        {
+            if (!string.IsNullOrEmpty(_publisherNameCol)) return _publisherNameCol;
+            
+            try 
+            {
+                DataTable dt = db.DataBaseQuery("SELECT * FROM publisher LIMIT 1");
+                if (dt != null)
+                {
+                    if (dt.Columns.Contains("publisherName")) _publisherNameCol = "publisherName";
+                    else if (dt.Columns.Contains("name")) _publisherNameCol = "name";
+                    else if (dt.Columns.Contains("Title")) _publisherNameCol = "Title";
+                    else if (dt.Columns.Contains("content")) _publisherNameCol = "content";
+                    else if (dt.Columns.Count >= 2) _publisherNameCol = dt.Columns[1].ColumnName; // Fallback
+                    else _publisherNameCol = "name";
+                }
+                else
+                {
+                     _publisherNameCol = "name";
+                }
+            } 
+            catch { _publisherNameCol = "name"; }
+            
+            return _publisherNameCol;
+        }
+
+        private string GetCategoryNameColumn()
+        {
+            if (!string.IsNullOrEmpty(_categoryNameCol)) return _categoryNameCol;
+
+            try
+            {
+                DataTable dt = db.DataBaseQuery("SELECT * FROM category LIMIT 1");
+                if (dt != null)
+                {
+                    if (dt.Columns.Contains("name")) _categoryNameCol = "name";
+                    else if (dt.Columns.Contains("CategoryName")) _categoryNameCol = "CategoryName";
+                    else if (dt.Columns.Contains("categoryName")) _categoryNameCol = "categoryName";
+                    else if (dt.Columns.Contains("Title")) _categoryNameCol = "Title";
+                    else if (dt.Columns.Contains("Genre")) _categoryNameCol = "Genre";
+                    else if (dt.Columns.Count >= 2) _categoryNameCol = dt.Columns[1].ColumnName; // Fallback
+                    else _categoryNameCol = "name";
+                }
+                 else
+                {
+                     _categoryNameCol = "name";
+                }
+            }
+            catch { _categoryNameCol = "name"; }
+
+            return _categoryNameCol;
+        }
+
+        private string GetBaseSelectQuery()
+        {
+            string pCol = GetPublisherNameColumn();
+            string cCol = GetCategoryNameColumn();
+            return $"SELECT b.*, p.{pCol} AS PublisherName, c.{cCol} AS CategoryName FROM book b LEFT JOIN publisher p ON b.publisherID = p.id LEFT JOIN category c ON b.categoryID = c.id";
+        }
 
         //NAME: GetAll
         //DESCRIPTION: Gets all books from the database.
@@ -65,7 +129,7 @@ namespace BookStore.DataAccess
         {
             EnsureAuthorColumnExists();
             List<Book> books = new List<Book>();
-            DataTable data = db.DataBaseQuery("SELECT * FROM book");
+            DataTable data = db.DataBaseQuery(GetBaseSelectQuery());
             if (data != null)
             {
                 foreach (DataRow row in data.Rows)
@@ -82,7 +146,7 @@ namespace BookStore.DataAccess
         //RETURN: MapRowToBook(data.Rows[0]), or null if not found.
         public Book? GetById(int bookId)
         {
-            string query = "SELECT * FROM book WHERE id = @id";
+            string query = $"{GetBaseSelectQuery()} WHERE b.id = @id";
             DataTable data = db.DataBaseQuery(query, new[] { "@id", bookId.ToString() });
             if (data?.Rows.Count > 0)
             {
@@ -98,7 +162,7 @@ namespace BookStore.DataAccess
         public List<Book> SearchByTitle(string title)
         {
             List<Book> books = new List<Book>();
-            string query = "SELECT * FROM book WHERE title LIKE @title";
+            string query = $"{GetBaseSelectQuery()} WHERE b.title LIKE @title";
             DataTable data = db.DataBaseQuery(query, new[] { "@title", $"%{title}%" });
             if (data != null)
             {
@@ -117,7 +181,7 @@ namespace BookStore.DataAccess
         public List<Book> SearchByAuthor(string author)
         {
             List<Book> books = new List<Book>();
-            string query = "SELECT * FROM book WHERE author LIKE @author";
+            string query = $"{GetBaseSelectQuery()} WHERE b.author LIKE @author";
             DataTable data = db.DataBaseQuery(query, new[] { "@author", $"%{author}%" });
             if (data != null)
             {
@@ -136,7 +200,7 @@ namespace BookStore.DataAccess
         public List<Book> SearchByCategory(int categoryId)
         {
             List<Book> books = new List<Book>();
-            string query = "SELECT * FROM book WHERE categoryID = @categoryId";
+            string query = $"{GetBaseSelectQuery()} WHERE b.categoryID = @categoryId";
             DataTable data = db.DataBaseQuery(query, new[] { "@categoryId", categoryId.ToString() });
             if (data != null)
             {
@@ -155,23 +219,23 @@ namespace BookStore.DataAccess
         public List<Book> Search(string title, string author, string isbn, string price, int categoryId)
         {
             List<Book> books = new List<Book>();
-            string query = "SELECT * FROM book WHERE 1=1";
+            string query = $"{GetBaseSelectQuery()} WHERE 1=1";
 
             if (!string.IsNullOrWhiteSpace(title))
-                query += $" AND title LIKE '%{title}%'";
+                query += $" AND b.title LIKE '%{title}%'";
             if (!string.IsNullOrWhiteSpace(author))
-                query += $" AND author LIKE '%{author}%'";
+                query += $" AND b.author LIKE '%{author}%'";
             if (!string.IsNullOrWhiteSpace(isbn))
-                query += $" AND isbn LIKE '%{isbn}%'";
+                query += $" AND b.isbn LIKE '%{isbn}%'";
             
             if (decimal.TryParse(price, out decimal p))
             {
-               query += $" AND price = {p}";
+               query += $" AND b.price = {p}";
             }
 
             if (categoryId > 0)
             {
-                query += $" AND categoryID = {categoryId}";
+                query += $" AND b.categoryID = {categoryId}";
             }
 
             DataTable data = db.DataBaseQuery(query);
@@ -264,8 +328,11 @@ namespace BookStore.DataAccess
                 ISBN = row["isbn"].ToString(),
                 Price = Convert.ToDecimal(row["price"]),
                 Stock = Convert.ToInt32(row["stock"]),
-                Author = row.Table.Columns.Contains("author") && row["author"] != DBNull.Value ? row["author"].ToString() : ""
+                Author = row.Table.Columns.Contains("author") && row["author"] != DBNull.Value ? row["author"].ToString() : "",
+                PublisherName = row.Table.Columns.Contains("PublisherName") && row["PublisherName"] != DBNull.Value ? row["PublisherName"].ToString() : "",
+                CategoryName = row.Table.Columns.Contains("CategoryName") && row["CategoryName"] != DBNull.Value ? row["CategoryName"].ToString() : ""
             };
         }
     }
 }
+
