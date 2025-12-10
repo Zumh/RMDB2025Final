@@ -7,16 +7,22 @@ This class manages orders in the database.
 It handles creating orders, saving order details, and searching order history.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using BookStore.Entities;
 using System.Data;
 
 namespace BookStore.DataAccess
 {
+    /*
+    * Class: OrderRepository
+    Purpose:  The OrderRepository class has been created to manage all database operations
+    *  related to customer orders. This class is responsible for creating new orders
+    *  and their associated order details, as well as retrieving, searching, and
+    *  deleting order records. It acts as a bridge between the application’s business
+    *  logic and the database by handling SQL queries, data loading, and object
+    *  mapping. The OrderRepository class ensures that order information is stored,
+    *  retrieved, and maintained in a consistent and reliable manner.
+    */
     internal class OrderRepository
     {
         private DBManager db = new DBManager();
