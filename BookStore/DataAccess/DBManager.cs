@@ -13,6 +13,16 @@ using System.Windows;
 
 namespace BookStore
 {
+    /*
+   * Class: DBManager
+   * Purpose: The DBManager class has been created to manage all database connections
+     *  and operations for the bookstore system. It provides methods to execute
+     *  SQL commands that either modify data (ExecuteNonQuery) or retrieve data
+     *  (DataBaseQuery). The class handles opening and closing database connections,
+     *  parameterized queries, and error handling, allowing other parts of the
+     *  application to interact with the database in a consistent and safe manner.
+     */
+
     internal class DBManager
     {
         public static string connectionString = "Server=localhost;Port=3306;Uid=root;Pwd=123456;Database=BookStore;";
@@ -22,7 +32,7 @@ namespace BookStore
         //DESCRIPTION: Executes a SQL command that does not return data
         //PARAMETERS: string query. Dictionary<string, string> parameters = null
         //RETURN: command.ExecuteNonQuery(), or -1 if there was an error.
-        public int ExecuteNonQuery(string query, Dictionary<string, string> parameters = null)
+        public int ExecuteNonQuery(string query, Dictionary<string, string>? parameters = null)
         {
             try
             {
@@ -53,7 +63,7 @@ namespace BookStore
         //DESCRIPTION: Executes a SQL command that returns data
         //PARAMETERS: string query. string[] parameters =null
         //RETURN: dataTable
-        public DataTable DataBaseQuery(string query, string[] parameters = null)
+        public DataTable DataBaseQuery(string query, string[]? parameters = null)
         {
             DataTable dataTable = new DataTable();
             try

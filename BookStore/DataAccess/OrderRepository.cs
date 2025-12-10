@@ -17,6 +17,16 @@ using System.Data;
 
 namespace BookStore.DataAccess
 {
+    /*
+    * Class: OrderRepository
+    Purpose:  The OrderRepository class has been created to manage all database operations
+    *  related to customer orders. This class is responsible for creating new orders
+    *  and their associated order details, as well as retrieving, searching, and
+    *  deleting order records. It acts as a bridge between the application’s business
+    *  logic and the database by handling SQL queries, data loading, and object
+    *  mapping. The OrderRepository class ensures that order information is stored,
+    *  retrieved, and maintained in a consistent and reliable manner.
+    */
     internal class OrderRepository
     {
         private DBManager db = new DBManager();

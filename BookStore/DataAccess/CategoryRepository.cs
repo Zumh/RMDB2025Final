@@ -13,6 +13,16 @@ using System.Data;
 
 namespace BookStore.DataAccess
 {
+    /*
+* Class: CategoryRepository
+* Purpose: The CategoryRepository class has been created to manage all database
+ *  operations related to book categories within the bookstore system. It
+ *  provides methods to retrieve all categories, determine the correct
+ *  column names dynamically, and seed default categories into the database
+ *  if they are missing. This class ensures consistent access and management
+ *  of category data while handling variations in database schema.
+ */
+
     public class CategoryRepository
     {
         private DBManager db = new DBManager();
